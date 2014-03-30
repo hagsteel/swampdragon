@@ -1,0 +1,29 @@
+{% extends 'bootstrap_base.html' %}
+
+{% block main_content %}
+    <div class="col-md-6" ng-controller="ChatCtrl">
+        <form method="post" class="form-inline">
+            <div class="form-group">
+                <input type="text" class="form-control" ng-model="name" placeholder="name" autofocus="true">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" ng-model="message" placeholder="message">
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" ng-click="sendMessage();">chat</button>
+            </div>
+
+            <div>
+                {$ errors.name $}
+                {$ errors.message $}
+            </div>
+        </form>
+
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="m in messages">
+                <span class="label label-primary">{$ m.name $} says</span> {$ m.message $}
+            </li>
+        </ul>
+    </div>
+{% endblock main_content %}

@@ -1,0 +1,20 @@
+{% extends 'bootstrap_base.html' %}
+
+{% block main_content %}
+    <div class="col-md-6" ng-controller="CompanyCtrl">
+        <ul>
+            <li ng-repeat="company in datasource">
+                {$ company.name $}
+                {$ company.companyowner.name $}
+                <ul>
+                    <li ng-repeat="s in company.staff">
+                        {$ s.name $}
+                        <ul>
+                            <li ng-repeat="d in s.documents">{$ d.title $}</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+{% endblock main_content %}

@@ -1,0 +1,9 @@
+*.log
+*.pot
+*.pyc
+local_settings.py
+.idea/
+dev.sqlite
+dev.sqlite3
+static_root/
+media/
