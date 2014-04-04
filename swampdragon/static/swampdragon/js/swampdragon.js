@@ -19,7 +19,7 @@ var SwampDragon = function(options) {
     swampDragon.channels = {};
     swampDragon.connectionAttempt = 0;
 
-    swampDragon.defaultOnOpen = function() { console.log("open") };
+    swampDragon.defaultOnOpen = function() {  };
     swampDragon.defaultOnMessage = function(e) { };
     swampDragon.defaultOnChannelMessage = function(channel, data) { };
     swampDragon.defaultOnClose = function() {
@@ -183,9 +183,13 @@ var SwampDragon = function(options) {
     swampDragon.emit = function(name, args) {
         swampDragon.events[name] = swampDragon.events[name] || [];
         args = args || [];
-        swampDragon.events[name].forEach(function(fn) {
+        for (var ev in swampDragon.events[name]) {
+            var fn = swampDragon.events[name][ev];
             fn.apply(this, args);
-        });
+        }
+//        swampDragon.events[name].forEach(function(fn) {
+//            fn.apply(this, args);
+//        });
     };
 
     return swampDragon;
