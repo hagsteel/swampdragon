@@ -16,6 +16,7 @@ It allows data to be published to channels via routers and does all the heavy li
 
 
 #TODO
+*  Auto discover routes returns URLs and needs to be renamed
 *  Important note about related serializers
 *  Write documentation
 *  Add instructions for swampDragon.call = function(verb, route, channel, args, callbackName)

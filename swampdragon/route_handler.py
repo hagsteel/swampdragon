@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+from tornado.web import HTTPError, RequestHandler
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
@@ -10,16 +12,39 @@ class UnexpectedVerbException(Exception):
     pass
 
 
-class BaseRouter(object):
+class FileUploadHandler(RequestHandler):
+    def get(self, *args, **kwargs):
+        self.write('hola hombre')
+
+    def post(self, *args, **kwargs):
+        import ipdb;ipdb.set_trace()
+        files = self.request.files
+        self.write('ok\n')
+
+    def options(self, *args, **kwargs):
+        import ipdb;ipdb.set_trace()
+
+
+    def file_upload(self, request):
+        pass
+
+
+class BaseRouter(FileUploadHandler):
     valid_verbs = ['get_list', 'get_single', 'create', 'update', 'delete', 'subscribe', 'unsubscribe']
     serializer_class = None
     serializer = None
     route_name = None
     permission_class = None
 
-    def __init__(self, connection):
+    def __init__(self, connection, request=None, **kwargs):
+        if request is not None:
+            super(BaseRouter, self).__init__(connection, request, **kwargs)
+        if request:
+            # This is a normal web request so we won't have a connection
+            return
+        else:
+            self.connection = connection
         self.context = dict()
-        self.connection = connection
 
     def make_channel_data(self, client_channel, server_channels):
         return {'local_channel': client_channel, 'remote_channels': server_channels}
@@ -36,7 +61,6 @@ class BaseRouter(object):
         kwargs = data.get('args', {})
         client_callback_name = data.get('callbackname')
         self.context['client_callback_name'] = client_callback_name,
-
         if verb in self.valid_verbs:
             m = getattr(self, verb)
             if self.permission_class:
@@ -45,7 +69,7 @@ class BaseRouter(object):
                     return
             m(**kwargs)
         else:
-            raise UnexpectedVerbException('Unexpected verb: {}'.format(verb))
+            raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
 
     def get_list(self, **kwargs):
         raise NotImplemented()

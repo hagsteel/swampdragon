@@ -47,7 +47,7 @@ class Command(BaseCommand):
 
         HOST = options['host']
         PORT = int(options['port'])
-        urls = []
+        urls = autodiscover_routes()
         for router in routers:
             urls += router.urls
 
@@ -55,10 +55,9 @@ class Command(BaseCommand):
         app.listen(PORT, address=HOST, no_keep_alive=options['no_keep_alive'])
         print('Running sock app on {}:{}'.format(HOST, PORT))
         try:
-            autodiscover_routes()
             iol = ioloop.IOLoop.instance()
             # ioloop.IOLoop.set_blocking_log_threshold(iol, 1)
             iol.start()
         except KeyboardInterrupt:
-            # so you don't think you errored when ^C'ing out
+            # so you don't think you erred when ^C'ing out
             pass

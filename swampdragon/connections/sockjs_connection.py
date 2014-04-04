@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.models import Session
 from sockjs.tornado import SockJSConnection
+from tornado import web
 from ..pubsub_providers.redis_pubsub_provider import RedisPubSubProvider
 from .. import route_handler
 import json
@@ -34,6 +35,9 @@ class SubscriberConnection(SockJSConnection):
     def broadcast(self, clients, message):
         data = self._to_json(message)
         super(SubscriberConnection, self).broadcast(clients, data)
+
+    def get(self):
+        import ipdb;ipdb.set_trace()
 
 
 class DjangoSubscriberConnection(SubscriberConnection):
