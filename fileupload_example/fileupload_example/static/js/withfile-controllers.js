@@ -3,15 +3,6 @@ var WithFileControllers = angular.module('WithFileControllers', ['SwampDragonSer
 WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', function($scope, dataService) {
     $scope.withfile = { a_bool: false };
 
-    $scope.$on('dragonReady', function() {
-//        dataService.getSingle('withfile-route', {id: 1}).then(function(data) {
-//            console.log(data);
-//            $scope.withfile = data;
-//        }).catch(function(errors) {
-//            console.log(errors);
-//        })
-    });
-
     $scope.save = function() {
         var promise = null;
         if ('id' in this.withfile) {
@@ -32,7 +23,6 @@ WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', functio
     $scope.$on("editWithFile", function (ev, wf) {
         $scope.withfile = wf;
     });
-
 }]);
 
 
@@ -50,5 +40,4 @@ WithFileControllers.controller('WithFileListCtrl', ['$scope', 'dataService', fun
     $scope.edit = function(wf) {
         $scope.$root.$broadcast("editWithFile", wf);
     }
-
 }]);
