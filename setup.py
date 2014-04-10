@@ -21,7 +21,8 @@ setup(
         "Tornado",
         "sockjs-tornado",
         "tornado-redis",
-        "redis"
+        "redis",
+        "python-dateutil"
     ],
     classifiers=[
         "Development Status :: Beta",

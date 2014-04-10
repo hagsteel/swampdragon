@@ -1,5 +1,7 @@
-from django.http import HttpResponse
-from tornado.web import HTTPError, RequestHandler
+import json
+from os.path import join
+from os import mkdir
+from tornado.web import RequestHandler
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
@@ -12,18 +14,52 @@ class UnexpectedVerbException(Exception):
     pass
 
 
+def _make_file_id(file_data):
+    return str(abs(hash(file_data)))
+
+
+def make_temp_file_location(file_name, file_id):
+    path = '/tmp/{}'.format(file_id)
+    try:
+        mkdir(path)
+    except:
+        pass
+    return join(path, file_name)
+
+
 class FileUploadHandler(RequestHandler):
+    def _set_access_control(self):
+        origin = self.request.headers['origin']
+        orig_test = origin.split('/')[-1]
+        if ':' in orig_test:
+            orig_test= orig_test.split(':')[0]
+        if not self.request.host.split(':')[0] == orig_test:
+            return
+        self.set_header('Access-Control-Allow-Credentials', True)
+        self.set_header('Access-Control-Allow-Methods', 'POST')
+        self.set_header('Access-Control-Allow-Origin', origin)
+
     def get(self, *args, **kwargs):
-        self.write('hola hombre')
+        self.write('Hello!')
 
     def post(self, *args, **kwargs):
-        import ipdb;ipdb.set_trace()
-        files = self.request.files
-        self.write('ok\n')
+        self._set_access_control()
+        files = self.request.files['uploadedFile']
+        response = {'files': []}
+        for f in files:
+            file_id = _make_file_id(f['body'])
+            file_name = f['filename']
+            named_file = open(make_temp_file_location(file_name, file_id), 'w')
+            named_file.write(f['body'])
+            named_file.close()
+            response['files'].append({
+                'file_id': file_id,
+                'file_name': file_name
+            })
+        self.write(json.dumps(response))
 
     def options(self, *args, **kwargs):
-        import ipdb;ipdb.set_trace()
-
+        self._set_access_control()
 
     def file_upload(self, request):
         pass
@@ -174,7 +210,7 @@ class BaseModelRouter(BaseRouter):
 
     def create(self, **kwargs):
         self.serializer = self.serializer_class(context=self.context, **kwargs)
-        obj = self.model(**kwargs)
+        obj = self.serializer.deserialize(**kwargs) #self.model(**kwargs)
         errors = self.serializer.is_valid(obj)
         if errors:
             self.on_error(errors)

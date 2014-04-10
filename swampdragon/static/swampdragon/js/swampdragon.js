@@ -14,6 +14,7 @@
  */
 var SwampDragon = function(options) {
     var swampDragon = this;
+    window.swampDragon = swampDragon;
     swampDragon.conn = null;
     swampDragon.host = null;
     swampDragon.channels = {};
@@ -64,6 +65,7 @@ var SwampDragon = function(options) {
     }
 
     swampDragon.connect = function(url, channel) {
+        swampDragon.url = url;
         swampDragon.disconnect();
         if (swampDragon.host == null) {
             if (channel.indexOf('/') != 0) {

@@ -1,5 +1,7 @@
 // Originated from http://jsfiddle.net/danielzen/utp7j/
-var uploadFile = function (element, dest) {
+var uploadFile = function (element, dest, uploadComplete) {
+    var that = this;
+    var url = window.swampDragon.url + dest;
     var fd = new FormData();
     for (var i in element.files) {
         fd.append("uploadedFile", element.files[i]);
@@ -9,16 +11,14 @@ var uploadFile = function (element, dest) {
     xhr.addEventListener("load", uploadComplete, false);
     xhr.addEventListener("error", uploadFailed, false);
     xhr.addEventListener("abort", uploadCanceled, false);
-////    xhr.open("POST", "/fileupload")
-    xhr.open("POST", dest, true);
-////    scope.progressVisible = true;
+    xhr.open("POST", url, true);
     xhr.send(fd);
 };
 
-function uploadComplete(evt) {
-    /* This event is raised when the server send back a response */
-    console.log(evt.target.responseText)
-}
+//function uploadCompleteOrig(evt) {
+//    /* This event is raised when the server send back a response */
+//    console.log(evt.target.responseText)
+//}
 
 function uploadFailed(evt) {
     console.log("There was an error attempting to upload the file.")
@@ -32,6 +32,7 @@ function uploadCanceled(evt) {
 }
 
 function uploadProgress(evt) {
+//    console.log(evt);
 //    scope.$apply(function () {
 //        if (evt.lengthComputable) {
 //            scope.progress = Math.round(evt.loaded * 100 / evt.total);
