@@ -14,6 +14,10 @@ It allows data to be published to channels via routers and does all the heavy li
 
 **Note**: All serializers needs to reside in serializers.py
 
+**Note**: Angular doesn't include a checkbox ng-model unless a value is set.
+This means adding a checkbox with ng-model="mymodel.flag" will not be included when submitting data,
+unless the checkbox is ticked or mymodel is initiated ```scope.mymodel = { flag=false };```
+
 
 #TODO
 *  Auto discover routes returns URLs and needs to be renamed

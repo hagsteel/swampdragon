@@ -1,30 +1,16 @@
 import json
-from os.path import join
-from os import mkdir
 from tornado.web import RequestHandler
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
 from .pubsub_providers.model_publisher import publish_model
+from .file_upload_handler import get_file_location, get_file_url, make_file_id
 
 registered_handlers = {}
 
 
 class UnexpectedVerbException(Exception):
     pass
-
-
-def _make_file_id(file_data):
-    return str(abs(hash(file_data)))
-
-
-def make_temp_file_location(file_name, file_id):
-    path = '/tmp/{}'.format(file_id)
-    try:
-        mkdir(path)
-    except:
-        pass
-    return join(path, file_name)
 
 
 class FileUploadHandler(RequestHandler):
@@ -47,14 +33,15 @@ class FileUploadHandler(RequestHandler):
         files = self.request.files['uploadedFile']
         response = {'files': []}
         for f in files:
-            file_id = _make_file_id(f['body'])
+            file_id = make_file_id(f['body'])
             file_name = f['filename']
-            named_file = open(make_temp_file_location(file_name, file_id), 'w')
+            named_file = open(get_file_location(file_name, file_id), 'w')
             named_file.write(f['body'])
             named_file.close()
             response['files'].append({
                 'file_id': file_id,
-                'file_name': file_name
+                'file_name': file_name,
+                'file_url': get_file_url(file_name, file_id)
             })
         self.write(json.dumps(response))
 
@@ -167,6 +154,14 @@ class BaseRouter(FileUploadHandler):
             self.connection.pub_sub.publish(channel, publish_data)
 
 
+def replace_original_with_data(kwargs):
+    keys = [key for key in kwargs.keys() if '__' in key]
+    for key in keys:
+        val = kwargs.pop(key)
+        kwargs[key.split('__')[0]] = val
+    return kwargs
+
+
 class BaseModelRouter(BaseRouter):
     model = None
     instance = None
@@ -209,12 +204,15 @@ class BaseModelRouter(BaseRouter):
         self.send_error(errors)
 
     def create(self, **kwargs):
+        kwargs = replace_original_with_data(kwargs)
         self.serializer = self.serializer_class(context=self.context, **kwargs)
         obj = self.serializer.deserialize(**kwargs) #self.model(**kwargs)
+
         errors = self.serializer.is_valid(obj)
         if errors:
             self.on_error(errors)
             return
+
         obj.save()
         self.serializer.instance = obj
         self.created(obj)
@@ -223,11 +221,11 @@ class BaseModelRouter(BaseRouter):
         self.send(self.serializer.serialize(obj))
 
     def update(self, **kwargs):
+        kwargs = replace_original_with_data(kwargs)
         obj = self.get_object(**kwargs)
         self.serializer = self.serializer_class(context=self.context, instance=obj, **kwargs)
         past_state = self.serializer.serialize()
-        for p in [x for x in self.serializer.get_update_fields() if x in kwargs]:
-            setattr(self.serializer.instance, p, kwargs.get(p))
+        self.serializer.instance = self.serializer.deserialize(obj, **kwargs)
         errors = self.serializer.is_valid(self.serializer.instance)
         if errors:
             self.on_error(errors)

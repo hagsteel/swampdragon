@@ -1,5 +1,6 @@
 from datetime import date
 from decimal import Decimal
+from django.db.models.fields.files import ImageFieldFile, FileField
 from ..serializers.serializer_importer import get_serializer
 from ..models import get_property
 
@@ -91,4 +92,8 @@ class BaseSerializer(object):
             return str(val)
         if isinstance(val, Decimal):
             return str(val)
+        if isinstance(val, ImageFieldFile):
+            return val.url
+        if isinstance(val, FileField):
+            return val.url
         return val

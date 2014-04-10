@@ -75,10 +75,15 @@ class DjangoModelSerializer(BaseSerializer):
         data['_type'] = self._get_type_name()
         return data
 
-    def deserialize(self, **kwargs):
-        model_instance = self._model()()
+    def deserialize(self, obj=None, **kwargs):
+        if obj is None:
+            model_instance = self._model()()
+        else:
+            model_instance = obj
 
         for key, val in kwargs.items():
+            if key not in self.update_fields:
+                continue
             field = model_instance._meta.get_field(key)
             field_type = field.__class__.__name__
             deserializer = get_deserializer(field_type)
@@ -88,6 +93,7 @@ class DjangoModelSerializer(BaseSerializer):
                 setattr(model_instance, key, val)
 
         return model_instance
+
 
     @classmethod
     def get_object_map(cls, include_serializers=None, ignore_serializers=None):

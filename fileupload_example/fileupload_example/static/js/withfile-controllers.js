@@ -1,18 +1,54 @@
 var WithFileControllers = angular.module('WithFileControllers', ['SwampDragonServices']);
 
 WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', function($scope, dataService) {
-    $scope.withfile = {
-        name: 'test',
-        created: '23/12/2014 10:02:23',
-        a_bool: true
-    };
+    $scope.withfile = { a_bool: false };
+
     $scope.$on('dragonReady', function() {
-        $scope.save = function() {
-            dataService.create('withfile-route', this.withfile).then(function(data) {
+//        dataService.getSingle('withfile-route', {id: 1}).then(function(data) {
+//            console.log(data);
+//            $scope.withfile = data;
+//        }).catch(function(errors) {
+//            console.log(errors);
+//        })
+    });
+
+    $scope.save = function() {
+        var promise = null;
+        if ('id' in this.withfile) {
+            promise = dataService.update('withfile-route', this.withfile);
+        } else {
+            promise = dataService.create('withfile-route', this.withfile);
+        }
+
+        if (promise) {
+            promise.then(function(data) {
                 console.log("ok");
             }).catch(function(errors) {
                 console.log(errors);
             })
-        };
+        }
+    };
+
+    $scope.$on("editWithFile", function (ev, wf) {
+        $scope.withfile = wf;
     });
+
+}]);
+
+
+WithFileControllers.controller('WithFileListCtrl', ['$scope', 'dataService', function($scope, dataService) {
+    $scope.datasource = []
+
+    $scope.$on('dragonReady', function() {
+        dataService.getList('withfile-route').then(function(data) {
+            $scope.datasource = data;
+        }).catch(function(errors) {
+            console.log(errors);
+        })
+    });
+
+    $scope.edit = function(wf) {
+        $scope.$root.$broadcast("editWithFile", wf);
+    }
+
 }]);

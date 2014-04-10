@@ -1,8 +1,10 @@
 import dateutil
+from django.conf import settings
 from django.core.files import File
 from os.path import join
 from django.core.files.base import ContentFile
 from dateutil.parser import parse
+from ..route_handler import get_file_location
 
 
 class BaseDeserializer(object):
@@ -12,18 +14,18 @@ class BaseDeserializer(object):
 
 class FileDeserializer(BaseDeserializer):
     def __call__(self, model_instance, key, val):
+        if isinstance(val, unicode) or isinstance(val, str):
+            return
         file_id = int(val['file_id'])
         if not file_id > 0:
             return
-
-        path = join('/tmp', str(file_id))
-        full_path = join(path, val['file_name'])
-        uploaded_file = File(file(full_path))
+        path = get_file_location(val['file_name'], val['file_id'])
+        uploaded_file = File(file(path))
         setattr(model_instance, key, val['file_name'])
         getattr(model_instance, key).save(
             val['file_name'],
             ContentFile(uploaded_file.read()),
-            save=True
+            save=False
         )
 
 

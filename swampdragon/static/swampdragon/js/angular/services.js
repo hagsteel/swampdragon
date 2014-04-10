@@ -53,11 +53,11 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
             return deferred.promise;
         },
 
-        get_list: function (route, data) {
+        getList: function (route, data) {
             return this.callRouter('get_list', route, data)
         },
 
-        get_single: function (route, data) {
+        getSingle: function (route, data) {
             return this.callRouter('get_single', route, data)
         },
 
