@@ -1,12 +1,14 @@
 import json
 import redis
 import tornadoredis.pubsub
+import tornadoredis
 from .base_provider import BaseProvider
 
 
 class RedisPubSubProvider(BaseProvider):
     def __init__(self):
         self._client = redis.StrictRedis()
+        self._async_client = tornadoredis.Client()
         self._subscriber = None
 
     def _get_subscriber(self):
@@ -34,4 +36,4 @@ class RedisPubSubProvider(BaseProvider):
         return self._client.execute_command('PUBSUB', 'channels', '{}*'.format(base_channel))
 
     def publish(self, channel, data):
-        self._client.publish(channel, json.dumps(data))
+        self._async_client.publish(channel, json.dumps(data))

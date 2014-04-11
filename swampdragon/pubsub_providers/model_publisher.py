@@ -5,6 +5,7 @@ from ..pubsub_providers.model_channel_builder import filter_channels_by_model, f
 def publish_model(model_instance, serializer, publisher, action, changes=None):
     if action is PUBACTIONS.updated and not changes:
         return
+
     base_channel = serializer.get_base_channel()
     all_model_channels = publisher.get_channels(base_channel)
     channels = filter_channels_by_model(all_model_channels, model_instance)
@@ -18,9 +19,11 @@ def publish_model(model_instance, serializer, publisher, action, changes=None):
 
     if changes:
         previous_relevant_channels = filter_channels_by_dict(all_model_channels, changes)
+        remove_from_channels = list(set(previous_relevant_channels) - set(channels))
+        if not remove_from_channels:
+            return
         publish_data = dict({'data': {'id': model_instance.pk}})
         publish_data['action'] = PUBACTIONS.deleted
-        remove_from_channels = list(set(previous_relevant_channels) - set(channels))
         for c in remove_from_channels:
             publish_data['channel'] = c
             publisher.publish(c, publish_data)
