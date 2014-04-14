@@ -233,7 +233,7 @@ class TestModelRouter(WebTest):
         kwargs = {'channel': 'client_chan', 'name': 'foo', }
         self.parent_handler(self.connection).subscribe(**kwargs)
         self.parent_handler(self.connection).update(**{'id': parent.pk, 'name': 'updated'})
-        last_update = json.loads(self.connection.sent_data[-1])
+        last_update = self.connection.get_last_published()
         self.assertEqual(last_update['action'], 'deleted')
 
     def test_specify_related_models_on_subscribe(self):

@@ -25,7 +25,7 @@ class MockPubSubProvider(BaseProvider):
     def publish(self, channel, data):
         connections = self._subscribers.get(channel, [])
         for c in connections:
-            c.send(data)
+            c.publish(data)
 
     def subscribe(self, channels, connection):
         if not isinstance(channels, list):

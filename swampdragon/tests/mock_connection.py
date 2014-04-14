@@ -4,10 +4,9 @@ from django.contrib.auth.models import AnonymousUser
 from .mock_provider import MockPubSubProvider
 from .models import TestUser
 from .. import route_handler
-from ..connections.sockjs_connection import ConnectionMixin
 
 
-class TestConnection(ConnectionMixin):
+class TestConnection(object):
     uid = None
 
     def __init__(self, user=AnonymousUser()):
@@ -25,7 +24,8 @@ class TestConnection(ConnectionMixin):
         self.published_data.append(json.dumps(message))
 
     def client_send(self, data):
-        data = self.to_json(data)
+        if not isinstance(data, dict):
+            data = json.loads(data)
         handler = route_handler.get_route_handler(data['route'])
         handler(self).handle(data)
 
@@ -37,13 +37,18 @@ class TestConnection(ConnectionMixin):
             return None
         return self.to_json(self.sent_data[-1])
 
-    def get_last_data(self):
-        if not self.sent_data:
+    def get_last_published(self):
+        if not self.published_data:
             return None
-        data = self.to_json(self.sent_data[-1])
-        if 'data' in data and data['data']:
-            return data['data']
-        return None
+        if isinstance(self.published_data[-1], dict):
+            return self.published_data[-1]
+        return json.loads(self.published_data[-1])
+
+    def get_last_published_data(self):
+        last_pub = self.get_last_published()
+        if last_pub is None:
+            return None
+        return last_pub['data']
 
 
 class TestConnectionWithUser(TestConnection):

@@ -63,7 +63,7 @@ class TestSelfPubModel(WebTest):
         kwargs = {'channel': 'client_chan', }
         self.company_handler(self.connection).subscribe(**kwargs)
         foo = Company.objects.create(name='foo', age=33)
-        json_data = json.loads(self.connection.sent_data[-1])['data']
+        json_data = self.connection.get_last_published_data()
         serialized_foo = foo.serializer_class().serialize(foo)
         self.assertDictEqual(serialized_foo, json_data)
 
@@ -71,7 +71,7 @@ class TestSelfPubModel(WebTest):
         kwargs = {'channel': 'client_chan', }
         self.foo_abs_handler(self.connection).subscribe(**kwargs)
         foo = FooWithAbstractBase.objects.create(name='foo')
-        json_data = json.loads(self.connection.sent_data[-1])['data']
+        json_data = self.connection.get_last_published_data()
         serialized_foo = foo.serializer_class().serialize(foo)
         self.assertDictEqual(serialized_foo, json_data)
 
@@ -94,7 +94,7 @@ class TestSelfPubModel(WebTest):
         foo.age = 34
         foo.save()
 
-        self.assertGreater(len(self.connection.sent_data), 0)
+        self.assertGreater(len(self.connection.published_data), 0)
 
     def test_publish_based_on_children(self):
         kwargs = {'channel': 'client_chan', 'name__contains': 'foo'}
@@ -108,7 +108,7 @@ class TestSelfPubModel(WebTest):
         self.connection.sent_data = []
         department.name = 'updated'
         department.save()
-        self.assertGreater(len(self.connection.sent_data), 0)
+        self.assertGreater(len(self.connection.published_data), 0)
 
     def test_no_publish_based_on_childrens_children(self):
         kwargs = {'channel': 'client_chan', 'id': 1}
@@ -150,7 +150,7 @@ class TestSelfPubModel(WebTest):
             document.staff.add(staff_b)
         document.name = 'test doc updated'
         document.save()
-        self.assertEqual(len(self.connection.sent_data), 3)
+        self.assertEqual(len(self.connection.published_data), 3)
 
     def test_get_m2m_fields(self):
         fields = DocumentSerializer._get_publish_m2m_fields()
@@ -181,5 +181,5 @@ class TestSelfPubModel(WebTest):
         self.company_handler(self.connection).subscribe(**kwargs)
         company.name = 'updated'
         company.save()
-        last_update = json.loads(self.connection.sent_data[-1])
+        last_update = self.connection.get_last_published()
         self.assertEqual(last_update['action'], 'deleted')
