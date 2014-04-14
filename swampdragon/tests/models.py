@@ -1,12 +1,12 @@
 from django.db import models
 from ..serializers.django_model_serializer import DjangoModelSerializer
 from ..models import SelfPublishModel
-from .mock_provider import MockProvider
+from .mock_provider import MockPubSubProvider
 from .serializers import CompanySerializer, DepartmentSerializer, StaffSerializer, DocumentSerializer, LogoSerializer
 
 
 class TestSelfPublishModel(SelfPublishModel):
-    publisher_class = MockProvider
+    publisher_class = MockPubSubProvider
 
 
 class CompanyLogo(TestSelfPublishModel, models.Model):

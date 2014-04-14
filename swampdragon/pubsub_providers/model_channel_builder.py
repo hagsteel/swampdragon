@@ -5,7 +5,7 @@ from swampdragon.model_tools import get_property
 
 
 def _construct_channel(base_channel, **channel_filter):
-    sorted_filter_keys = sorted(channel_filter, key=channel_filter.get)
+    sorted_filter_keys = sorted(channel_filter)
     filter_string = '|'.join(['{}:{}'.format(k, make_safe(channel_filter[k])) for k in sorted_filter_keys])
     complete_channel = '{}{}'.format(base_channel, filter_string)
     return complete_channel
@@ -62,9 +62,9 @@ def make_channels(serializer, related_serializers=None, **kwargs):
 def filter_channels_by_model(channels, obj):
     result = []
     for channel in channels:
-        prop = get_property_from_channel(channel)
-        val = get_property(obj, prop)
-        if channel_match_check(channel, {prop: val}):
+        properties = get_property_from_channel(channel)
+        data = {p:get_property(obj, p) for p in properties}
+        if channel_match_check(channel, data):
             result.append(channel)
     return result
 

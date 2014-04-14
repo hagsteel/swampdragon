@@ -153,6 +153,8 @@ class BaseRouter(FileUploadHandler):
             publish_data['channel'] = channel
             self.connection.pub_sub.publish(channel, publish_data)
 
+    def get_subscription_context(self, **kwargs):
+        return dict(kwargs)
 
 def replace_original_with_data(kwargs):
     keys = [key for key in kwargs.keys() if '__' in key]
@@ -250,10 +252,6 @@ class BaseModelRouter(BaseRouter):
 class BaseModelPublisherRouter(BaseModelRouter):
     include_related = []
 
-    # def publish(self, channel, publish_data):
-    #     publish_data['channel'] = channel
-    #     self.connection.pub_sub.publish(channel, publish_data)
-
     def publish_action(self, channels, data, action):
         publish_data = dict({'data': data})
         publish_data['action'] = action
@@ -287,7 +285,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
 
     def subscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
-        server_channels = make_channels(self.serializer_class, self.include_related, **kwargs)
+        server_channels = make_channels(self.serializer_class, self.include_related, **self.get_subscription_context(**kwargs))
         self.send(
             data=self.serializer_class.get_object_map(self.include_related),
             channel_setup=self.make_channel_data(client_channel, server_channels)
@@ -296,7 +294,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
 
     def unsubscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
-        server_channels = make_channels(self.serializer_class, self.include_related, **kwargs)
+        server_channels = make_channels(self.serializer_class, self.include_related, **self.get_subscription_context(**kwargs))
         self.send(data='unsubscribed', channel_setup=self.make_channel_data(client_channel, server_channels))
         self.connection.pub_sub.unsubscribe(server_channels, self.connection)
 

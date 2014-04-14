@@ -2,13 +2,23 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.models import Session
 from sockjs.tornado import SockJSConnection
-from tornado import web
 from ..pubsub_providers.redis_pubsub_provider import RedisPubSubProvider
 from .. import route_handler
 import json
 
 
-class SubscriberConnection(SockJSConnection):
+class ConnectionMixin(object):
+    def to_json(self, data):
+        if isinstance(data, dict):
+            return data
+        try:
+            data = json.loads(data.replace("'", '"'))
+            return data
+        except:
+            return {'message': data}
+
+
+class SubscriberConnection(ConnectionMixin, SockJSConnection):
     def __init__(self, session):
         super(SubscriberConnection, self).__init__(session)
 
@@ -18,26 +28,14 @@ class SubscriberConnection(SockJSConnection):
     def on_close(self):
         self.pub_sub.close()
 
-    def _to_json(self, data):
-        if isinstance(data, dict):
-            return data
-        try:
-            data = json.loads(data.replace("'", '"'))
-            return data
-        except:
-            return {'message': data}
-
     def on_message(self, data):
-        data = self._to_json(data)
+        data = self.to_json(data)
         handler = route_handler.get_route_handler(data['route'])
         handler(self).handle(data)
 
     def broadcast(self, clients, message):
-        data = self._to_json(message)
+        data = self.to_json(message)
         super(SubscriberConnection, self).broadcast(clients, data)
-
-    def get(self):
-        import ipdb;ipdb.set_trace()
 
 
 class DjangoSubscriberConnection(SubscriberConnection):

@@ -11,13 +11,14 @@ def make_safe(val):
 
 
 def get_property_from_channel(channel):
-    filter = channel.split('|')[1].split(':')[0]
-
-    if filter.split('__')[-1] in filter_options.keys():
-        prop = '__'.join(filter.split('__')[:-1])
-    else:
-        prop = '__'.join(filter.split('__'))
-    return prop
+    filters = channel.split('|')[1:]
+    properties = []
+    for filter in [f.split(':')[0] for f in filters]:
+        if filter.split('__')[-1] in filter_options.keys():
+            properties.append('__'.join(filter.split('__')[:-1]))
+        else:
+            properties.append('__'.join(filter.split('__')))
+    return properties
 
 
 def filter_matching_channels(channels, data):
