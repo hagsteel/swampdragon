@@ -88,7 +88,7 @@ class BaseRouter(FileUploadHandler):
             m = getattr(self, verb)
             if self.permission_classes:
                 for permission in self.permission_classes:
-                    if not permission.test_permission(self, verb):
+                    if not permission.test_permission(self, verb, **kwargs):
                         permission.permission_failed(self)
                         return
             m(**kwargs)
