@@ -50,14 +50,24 @@ class TestConnection(object):
             return None
         return last_pub['data']
 
+    def subscribe(self, client_channel, **kwargs):
+        data = {'route': 'notifications', 'verb': 'subscribe', 'args': {'channel': client_channel}}
+        data['args'].update(kwargs)
+        self.client_send(data)
 
-class TestConnectionWithUser(TestConnection):
-    def __init__(self, user=None):
-        super(TestConnectionWithUser, self).__init__()
-        if user is None:
-            self.user = TestUser()
-        else:
-            self.user = user
+    def unsubscribe(self, client_channel, **kwargs):
+        data = {'route': 'notifications', 'verb': 'unsubscribe', 'args': {'channel': client_channel}}
+        data['args'].update(kwargs)
+        self.client_send(data)
 
-    def get_user(self, **kwargs):
-        return self.user
+#
+# class TestConnectionWithUser(TestConnection):
+#     def __init__(self, user=None):
+#         super(TestConnectionWithUser, self).__init__()
+#         if user is None:
+#             self.user = TestUser()
+#         else:
+#             self.user = user
+#
+#     def get_user(self, **kwargs):
+#         return self.user

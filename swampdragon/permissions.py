@@ -12,17 +12,23 @@ def login_required(func):
 
 
 class RoutePermission(object):
-    def test_permission(self, connection, verb, **kwargs):
+    def test_permission(self, handler, verb, **kwargs):
         raise NotImplemented("You need to implement test_permission")
+
+    def permission_failed(self, handler):
+        raise NotImplemented("You need to implement permission_failed")
 
 
 class LoginRequired(RoutePermission):
     def __init__(self, verbs=None):
         self.test_against_verbs = verbs
 
-    def test_permission(self, connection, verb, **kwargs):
+    def test_permission(self, handler, verb, **kwargs):
         if self.test_against_verbs:
             if verb not in self.test_against_verbs:
                 return True
-        user = connection.get_user()
+        user = handler.connection.get_user()
         return not user.is_anonymous()
+
+    def permission_failed(self, handler):
+        handler.send_login_required()

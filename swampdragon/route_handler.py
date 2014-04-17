@@ -57,7 +57,7 @@ class BaseRouter(FileUploadHandler):
     serializer_class = None
     serializer = None
     route_name = None
-    permission_class = None
+    permission_classes = []
 
     def __init__(self, connection, request=None, **kwargs):
         if request is not None:
@@ -86,10 +86,11 @@ class BaseRouter(FileUploadHandler):
         self.context['client_callback_name'] = client_callback_name,
         if verb in self.valid_verbs:
             m = getattr(self, verb)
-            if self.permission_class:
-                if not self.permission_class.test_permission(self.connection, verb):
-                    self.send_login_required()
-                    return
+            if self.permission_classes:
+                for permission in self.permission_classes:
+                    if not permission.test_permission(self, verb):
+                        permission.permission_failed(self)
+                        return
             m(**kwargs)
         else:
             raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
@@ -209,7 +210,6 @@ class BaseModelRouter(BaseRouter):
         kwargs = replace_original_with_data(kwargs)
         self.serializer = self.serializer_class(context=self.context, **kwargs)
         obj = self.serializer.deserialize(**kwargs) #self.model(**kwargs)
-
         errors = self.serializer.is_valid(obj)
         if errors:
             self.on_error(errors)
