@@ -30,3 +30,33 @@ i.e ```MyModel.objects.all().update(foo=bar)``` won't trigger a publishing actio
 *  Add instructions on self publishing models
 *  term_match_check: make sure compared values are of the same type
 *  Filter case sensitivity
+
+
+# Routers
+Routers routes the messages to the right handler.
+
+
+## Route permissions
+
+Route permissions takes a list of permissions
+
+    class FooRoute(BaseRoute):
+        model = FooModel
+        serializer_class = FooModelSerializer
+        route_name = 'foo'
+        permission_classes = [LoginRequired(), CustomPermission()]
+
+You can create your own custom permissions:
+
+    class CustomPermission(RoutePermission):
+        def test_permission(self, handler, verb, **kwargs):
+            if verb == 'update':
+                return False
+            return True
+
+        def permission_failed(self, handler):
+            handler.send_error(data={'message': 'update is not allowed'})
+
+This permission sends an error in case anyone is trying to call the ```update``` verb.
+** Note ** This permission is an example, if updates weren't allowed, then the ```valid_verbs```
+would be a more suitable option.

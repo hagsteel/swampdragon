@@ -35,7 +35,10 @@ class TestConnection(object):
     def get_last_message(self):
         if not self.sent_data:
             return None
-        return self.to_json(self.sent_data[-1])
+        last_message = self.sent_data[-1]
+        if not isinstance(last_message, dict):
+            last_message = json.loads(last_message)
+        return last_message
 
     def get_last_published(self):
         if not self.published_data:
@@ -50,24 +53,21 @@ class TestConnection(object):
             return None
         return last_pub['data']
 
-    def subscribe(self, client_channel, **kwargs):
-        data = {'route': 'notifications', 'verb': 'subscribe', 'args': {'channel': client_channel}}
-        data['args'].update(kwargs)
+    def subscribe(self, route, client_channel, subscription_data):
+        data = {'route': route, 'verb': 'subscribe', 'args': {'channel': client_channel}}
+        data['args'].update(subscription_data)
         self.client_send(data)
 
-    def unsubscribe(self, client_channel, **kwargs):
-        data = {'route': 'notifications', 'verb': 'unsubscribe', 'args': {'channel': client_channel}}
-        data['args'].update(kwargs)
+    def unsubscribe(self, route, client_channel, subscription_data):
+        data = {'route': route, 'verb': 'unsubscribe', 'args': {'channel': client_channel}}
+        data['args'].update(subscription_data)
         self.client_send(data)
 
-#
-# class TestConnectionWithUser(TestConnection):
-#     def __init__(self, user=None):
-#         super(TestConnectionWithUser, self).__init__()
-#         if user is None:
-#             self.user = TestUser()
-#         else:
-#             self.user = user
-#
-#     def get_user(self, **kwargs):
-#         return self.user
+    def create(self, route, data):
+        self.client_send({'route': route, 'verb': 'create', 'args': data})
+
+    def update(self, route, data):
+        self.client_send({'route': route, 'verb': 'update', 'args': data})
+
+    def remove(self, route, data):
+        self.client_send({'route': route, 'verb': 'delete', 'args': data})

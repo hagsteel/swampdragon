@@ -75,24 +75,37 @@ class DjangoModelSerializer(BaseSerializer):
         data['_type'] = self._get_type_name()
         return data
 
-    def deserialize(self, obj=None, **kwargs):
+    def deserialize(self, obj=None, initials=dict(), **kwargs):
         if obj is None:
             model_instance = self._model()()
         else:
             model_instance = obj
 
+        for key, val in initials.items():
+            self.deserialize_field(model_instance, key, val)
+
         for key, val in kwargs.items():
             if key not in self.update_fields:
                 continue
-            field = model_instance._meta.get_field(key)
-            field_type = field.__class__.__name__
-            deserializer = get_deserializer(field_type)
-            if deserializer:
-                deserializer(model_instance, key, val)
-            else:
-                setattr(model_instance, key, val)
+            self.deserialize_field(model_instance, key, val)
+            # field = model_instance._meta.get_field(key)
+            # field_type = field.__class__.__name__
+            # deserializer = get_deserializer(field_type)
+            # if deserializer:
+            #     deserializer(model_instance, key, val)
+            # else:
+            #     setattr(model_instance, key, val)
 
         return model_instance
+
+    def deserialize_field(self, model_instance, key, val):
+        field = model_instance._meta.get_field(key)
+        field_type = field.__class__.__name__
+        deserializer = get_deserializer(field_type)
+        if deserializer:
+            deserializer(model_instance, key, val)
+        else:
+            setattr(model_instance, key, val)
 
 
     @classmethod

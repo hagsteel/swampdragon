@@ -122,6 +122,9 @@ class BaseRouter(FileUploadHandler):
     def deleted(self, obj, **kwargs):
         raise NotImplemented()
 
+    def get_initials(self, verb, **kwargs):
+        return dict()
+
     def send(self, data, channel_setup=None):
         self.context['state'] = 'success'
         self.connection.send(format_message(data=data, context=self.context, channel_setup=channel_setup))
@@ -208,8 +211,9 @@ class BaseModelRouter(BaseRouter):
 
     def create(self, **kwargs):
         kwargs = replace_original_with_data(kwargs)
+        initials = self.get_initials('create', **kwargs)
         self.serializer = self.serializer_class(context=self.context, **kwargs)
-        obj = self.serializer.deserialize(**kwargs) #self.model(**kwargs)
+        obj = self.serializer.deserialize(initials=initials, **kwargs)
         errors = self.serializer.is_valid(obj)
         if errors:
             self.on_error(errors)
@@ -224,10 +228,11 @@ class BaseModelRouter(BaseRouter):
 
     def update(self, **kwargs):
         kwargs = replace_original_with_data(kwargs)
+        initials = self.get_initials('update', **kwargs)
         obj = self.get_object(**kwargs)
         self.serializer = self.serializer_class(context=self.context, instance=obj, **kwargs)
         past_state = self.serializer.serialize()
-        self.serializer.instance = self.serializer.deserialize(obj, **kwargs)
+        self.serializer.instance = self.serializer.deserialize(obj, initials=initials, **kwargs)
         errors = self.serializer.is_valid(self.serializer.instance)
         if errors:
             self.on_error(errors)
@@ -242,11 +247,12 @@ class BaseModelRouter(BaseRouter):
     def delete(self, **kwargs):
         self.serializer = self.serializer_class(context=self.context, **kwargs)
         obj = self.get_object(**kwargs)
+        serialized_obj = self.serializer.serialize(obj)
         obj.delete()
-        self.deleted(obj, **kwargs)
+        self.deleted(serialized_obj)
 
-    def deleted(self, obj, **kwargs):
-        self.send(self.serializer.serialize(obj))
+    def deleted(self, serialized_obj):
+        self.send(serialized_obj)
 
 
 class BaseModelPublisherRouter(BaseModelRouter):
