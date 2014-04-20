@@ -81,11 +81,9 @@ var SwampDragon = function(options) {
         };
 
         swampDragon.conn.onmessage = function(e) {
-//            if ('data' in e && 'context' in e.data && 'state' in e.data.context) {
-//                if (e.data.context.state == "login_required") {
-//                    settings.onloginrequired(e);
-//                }
-//            }
+            if ('data' in e) {
+                e['data'] = JSON.parse(e['data']);
+            }
 
             if ('data' in e && 'context' in e.data && 'client_callback_name' in e.data.context) {
                 swampDragon.emit(e.data.context.client_callback_name, [e.data.context, e.data.data]);

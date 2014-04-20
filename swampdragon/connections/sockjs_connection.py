@@ -15,7 +15,12 @@ class ConnectionMixin(object):
             data = json.loads(data.replace("'", '"'))
             return data
         except:
-            return {'message': data}
+            return json.dumps({'message': data})
+
+    def to_string(self, data):
+        if isinstance(data, dict):
+            return json.dumps(data).replace("'", '"')
+        return data
 
 
 class SubscriberConnection(ConnectionMixin, SockJSConnection):
@@ -33,8 +38,11 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
         handler = route_handler.get_route_handler(data['route'])
         handler(self).handle(data)
 
+    def send(self, message, binary=False):
+        super(SubscriberConnection, self).send(self.to_string(message), binary)
+
     def broadcast(self, clients, message):
-        data = self.to_json(message)
+        data = self.to_string(message)
         super(SubscriberConnection, self).broadcast(clients, data)
 
 

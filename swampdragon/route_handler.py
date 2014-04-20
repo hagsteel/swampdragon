@@ -127,7 +127,8 @@ class BaseRouter(FileUploadHandler):
 
     def send(self, data, channel_setup=None):
         self.context['state'] = 'success'
-        self.connection.send(format_message(data=data, context=self.context, channel_setup=channel_setup))
+        message = format_message(data=data, context=self.context, channel_setup=channel_setup)
+        self.connection.send(message)
 
     def send_error(self, data, channel_setup=None):
         self.context['state'] = 'error'
