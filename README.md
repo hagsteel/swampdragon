@@ -60,3 +60,29 @@ You can create your own custom permissions:
 This permission sends an error in case anyone is trying to call the ```update``` verb.
 ** Note ** This permission is an example, if updates weren't allowed, then the ```valid_verbs```
 would be a more suitable option.
+
+
+# Sessions
+
+Storing values for a period of time is done in the session store.
+The default session store is RedisSessionStore, which reads and writes to Redis
+
+To create your own session store, inherit from ```BaseSessionStore```.
+Assign the store by setting ```DRAGON_SESSION_STORE``` in your settings file.
+
+i.e DRAGON_SESSION_STORE = 'app.session_store.FooSessionStore'
+
+You have to implement the expiration procedure manually.
+
+Implementing your own session store requires two functions:
+
+class FooSessionStore(object):
+    def save(self, key, val):
+        ...
+
+    def get(self, key):
+        ...
+
+Currently the keys are plain UUIDs. If you want to manufacture your own session keys, override ```generate_key```.
+
+

@@ -16,7 +16,6 @@ class SessionTest(DragonTestCase):
 
     def test_save_sessions_get_key(self):
         val = 'bar'
-
         key = self.session_store.save_get_key(val)
         actual = self.session_store.get(key)
         self.assertEqual(val, actual)
