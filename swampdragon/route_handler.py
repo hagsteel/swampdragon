@@ -5,6 +5,7 @@ from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
 from .pubsub_providers.model_publisher import publish_model
 from .file_upload_handler import get_file_location, get_file_url, make_file_id
+from swampdragon.sessions.sessions import get_session_store
 
 registered_handlers = {}
 
@@ -58,6 +59,7 @@ class BaseRouter(FileUploadHandler):
     serializer = None
     route_name = None
     permission_classes = []
+    session_store = get_session_store()
 
     def __init__(self, connection, request=None, **kwargs):
         if request is not None:
