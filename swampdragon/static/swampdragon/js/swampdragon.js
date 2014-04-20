@@ -14,6 +14,7 @@
  */
 var SwampDragon = function(options) {
     var swampDragon = this;
+    swampDragon.isReady = false;
     window.swampDragon = swampDragon;
     swampDragon.conn = null;
     swampDragon.host = null;
@@ -25,6 +26,7 @@ var SwampDragon = function(options) {
     swampDragon.defaultOnChannelMessage = function(channel, data) { };
     swampDragon.defaultOnClose = function() {
         swampDragon.conn = null;
+        swampDragon.isReady = false;
         setTimeout(function() {
             if (swampDragon.connectionAttempt < 10) {
                 swampDragon.connectionAttempt++;
@@ -77,6 +79,7 @@ var SwampDragon = function(options) {
 
         swampDragon.conn.onopen = function() {
             swampDragon.connectionAttempt = 0;
+            swampDragon.isReady = true;
             swampDragon.settings.onopen();
         };
 
@@ -122,6 +125,7 @@ var SwampDragon = function(options) {
         if (swampDragon.conn != null) {
             swampDragon.conn.close();
             swampDragon.conn = null;
+            swampDragon.isReady = false;
         }
     };
 

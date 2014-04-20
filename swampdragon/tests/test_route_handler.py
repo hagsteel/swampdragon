@@ -30,7 +30,8 @@ class ParentModelSerializer(DjangoModelSerializer):
     update_fields = ['name', 'age']
 
     def serialize_children(self, obj, **kwargs):
-        return [ChildModelSerializer().serialize(c) for c in obj.children.all()]
+        children = [ChildModelSerializer().serialize(c) for c in obj.children.all()]
+        return children
 
 
 class ParentRouter(BaseModelPublisherRouter):

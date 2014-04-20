@@ -33,6 +33,10 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
             deferred.reject(data);
         },
 
+        isReady: function() {
+            return swampDragon.isReady;
+        },
+
         on: function (eventName, callback) {
             swampDragon.on(eventName, function () {
                 var args = arguments

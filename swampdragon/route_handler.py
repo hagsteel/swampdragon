@@ -248,11 +248,11 @@ class BaseModelRouter(BaseRouter):
     def delete(self, **kwargs):
         self.serializer = self.serializer_class(context=self.context, **kwargs)
         obj = self.get_object(**kwargs)
-        serialized_obj = self.serializer.serialize(obj)
+        self.deleted(obj)
         obj.delete()
-        self.deleted(serialized_obj)
 
-    def deleted(self, serialized_obj):
+    def deleted(self, obj):
+        serialized_obj = self.serializer.serialize(obj)
         self.send(serialized_obj)
 
 

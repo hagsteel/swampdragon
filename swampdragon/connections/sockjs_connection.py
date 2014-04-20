@@ -47,17 +47,22 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
 
 
 class DjangoSubscriberConnection(SubscriberConnection):
+    def __init__(self, session):
+        self.user = None
+        super(DjangoSubscriberConnection, self).__init__(session)
+
     def get_user(self):
-        if 'sessionid' not in self.session.handler.cookies:
-            return AnonymousUser()
-        session_id = self.session.handler.cookies['sessionid'].value
-        try:
-            session = Session.objects.get(session_key=session_id)
-        except Session.DoesNotExist:
-            return AnonymousUser()
-        uid = session.get_decoded().get('_auth_user_id')
-        try:
-            user = get_user_model().objects.get(pk=uid)
-            return user
-        except get_user_model().DoesNotExist:
-            return AnonymousUser()
+        return self.user
+        # if 'sessionid' not in self.session.handler.cookies:
+        #     return AnonymousUser()
+        # session_id = self.session.handler.cookies['sessionid'].value
+        # try:
+        #     session = Session.objects.get(session_key=session_id)
+        # except Session.DoesNotExist:
+        #     return AnonymousUser()
+        # uid = session.get_decoded().get('_auth_user_id')
+        # try:
+        #     user = get_user_model().objects.get(pk=uid)
+        #     return user
+        # except get_user_model().DoesNotExist:
+        #     return AnonymousUser()
