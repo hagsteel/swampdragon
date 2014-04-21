@@ -92,8 +92,9 @@ class BaseSerializer(object):
             return str(val)
         if isinstance(val, Decimal):
             return str(val)
-        if isinstance(val, ImageFieldFile):
-            return val.url
-        if isinstance(val, FileField):
-            return val.url
+        if isinstance(val, ImageFieldFile) or isinstance(val, FileField):
+            try:
+                return val.url
+            except:
+                return None
         return val

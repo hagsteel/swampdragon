@@ -36,7 +36,7 @@ class FileUploadHandler(RequestHandler):
         for f in files:
             file_id = make_file_id(f['body'])
             file_name = f['filename']
-            named_file = open(get_file_location(file_name, file_id), 'w')
+            named_file = open(get_file_location(file_name, file_id), 'wb')
             named_file.write(f['body'])
             named_file.close()
             response['files'].append({
