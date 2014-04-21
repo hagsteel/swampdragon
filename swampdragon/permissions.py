@@ -27,8 +27,8 @@ class LoginRequired(RoutePermission):
         if self.test_against_verbs:
             if verb not in self.test_against_verbs:
                 return True
-        user = handler.connection.get_user()
-        return not user.is_anonymous()
+        user = handler.connection.user
+        return user is not None
 
     def permission_failed(self, handler):
         handler.send_login_required()

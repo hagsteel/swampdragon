@@ -24,12 +24,16 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
         },
 
         _handleCallback: function (context, data, deferred) {
-            if (context.state == 'success')
+            if (context.state == 'success') {
                 deferred.resolve(data);
-            else if (context.state == 'error')
+            }
+            else if (context.state == 'error') {
                 deferred.reject(data);
-            else if (context.state == 'login_required')
-                console.log("LOGIN REQUIRED");
+            }
+            else if (context.state == 'login_required') {
+                deferred.reject(data);
+                $rootScope.$broadcast('loginRequired');
+            }
             deferred.reject(data);
         },
 
