@@ -55,6 +55,7 @@ class FileUploadHandler(RequestHandler):
 
 class BaseRouter(FileUploadHandler):
     valid_verbs = ['get_list', 'get_single', 'create', 'update', 'delete', 'subscribe', 'unsubscribe']
+    exclude_verbs = []
     serializer_class = None
     serializer = None
     route_name = None
@@ -95,7 +96,8 @@ class BaseRouter(FileUploadHandler):
                         return
             m(**kwargs)
         else:
-            raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
+            if verb not in self.exclude_verbs:
+                raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
 
     def get_list(self, **kwargs):
         raise NotImplemented('get_list is not implemented')
@@ -217,10 +219,11 @@ class BaseModelRouter(BaseRouter):
             return
 
         obj.save()
-        self.serializer.instance = obj
         self.created(obj)
 
     def created(self, obj):
+        if not self.serializer:
+            self.serializer = self.serializer_class()
         self.send(self.serializer.serialize(obj))
 
     def update(self, **kwargs):
@@ -306,10 +309,10 @@ def register(route):
     if route in registered_handlers:
         return
     if issubclass(route, BaseModelRouter) or issubclass(route, BaseModelPublisherRouter):
-        if 'get_single' in route.valid_verbs:
+        if 'get_single' in route.valid_verbs and 'get_single' not in route.exclude_verbs:
             if not hasattr(route, 'get_object'):
                 raise Exception('\n-----------\nget_object needs to be implemented if get_single is available ({})\n-----------\n'.format(route.__name__))
-        if 'get_list' in route.valid_verbs:
+        if 'get_list' in route.valid_verbs and 'get_list' not in route.exclude_verbs:
             if not hasattr(route, 'get_query_set'):
                 raise Exception('\n-----------\nget_query_set needs to be implemented if get_list is available ({})\n-----------\n'.format(route.__name__))
     route_name = route.get_name()
