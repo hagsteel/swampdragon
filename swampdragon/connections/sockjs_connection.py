@@ -1,7 +1,3 @@
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.sessions.models import Session
 from sockjs.tornado import SockJSConnection
 from ..pubsub_providers.redis_pubsub_provider import RedisPubSubProvider
 from .. import route_handler
@@ -61,16 +57,3 @@ class DjangoSubscriberConnection(SubscriberConnection):
 
     def get_user(self):
         return self.user
-        # if 'sessionid' not in self.session.handler.cookies:
-        #     return AnonymousUser()
-        # session_id = self.session.handler.cookies['sessionid'].value
-        # try:
-        #     session = Session.objects.get(session_key=session_id)
-        # except Session.DoesNotExist:
-        #     return AnonymousUser()
-        # uid = session.get_decoded().get('_auth_user_id')
-        # try:
-        #     user = get_user_model().objects.get(pk=uid)
-        #     return user
-        # except get_user_model().DoesNotExist:
-        #     return AnonymousUser()

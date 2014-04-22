@@ -7,6 +7,9 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
         },
         onopen: function () {
             $rootScope.$broadcast('dragonReady');
+        },
+        onheartbeat: function() {
+            $rootScope.$broadcast('heartbeat');
         }
     });
 
@@ -44,9 +47,9 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
         on: function (eventName, callback) {
             swampDragon.on(eventName, function () {
                 var args = arguments
-                $rootScope.$apply(function () {
+//                $rootScope.$apply(function () {
                     callback.apply(swampDragon, args);
-                });
+//                });
             });
         },
 
@@ -87,6 +90,10 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
 
         unsubscribe: function (route, channel, args) {
             return this.callRouter('unsubscribe', route, args, channel);
+        },
+
+        sendJSON: function(data) {
+            return swampDragon.sendJSON(data);
         }
     };
 }]);

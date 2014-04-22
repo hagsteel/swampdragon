@@ -23,6 +23,7 @@ var SwampDragon = function(options) {
 
     swampDragon.defaultOnOpen = function() {  };
     swampDragon.defaultOnMessage = function(e) { };
+    swampDragon.defaultOnHeartbeat = function(e) { };
     swampDragon.defaultOnChannelMessage = function(channel, data) { };
     swampDragon.defaultOnClose = function() {
         swampDragon.conn = null;
@@ -41,7 +42,8 @@ var SwampDragon = function(options) {
         onmessage: swampDragon.defaultOnMessage,
         onchannelmessage: swampDragon.defaultOnChannelMessage,
         onclose: swampDragon.defaultOnClose,
-        onloginrequired: swampDragon.defaultLoginRequired
+        onloginrequired: swampDragon.defaultLoginRequired,
+        onheartbeat: swampDragon.defaultOnHeartbeat
     };
 
     swampDragon.settings = settings;
@@ -64,6 +66,10 @@ var SwampDragon = function(options) {
 
     if ('onloginrequired' in options) {
         swampDragon.settings.onclose = options.onloginrequired;
+    }
+
+    if ('onheartbeat' in options) {
+        swampDragon.settings.onheartbeat = options.onheartbeat;
     }
 
     swampDragon.connect = function(url, channel) {
@@ -116,6 +122,9 @@ var SwampDragon = function(options) {
                 return;
             }
 
+            if ('data' in e && 'heartbeat' in e['data']) {
+                swampDragon.settings.onheartbeat();
+            }
             settings.onmessage(e);
         };
         swampDragon.conn.onclose = swampDragon.settings.onclose;

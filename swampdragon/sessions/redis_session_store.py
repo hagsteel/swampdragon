@@ -12,5 +12,7 @@ class RedisSessionStore(BaseSessionStore):
         self.client.expire(key, getattr(settings, 'SESSION_EXPIRATION_TIME', 30) * 60)
 
     def get(self, key):
-        self.client.expire(key, getattr(settings, 'SESSION_EXPIRATION_TIME', 30) * 60)
         return self.client.get(key)
+
+    def refresh_key_timeout(self, key):
+        self.client.expire(key, getattr(settings, 'SESSION_EXPIRATION_TIME', 30) * 60)

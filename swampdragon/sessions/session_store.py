@@ -16,3 +16,6 @@ class BaseSessionStore(object):
     def generate_key(self):
         key = uuid.uuid4()
         return key.hex
+
+    def refresh_key_timeout(self, key):
+        raise NotImplemented()

@@ -21,6 +21,7 @@ SDFileUploader.directive('sdFileUploader', ['$parse', function ($parse) {
                 model_data.assign(scope, data.files[0]);
             }
             scope.$apply();
+            console.log('wrap function, not just apply');
         }
     }
 
