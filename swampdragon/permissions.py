@@ -4,8 +4,8 @@ def login_required(func):
         return
 
     def check_user(self, **kwargs):
-        user = self.connection.get_user()
-        if user.is_anonymous():
+        user = self.connection.user
+        if not user:
             return not_logged_in(self, **kwargs)
         return func(self, **kwargs)
     return check_user
@@ -24,6 +24,8 @@ class LoginRequired(RoutePermission):
         self.test_against_verbs = verbs
 
     def test_permission(self, handler, verb, **kwargs):
+        if not self.test_against_verbs:
+            return handler.connection.user is not None
         if self.test_against_verbs:
             if verb not in self.test_against_verbs:
                 return True

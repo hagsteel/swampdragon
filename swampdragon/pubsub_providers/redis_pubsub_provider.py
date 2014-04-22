@@ -33,7 +33,8 @@ class RedisPubSubProvider(BaseProvider):
         self._get_subscriber().unsubscribe(channels, broadcaster)
 
     def _get_channels_from_redis(self, base_channel):
-        return self._client.execute_command('PUBSUB', 'channels', '{}*'.format(base_channel))
+        channels = self._client.execute_command('PUBSUB', 'channels', '{}*'.format(base_channel))
+        return [str(c, 'utf-8') for c in channels]
 
     def publish(self, channel, data):
-        self._async_client.publish(channel, json.dumps(data))
+        self._client.publish(channel, json.dumps(data))

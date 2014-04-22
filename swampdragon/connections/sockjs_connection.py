@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.models import Session
@@ -34,9 +35,16 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
         self.pub_sub.close()
 
     def on_message(self, data):
-        data = self.to_json(data)
-        handler = route_handler.get_route_handler(data['route'])
-        handler(self).handle(data)
+        try:
+            data = self.to_json(data)
+            handler = route_handler.get_route_handler(data['route'])
+            handler(self).handle(data)
+        except Exception as e:
+            self.abort_connection()
+            raise e
+
+    def abort_connection(self):
+        self.close()
 
     def send(self, message, binary=False):
         super(SubscriberConnection, self).send(self.to_string(message), binary)

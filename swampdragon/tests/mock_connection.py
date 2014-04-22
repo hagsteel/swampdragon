@@ -9,7 +9,7 @@ from .. import route_handler
 class TestConnection(object):
     uid = None
 
-    def __init__(self, user=AnonymousUser()):
+    def __init__(self, user=None):
         self.uid = str(uuid.uuid4())
         self.user = user
 
@@ -28,6 +28,13 @@ class TestConnection(object):
             data = json.loads(data)
         handler = route_handler.get_route_handler(data['route'])
         handler(self).handle(data)
+
+    def call_verb(self, route, verb, **kwargs):
+        self.client_send({
+            'route': route,
+            'verb': verb,
+            'args': kwargs
+        })
 
     def get_user(self, **kwargs):
         return self.user

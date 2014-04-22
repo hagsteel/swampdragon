@@ -167,6 +167,7 @@ var SwampDragon = function(options) {
 
     swampDragon.callRouter = function(verb, route, args, callbackName, channel) {
         if (channel != null) {
+            args = args || {};
             args['channel'] = channel
         }
         return swampDragon.sendJSON({

@@ -98,31 +98,31 @@ class BaseRouter(FileUploadHandler):
             raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
 
     def get_list(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('get_list is not implemented')
 
     def got_list(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('got_list is not implemented')
 
     def get_single(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('get_single is not implemented')
 
     def create(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('create is not implemented')
 
     def created(self, obj):
-        raise NotImplemented()
+        raise NotImplemented('created is not implemented')
 
     def update(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('update is not implemented')
 
     def updated(self, obj, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('updated is not implemented')
 
     def delete(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('delete is not implemented')
 
     def deleted(self, obj, **kwargs):
-        raise NotImplemented()
+        raise NotImplemented('deleted is not implemented')
 
     def get_initials(self, verb, **kwargs):
         return dict()
@@ -184,12 +184,6 @@ class BaseModelRouter(BaseRouter):
         if self.serializer.id_field not in changed_state:
             changed_state[self.serializer.id_field] = current_state[self.serializer.id_field]
         return changed_state
-
-    def get_query_set(self, **kwargs):
-        raise NotImplemented('Implement get_query_set in your handler')
-
-    def get_object(self, **kwargs):
-        raise NotImplemented('Implement get_object in your handler')
 
     def get_list(self, **kwargs):
         obj_list = self.get_query_set(**kwargs)
@@ -311,6 +305,13 @@ class BaseModelPublisherRouter(BaseModelRouter):
 def register(route):
     if route in registered_handlers:
         return
+    if issubclass(route, BaseModelRouter) or issubclass(route, BaseModelPublisherRouter):
+        if 'get_single' in route.valid_verbs:
+            if not hasattr(route, 'get_object'):
+                raise Exception('\n-----------\nget_object needs to be implemented if get_single is available ({})\n-----------\n'.format(route.__name__))
+        if 'get_list' in route.valid_verbs:
+            if not hasattr(route, 'get_query_set'):
+                raise Exception('\n-----------\nget_query_set needs to be implemented if get_list is available ({})\n-----------\n'.format(route.__name__))
     route_name = route.get_name()
     registered_handlers[route_name] = route
 

@@ -11,7 +11,7 @@ def make_safe(val):
 
 
 def get_property_from_channel(channel):
-    filters = channel.split('|')[1:]
+    filters = str(channel).split('|')[1:]
     properties = []
     for filter in [f.split(':')[0] for f in filters]:
         if filter.split('__')[-1] in filter_options.keys():

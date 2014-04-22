@@ -17,6 +17,8 @@ class DocumentRouter(BaseModelPublisherRouter):
     def get_query_set(self, **kwargs):
         return self.model.objects.filter(**kwargs)
 
+    def get_object(self, **kwargs):
+        return self.model.objects.get(**kwargs)
 
 class CompanyRouter(BaseModelPublisherRouter):
     model = Company
@@ -27,6 +29,9 @@ class CompanyRouter(BaseModelPublisherRouter):
     def get_query_set(self, **kwargs):
         return self.model.objects.filter(**kwargs)
 
+    def get_object(self, **kwargs):
+        return self.model.objects.get(**kwargs)
+
 
 class FooWithAbstractRouter(BaseModelPublisherRouter):
     model = FooWithAbstractBase
@@ -36,6 +41,9 @@ class FooWithAbstractRouter(BaseModelPublisherRouter):
     def get_query_set(self, **kwargs):
         return self.model.objects.filter(**kwargs)
 
+    def get_object(self, **kwargs):
+        return self.model.objects.get(**kwargs)
+
 
 class BarWithAbstractRouter(BaseModelPublisherRouter):
     model = BarWithAbstractBase
@@ -44,6 +52,9 @@ class BarWithAbstractRouter(BaseModelPublisherRouter):
 
     def get_query_set(self, **kwargs):
         return self.model.objects.filter(**kwargs)
+
+    def get_object(self, **kwargs):
+        return self.model.objects.get(**kwargs)
 
 
 class TestSelfPubModel(WebTest):
