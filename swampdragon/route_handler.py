@@ -292,9 +292,11 @@ class BaseModelPublisherRouter(BaseModelRouter):
     def subscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
         server_channels = make_channels(self.serializer_class, self.include_related, **self.get_subscription_context(**kwargs))
+        data = self.serializer_class.get_object_map(self.include_related)
+        channel_setup = self.make_channel_data(client_channel, server_channels)
         self.send(
-            data=self.serializer_class.get_object_map(self.include_related),
-            channel_setup=self.make_channel_data(client_channel, server_channels)
+            data=data,
+            channel_setup=channel_setup
         )
         self.connection.pub_sub.subscribe(server_channels, self.connection)
 
