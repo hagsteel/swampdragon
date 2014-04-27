@@ -27,6 +27,10 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
         },
 
         _handleCallback: function (context, data, deferred) {
+            if ('client_context' in context) {
+                data['context'] = context['client_context'];
+            }
+
             if (context.state == 'success') {
                 deferred.resolve(data);
             }
@@ -36,8 +40,9 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
             else if (context.state == 'login_required') {
                 deferred.reject(data);
                 $rootScope.$broadcast('loginRequired');
+            } else {
+                deferred.reject(data);
             }
-            deferred.reject(data);
         },
 
         isReady: function() {

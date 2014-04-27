@@ -1,9 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db.models import ManyToManyField
 from django.db.models.loading import get_model
+from ..serializers.field_deserializers import get_deserializer
 from .base_serializer import BaseSerializer
 from .object_map import get_object_map
-from swampdragon.serializers.field_deserializers import get_deserializer
 
 
 class DjangoModelSerializer(BaseSerializer):

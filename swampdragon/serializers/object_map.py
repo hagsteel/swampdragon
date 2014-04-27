@@ -55,7 +55,6 @@ def get_object_map(cls, include_serializers=None, ignore_serializers=None):
                 field_name
             ))
 
-        # if hasattr(cls, '_serializers'):
         if include_serializers:
             for s in include_serializers:
                 if ignore_serializers and s in ignore_serializers:

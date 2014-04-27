@@ -86,7 +86,8 @@ class BaseRouter(FileUploadHandler):
         verb = data['verb']
         kwargs = data.get('args', {})
         client_callback_name = data.get('callbackname')
-        self.context['client_callback_name'] = client_callback_name,
+        self.context['client_callback_name'] = client_callback_name
+        self.context['verb'] = verb
         if verb in self.valid_verbs:
             m = getattr(self, verb)
             if self.permission_classes:
@@ -98,6 +99,9 @@ class BaseRouter(FileUploadHandler):
         else:
             if verb not in self.exclude_verbs:
                 raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
+
+    def get_client_context(self, verb, **kwargs):
+        return None
 
     def get_list(self, **kwargs):
         raise NotImplemented('get_list is not implemented')
@@ -129,8 +133,14 @@ class BaseRouter(FileUploadHandler):
     def get_initials(self, verb, **kwargs):
         return dict()
 
-    def send(self, data, channel_setup=None):
+    def send(self, data, channel_setup=None, **kwargs):
         self.context['state'] = 'success'
+
+        if 'verb' in self.context:
+            client_context = self.get_client_context(self.context['verb'], **kwargs)
+            if client_context:
+                self.context['client_context'] = client_context
+
         message = format_message(data=data, context=self.context, channel_setup=channel_setup)
         self.connection.send(message)
 
@@ -148,13 +158,20 @@ class BaseRouter(FileUploadHandler):
     def subscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
         server_channels = self.get_subscription_channels(**kwargs)
-        self.send(data='subscribed', channel_setup=self.make_channel_data(client_channel, server_channels))
+        self.send(
+            data='subscribed',
+            channel_setup=self.make_channel_data(client_channel, server_channels),
+            **kwargs)
         self.connection.pub_sub.subscribe(server_channels, self.connection)
 
     def unsubscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
         server_channels = self.get_subscription_channels(**kwargs)
-        self.send(data='unsubscribed', channel_setup=self.make_channel_data(client_channel, server_channels))
+        self.send(
+            data='unsubscribed',
+            channel_setup=self.make_channel_data(client_channel, server_channels),
+            **kwargs
+        )
         self.connection.pub_sub.unsubscribe(server_channels, self.connection)
 
     def publish(self, channels, publish_data):
@@ -194,7 +211,7 @@ class BaseModelRouter(BaseRouter):
 
     def send_list(self, object_list, **kwargs):
         self.serializer = self.serializer_class(context=self.context, **kwargs)
-        self.send([self.serializer.serialize(o) for o in object_list])
+        self.send([self.serializer.serialize(o) for o in object_list], **kwargs)
 
     def get_single(self, **kwargs):
         obj = self.get_object(**kwargs)
@@ -203,7 +220,7 @@ class BaseModelRouter(BaseRouter):
 
     def send_single(self, obj, **kwargs):
         self.serializer = self.serializer_class(context=self.context, instance=obj, **kwargs)
-        self.send(self.serializer.serialize())
+        self.send(self.serializer.serialize(), **kwargs)
 
     def on_error(self, errors):
         self.send_error(errors)
@@ -221,7 +238,7 @@ class BaseModelRouter(BaseRouter):
         obj.save()
         self.created(obj)
 
-    def created(self, obj):
+    def created(self, obj, **kwargs):
         if not self.serializer:
             self.serializer = self.serializer_class()
         self.send(self.serializer.serialize(obj))
@@ -242,7 +259,7 @@ class BaseModelRouter(BaseRouter):
         self.updated(self.serializer.instance, updated_data=updated_data, past_state=past_state)
 
     def updated(self, obj, **kwargs):
-        self.send(kwargs.get('updated_data'))
+        self.send(kwargs.get('updated_data'), **kwargs)
 
     def delete(self, **kwargs):
         self.serializer = self.serializer_class(context=self.context, **kwargs)
@@ -250,9 +267,9 @@ class BaseModelRouter(BaseRouter):
         self.deleted(obj)
         obj.delete()
 
-    def deleted(self, obj):
+    def deleted(self, obj, **kwargs):
         serialized_obj = self.serializer.serialize(obj)
-        self.send(serialized_obj)
+        self.send(serialized_obj, **kwargs)
 
 
 class BaseModelPublisherRouter(BaseModelRouter):
@@ -296,14 +313,18 @@ class BaseModelPublisherRouter(BaseModelRouter):
         channel_setup = self.make_channel_data(client_channel, server_channels)
         self.send(
             data=data,
-            channel_setup=channel_setup
+            channel_setup=channel_setup,
+            **kwargs
         )
         self.connection.pub_sub.subscribe(server_channels, self.connection)
 
     def unsubscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
         server_channels = make_channels(self.serializer_class, self.include_related, **self.get_subscription_context(**kwargs))
-        self.send(data='unsubscribed', channel_setup=self.make_channel_data(client_channel, server_channels))
+        self.send(
+            data='unsubscribed',
+            channel_setup=self.make_channel_data(client_channel, server_channels),
+            **kwargs)
         self.connection.pub_sub.unsubscribe(server_channels, self.connection)
 
 

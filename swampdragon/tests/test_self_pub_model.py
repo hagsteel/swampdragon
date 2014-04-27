@@ -188,7 +188,7 @@ class TestSelfPubModel(WebTest):
     def test_remove_on_update(self):
         with Company(name='foo', age=55) as company:
             pass
-        kwargs = {'channel': 'client_chan', 'name': 'foo', }
+        kwargs = {'channel': 'client_chan', 'name': 'foo'}
         self.company_handler(self.connection).subscribe(**kwargs)
         company.name = 'updated'
         company.save()
