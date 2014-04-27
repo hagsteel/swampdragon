@@ -86,6 +86,7 @@ filter_options = {
     'lte': lte_compare,
     'gt': gt_compare,
     'gte': gte_compare,
+    'eq': standard_compare,
 }
 
 

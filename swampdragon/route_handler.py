@@ -19,7 +19,7 @@ class FileUploadHandler(RequestHandler):
         origin = self.request.headers['origin']
         orig_test = origin.split('/')[-1]
         if ':' in orig_test:
-            orig_test= orig_test.split(':')[0]
+            orig_test = orig_test.split(':')[0]
         if not self.request.host.split(':')[0] == orig_test:
             return
         self.set_header('Access-Control-Allow-Credentials', True)
@@ -179,8 +179,9 @@ class BaseRouter(FileUploadHandler):
             publish_data['channel'] = channel
             self.connection.pub_sub.publish(channel, publish_data)
 
-    def get_subscription_context(self, **kwargs):
+    def get_subscription_contexts(self, **kwargs):
         return dict(kwargs)
+
 
 def replace_original_with_data(kwargs):
     keys = [key for key in kwargs.keys() if '__' in key]
@@ -193,6 +194,8 @@ def replace_original_with_data(kwargs):
 class BaseModelRouter(BaseRouter):
     model = None
     instance = None
+    _query_set = None
+    _obj = None
 
     def _get_changes(self, current_state, past_state):
         changed_state = {}
@@ -203,6 +206,18 @@ class BaseModelRouter(BaseRouter):
         if self.serializer.id_field not in changed_state:
             changed_state[self.serializer.id_field] = current_state[self.serializer.id_field]
         return changed_state
+
+    def _get_query_set(self, **kwargs):
+        if self._query_set:
+            return self._query_set
+        self._query_set = self.get_query_set(**kwargs)
+        return self._query_set
+
+    def _get_object(self, **kwargs):
+        if self._obj:
+            return self._obj
+        self._obj = self.get_object(**kwargs)
+        return self._obj
 
     def get_list(self, **kwargs):
         obj_list = self.get_query_set(**kwargs)
@@ -282,7 +297,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
         self.publish(channels, publish_data)
 
     def created(self, obj):
-        super(BaseModelPublisherRouter, self).updated(obj)
+        super(BaseModelPublisherRouter, self).created(obj)
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
@@ -308,7 +323,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
 
     def subscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
-        server_channels = make_channels(self.serializer_class, self.include_related, **self.get_subscription_context(**kwargs))
+        server_channels = make_channels(self.serializer_class, self.include_related, self.get_subscription_contexts(**kwargs))
         data = self.serializer_class.get_object_map(self.include_related)
         channel_setup = self.make_channel_data(client_channel, server_channels)
         self.send(
@@ -320,7 +335,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
 
     def unsubscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
-        server_channels = make_channels(self.serializer_class, self.include_related, **self.get_subscription_context(**kwargs))
+        server_channels = make_channels(self.serializer_class, self.include_related, self.get_subscription_contexts(**kwargs))
         self.send(
             data='unsubscribed',
             channel_setup=self.make_channel_data(client_channel, server_channels),

@@ -47,15 +47,24 @@ def get_related_channels(serializer, related_serializers=None, **channel_filter)
     return related_channels
 
 
-def make_channels(serializer, related_serializers=None, **kwargs):
+def make_channels(serializer, related_serializers=None, property_filter=None):
     if related_serializers:
         copy_of_related_serializers = list(related_serializers)
     else:
         copy_of_related_serializers = None
     channels = []
     base_channel = serializer.get_base_channel()
-    channels.append(_construct_channel(base_channel, **kwargs))
-    channels += get_related_channels(serializer, copy_of_related_serializers, **kwargs)
+    if property_filter:
+        if isinstance(property_filter, list):
+            for p in property_filter:
+                channels.append(_construct_channel(base_channel, **p))
+                channels += get_related_channels(serializer, copy_of_related_serializers, **p)
+        else:
+            channels.append(_construct_channel(base_channel, **property_filter))
+            channels += get_related_channels(serializer, copy_of_related_serializers, **property_filter)
+    else:
+        channels.append(_construct_channel(base_channel))
+        channels += get_related_channels(serializer, copy_of_related_serializers)
     return channels
 
 
@@ -63,7 +72,11 @@ def filter_channels_by_model(channels, obj):
     result = []
     for channel in channels:
         properties = get_property_from_channel(channel)
-        data = {p:get_property(obj, p) for p in properties}
+        data = {}
+        for p in properties:
+            val = get_property(obj, p)
+            if val:
+                data[p] = val
         if channel_match_check(channel, data):
             result.append(channel)
     return result

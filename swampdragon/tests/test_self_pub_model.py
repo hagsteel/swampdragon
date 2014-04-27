@@ -1,12 +1,11 @@
-import json
-from django_webtest import WebTest
 from .. import route_handler
 from ..route_handler import BaseModelPublisherRouter
 from .models import Company, CompanySerializer, FooWithAbstractBase, FooWithAbstractSerializer, BarWithAbstractBase, \
     BarWithAbstractSerializer, Department, Staff, Document
 from .mock_connection import TestConnection
-from . import mock_provider
 from .serializers import DocumentSerializer, DepartmentSerializer, StaffSerializer
+from .dragon_django_test_case import DragonDjangoTestCase
+from . import mock_provider
 
 
 class DocumentRouter(BaseModelPublisherRouter):
@@ -57,7 +56,7 @@ class BarWithAbstractRouter(BaseModelPublisherRouter):
         return self.model.objects.get(**kwargs)
 
 
-class TestSelfPubModel(WebTest):
+class TestSelfPubModel(DragonDjangoTestCase):
     def setUp(self):
         route_handler.register(CompanyRouter)
         route_handler.register(FooWithAbstractRouter)

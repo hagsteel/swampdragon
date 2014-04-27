@@ -1,12 +1,10 @@
 import json
-from django_webtest import WebTest
 from .. import route_handler
 from ..route_handler import BaseModelPublisherRouter, UnexpectedVerbException
 from ..serializers.django_model_serializer import DjangoModelSerializer
-from ..tests.serializers import CompanySerializer
 from ..tests import ParentModel, ChildModel, SubChildModel
 from .mock_connection import TestConnection
-from . import mock_provider
+from .dragon_django_test_case import DragonDjangoTestCase
 
 
 class ChildModelSerializer(DjangoModelSerializer):
@@ -76,13 +74,11 @@ class SubChildRouter(BaseModelPublisherRouter):
         return self.model.objects.get(**kwargs)
 
 
-class TestModelRouter(WebTest):
+class TestModelRouter(DragonDjangoTestCase):
     def setUp(self):
         route_handler.register(ParentRouter)
         route_handler.register(ChildRouter)
         route_handler.register(SubChildRouter)
-        mock_provider._channels = []
-        mock_provider.__subscribers = {}
         self.connection = TestConnection()
         self.parent_handler = route_handler.get_route_handler(ParentRouter.route_name)
         self.child_handler = route_handler.get_route_handler(ChildRouter.route_name)
@@ -107,7 +103,7 @@ class TestModelRouter(WebTest):
         self.assertEqual(json.loads(self.connection.sent_data[-1])['data'], 'unsubscribed')
         remote_channels = json.loads(self.connection.sent_data[-1])['channel_data']['remote_channels']
         for channel in remote_channels:
-            self.assertTrue(self.connection not in self.connection.pub_sub._subscribers[channel])
+            self.assertTrue(self.connection not in self.connection.pub_sub._subscribers.get(channel, []))
 
     def test_create_model(self):
         model_data = {'name': 'test parent', 'age': 55}

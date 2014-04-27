@@ -1,11 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
-from django_webtest import WebTest
 from ..serializers.base_serializer import BaseSerializer
 from ..serializers.serializer_importer import get_serializer, _imported_modules_
 from .models import CompanySerializer, Company, Department, Staff, Document
 from .mock_connection import TestConnection
 from .serializers import DocumentSerializer, DepartmentSerializer, StaffSerializer
+from .dragon_django_test_case import DragonDjangoTestCase
 
 
 class TestObject(object):
@@ -29,7 +29,7 @@ class TestObjectWithSerializer(object):
         self.dec_value = Decimal(12.44)
 
 
-class SerializerTest(WebTest):
+class SerializerTest(DragonDjangoTestCase):
     def setUp(self):
         self.connection = TestConnection()
 

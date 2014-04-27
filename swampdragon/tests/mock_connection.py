@@ -1,8 +1,6 @@
 import json
 import uuid
-from django.contrib.auth.models import AnonymousUser
 from .mock_provider import MockPubSubProvider
-from .models import TestUser
 from .. import route_handler
 
 
