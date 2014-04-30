@@ -21,7 +21,7 @@ class DocumentRouter(BaseModelPublisherRouter):
 
 class CompanyRouter(BaseModelPublisherRouter):
     model = Company
-    route_name = 'test_foo_router'
+    route_name = 'test_company_router'
     serializer_class = CompanySerializer
     include_related = [DepartmentSerializer]
 
@@ -61,8 +61,6 @@ class TestSelfPubModel(DragonDjangoTestCase):
         route_handler.register(CompanyRouter)
         route_handler.register(FooWithAbstractRouter)
         route_handler.register(DocumentRouter)
-        mock_provider._channels = []
-        mock_provider.__subscribers = {}
         self.connection = TestConnection()
         self.company_handler = route_handler.get_route_handler(CompanyRouter.route_name)
         self.foo_abs_handler = route_handler.get_route_handler(FooWithAbstractRouter.route_name)
@@ -72,7 +70,7 @@ class TestSelfPubModel(DragonDjangoTestCase):
     def test_self_publish(self):
         kwargs = {'channel': 'client_chan', }
         self.company_handler(self.connection).subscribe(**kwargs)
-        foo = Company.objects.create(name='foo', age=33)
+        foo = Company.objects.create(name='foo', comp_num=33)
         json_data = self.connection.get_last_published_data()
         serialized_foo = foo.serializer_class().serialize(foo)
         self.assertDictEqual(serialized_foo, json_data)
@@ -94,40 +92,37 @@ class TestSelfPubModel(DragonDjangoTestCase):
     def test_only_publish_changes(self):
         kwargs = {'channel': 'client_chan', }
         self.company_handler(self.connection).subscribe(**kwargs)
-        foo = Company.objects.create(name='foo', age=33)
+        foo = Company.objects.create(name='foo', comp_num=33)
 
         self.connection.sent_data = []
-        foo.age = 33
+        foo.comp_num = 33
         foo.save()
         self.assertEqual(len(self.connection.sent_data), 0)
 
-        foo.age = 34
+        foo.comp_num = 34
         foo.save()
 
         self.assertGreater(len(self.connection.published_data), 0)
 
     def test_publish_based_on_children(self):
-        kwargs = {'channel': 'client_chan', 'name__contains': 'foo'}
-        with Company(name='foo company', age=33) as company:
+        with Company(name='foo company', comp_num=33) as company:
             pass
         with Department(name='department a', company=company) as department:
             pass
+        self.connection.subscribe('test_company_router', 'cli_chan', {'name__contains': 'foo'})
 
-        self.company_handler(self.connection).subscribe(**kwargs)
-
-        self.connection.sent_data = []
         department.name = 'updated'
         department.save()
         self.assertGreater(len(self.connection.published_data), 0)
 
     def test_no_publish_based_on_childrens_children(self):
         kwargs = {'channel': 'client_chan', 'id': 1}
-        company = Company.objects.create(name='company a', age=33)
+        company = Company.objects.create(name='company a', comp_num=33)
         department = Department.objects.create(name='department a', company=company)
         Staff.objects.create(name='John', department=department)
         dont_publish_staff = Staff.objects.create(
             name='no pub staff',
-            department=Department.objects.create(name='foo', company=Company.objects.create(name='foo2', age=33)),
+            department=Department.objects.create(name='foo', company=Company.objects.create(name='foo2', comp_num=33)),
         )
         self.company_handler(self.connection).subscribe(**kwargs)
         self.connection.sent_data = []
@@ -138,9 +133,9 @@ class TestSelfPubModel(DragonDjangoTestCase):
     def test_get_changes(self):
         kwargs = {'channel': 'client_chan', }
         self.company_handler(self.connection).subscribe(**kwargs)
-        foo = Company.objects.create(name='foo', age=33)
+        foo = Company.objects.create(name='foo', comp_num=33)
         expected = foo._get_changes()
-        foo.age = 33
+        foo.comp_num = 33
         actual = foo._get_changes()
         self.assertDictEqual(expected, actual)
 
@@ -185,7 +180,7 @@ class TestSelfPubModel(DragonDjangoTestCase):
         self.assertListEqual(fields, expected)
 
     def test_remove_on_update(self):
-        with Company(name='foo', age=55) as company:
+        with Company(name='foo', comp_num=55) as company:
             pass
         kwargs = {'channel': 'client_chan', 'name': 'foo'}
         self.company_handler(self.connection).subscribe(**kwargs)

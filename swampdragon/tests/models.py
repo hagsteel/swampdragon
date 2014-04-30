@@ -17,7 +17,7 @@ class CompanyLogo(TestSelfPublishModel, models.Model):
 class Company(TestSelfPublishModel, models.Model):
     serializer_class = CompanySerializer
     name = models.CharField(max_length=100)
-    age = models.PositiveIntegerField()
+    comp_num = models.PositiveIntegerField()
     logo = models.OneToOneField(CompanyLogo, null=True)
 
 

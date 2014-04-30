@@ -13,3 +13,7 @@ def get_property(obj, field):
         return getattr(obj, field, None)
     except:
         return None
+
+
+def string_to_list(val):
+    return val.replace('[','').replace(']','').split(',')

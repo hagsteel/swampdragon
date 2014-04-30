@@ -5,6 +5,7 @@ from ..pubsub_providers.model_channel_builder import filter_channels_by_model, f
 def publish_model(model_instance, serializer, publisher, action, changes=None):
     if action is PUBACTIONS.updated and not changes:
         return
+
     base_channel = serializer.get_base_channel()
     all_model_channels = publisher.get_channels(base_channel)
     channels = filter_channels_by_model(all_model_channels, model_instance)

@@ -1,3 +1,7 @@
+from ..model_tools import string_to_list, get_property
+from .channel_filters import filter_options, in_compare, term_match_check
+
+
 try:
     from urllib.parse import quote_plus, unquote_plus
 except ImportError:
@@ -5,28 +9,53 @@ except ImportError:
 
 
 def make_safe(val):
+    """
+    Make strings in filters save.
+    i.e 'foo bar' becomes 'foo+bar'
+    """
     if not isinstance(val, str):
         return val
     return quote_plus(val)
 
 
-def get_property_from_channel(channel):
-    filters = str(channel).split('|')[1:]
+def remove_channel_filter(channel):
+    """
+    Remove filters from channel strings
+    i.e foo_contains becomes foo
+    """
+    if '__' not in channel:
+        return channel
+    chan, channel_filter = channel.rsplit('__', 1)
+    if filter_options.get(channel_filter):
+        return chan
+    return channel
+
+
+def get_channel_filter(channel):
+    if '__' not in channel:
+        return filter_options['eq']
+    chan, channel_filter_name = channel.rsplit('__', 1)
+    channel_filter = filter_options.get(channel_filter_name)
+    if not channel_filter:
+        return filter_options['eq']
+    return channel_filter
+
+
+def get_property_and_value_from_channel(channel):
+    """
+    Get a list of tuples with properties and channels.
+    i.e foo|bar__name__contains:baz returns a list: [('bar__name__contains', 'baz')]
+    """
+    filters = filter(None, str(channel).split('|')[1:])
+    if not filters:
+        return None
     properties = []
-    for filter in [f.split(':')[0] for f in filters]:
-        if filter.split('__')[-1] in filter_options.keys():
-            properties.append('__'.join(filter.split('__')[:-1]))
-        else:
-            properties.append('__'.join(filter.split('__')))
+    for channel_filter, val in [tuple(f.split(':', 1)) for f in filters]:
+        filter_option = filter_options.get(channel_filter.split('__')[-1])
+        if filter_option == in_compare:
+            val = string_to_list(val)
+        properties.append((channel_filter, val))
     return properties
-
-
-def filter_matching_channels(channels, data):
-    relevant_channels = []
-    for channel in channels:
-        if channel_match_check(channel, data):
-            relevant_channels.append(channel)
-    return relevant_channels
 
 
 def channel_match_check(channel, data):
@@ -35,7 +64,8 @@ def channel_match_check(channel, data):
     for term in terms:
         key, val = term.split(':')
         if '__' in key and key.split('__')[-1] in filter_options.keys():
-            key, option = key.rsplit('__', 1)
+            option = key.rsplit('__', 1)[-1]
+        # key = remove_channel_filter(key)
         if not key in data:
             return False
         if not term_match_check(data[key], val, option):
@@ -43,54 +73,50 @@ def channel_match_check(channel, data):
     return True
 
 
-def term_match_check(term, val, option):
-    decoded_val = unquote_plus(val)
-    comparer = term_comparison_factory(option)
-    return comparer(decoded_val, term)
+def properties_match_channel_by_object(obj, channel_properties):
+    result = True
+    for prop, val in channel_properties:
+        if not has_val(obj, prop, val) and not has_related_value(obj, prop, val):
+            return False
+    return result
 
 
-def standard_compare(term, val):
-    if val is None:
-        return term is val
-    term = type(val)(term)
-    return term == (val)
+def properties_match_channel_by_dict(dict, channel_properties):
+    result = True
+    for prop, val in channel_properties:
+        if not prop in dict:
+            return False
+        if not dict[prop] == val:
+            return False
+    return result
 
 
-def contains_compare(term, val):
-    return term in val
+def get_value(obj, prop):
+    data = {}
+    val = get_property(obj, prop)
+    if val:
+        data[prop] = val
+    return data
 
 
-def lt_compare(term, val):
-    term = type(val)(term)
-    return val < term
+def has_val(obj, prop, val):
+    obj_val = get_property(obj, remove_channel_filter(prop))
+    if not obj_val:
+        return False
+    channel_filter = get_channel_filter(prop)
+    return channel_filter(obj_val, val)
 
 
-def lte_compare(term, val):
-    term = type(val)(term)
-    return val <= term
+def has_related_value(obj, field, channel_val):
+    if not '__' in field:
+        filter_by_val = channel_val
+        property_name = field
+    else:
+        property_name, filter_by_val = field.split('__', 1)
+    attr = getattr(obj, property_name)
+    if hasattr(attr, 'all'):
+        return getattr(obj, property_name).filter(**{filter_by_val: channel_val}).exists()
+    else:
+        return obj.__class__.objects.filter(**{field: channel_val}).exists()
 
 
-def gt_compare(term, val):
-    term = type(val)(term)
-    return val > term
-
-
-def gte_compare(term, val):
-    term = type(val)(term)
-    return val >= term
-
-
-filter_options = {
-    'contains': contains_compare,
-    'lt': lt_compare,
-    'lte': lte_compare,
-    'gt': gt_compare,
-    'gte': gte_compare,
-    'eq': standard_compare,
-}
-
-
-def term_comparison_factory(option):
-    if option is None:
-        return standard_compare
-    return filter_options.get(option)

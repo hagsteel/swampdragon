@@ -1,4 +1,3 @@
-from ..pubsub_providers.channel_utils import filter_matching_channels
 from ..serializers.base_serializer import BaseSerializer
 from ..pubsub_providers.model_channel_builder import make_channels
 from ..tests.serializers import CompanySerializer
@@ -28,20 +27,6 @@ class PubSubTest(DragonTestCase):
         test_object = TestObject('bar', 2)
         connection.pub_sub.publish(channel, TestObjectSerializer().serialize(test_object))
         self.assertEqual(len(connection.pub_sub._subscribers.keys()), 1)
-
-    def test_filter_matching_channels(self):
-        channels = [
-            'TestObject|name__contains:foo',
-            'TestObject|name__contains:bar',
-        ]
-        matched_channels = filter_matching_channels(channels, data={'name': 'fooo'})
-        self.assertEqual(matched_channels[0], channels[0])
-        self.assertEqual(len(matched_channels), 1)
-        matched_channels = filter_matching_channels(channels, data={'name': 'barr'})
-        self.assertEqual(matched_channels[0], channels[1])
-        self.assertEqual(len(matched_channels), 1)
-        matched_channels = filter_matching_channels(channels, data={'name': 'foobar'})
-        self.assertEqual(len(matched_channels), 2)
 
     def test_and_or_channel_filters(self):
         context_a = {

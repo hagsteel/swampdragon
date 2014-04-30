@@ -1,7 +1,8 @@
-from ..pubsub_providers.model_channel_builder import make_channels
+from ..pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
 from .serializers import CompanySerializer, DepartmentSerializer, LogoSerializer, StaffSerializer, DocumentSerializer
 from ..pubsub_providers.channel_utils import channel_match_check
 from .dragon_test_case import DragonTestCase
+from .models import Company, Department
 
 
 class TestChannelConstructor(DragonTestCase):
@@ -56,3 +57,23 @@ class TestChannelUtils(DragonTestCase):
         channel = u'department|company__name__contains:foo'
         data = {'company_id': 1, 'id': 1, '_type': 'department', 'name': 'updated', 'staff': []}
         channel_match_check(channel, data)
+
+    def test_filter_channels_by_related_in(self):
+        comp = Company.objects.create(name='test co', comp_num=123)
+        dep_a = Department.objects.create(company=comp, name='dep a')
+
+        channels = [
+            'company|departments__id__in:[3, {}, 99999]'.format(dep_a.pk)
+        ]
+        res = filter_channels_by_model(channels, comp)
+        self.assertEqual(res, channels)
+
+    def test_filter_channels_by_related_multiple_in(self):
+        comp = Company.objects.create(name='test co', comp_num=123)
+        dep_a = Department.objects.create(company=comp, name='dep a')
+
+        channels = [
+            'company|departments__id__in:[3, {}, 99999]|name:test co'.format(dep_a.pk)
+        ]
+        res = filter_channels_by_model(channels, comp)
+        self.assertEqual(res, channels)

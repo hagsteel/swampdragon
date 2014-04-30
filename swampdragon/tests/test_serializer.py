@@ -55,7 +55,7 @@ class SerializerTest(DragonDjangoTestCase):
     def test_m2m_serialization(self):
         with Company() as company:
             company.name = 'company a'
-            company.age = 33
+            company.comp_num = 33
 
         with Department() as department:
             department.name = 'dep a'

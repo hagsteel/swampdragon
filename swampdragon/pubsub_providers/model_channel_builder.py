@@ -1,7 +1,6 @@
 from django.db.models import OneToOneField, ManyToManyField
 from django.db.models.related import RelatedObject
-from .channel_utils import make_safe, get_property_from_channel, channel_match_check
-from swampdragon.model_tools import get_property
+from .channel_utils import make_safe, get_property_and_value_from_channel, properties_match_channel_by_object, properties_match_channel_by_dict
 
 
 def _construct_channel(base_channel, **channel_filter):
@@ -68,23 +67,39 @@ def make_channels(serializer, related_serializers=None, property_filter=None):
     return channels
 
 
-def filter_channels_by_model(channels, obj):
-    result = []
-    for channel in channels:
-        properties = get_property_from_channel(channel)
-        data = {}
-        for p in properties:
-            val = get_property(obj, p)
-            if val:
-                data[p] = val
-        if channel_match_check(channel, data):
-            result.append(channel)
-    return result
-
-
 def filter_channels_by_dict(channels, dict):
     result = []
     for channel in channels:
-        if channel_match_check(channel, dict):
+        channel_properties = get_property_and_value_from_channel(channel)
+        if not channel_properties:
+            result.append(channel)
+            continue
+        if properties_match_channel_by_dict(dict, channel_properties):
             result.append(channel)
     return result
+
+
+def filter_channels_by_model(channels, obj):
+    result = []
+    for channel in channels:
+        channel_properties = get_property_and_value_from_channel(channel)
+        if not channel_properties:
+            result.append(channel)
+            continue
+        if properties_match_channel_by_object(obj, channel_properties):
+            result.append(channel)
+    return result
+
+
+def has_related_values(obj, properties):
+    for field, channel_val in properties:
+        if not '__' in field:
+            filter_name = channel_val
+            property_name = field
+        else:
+            property_name, filter_name = field.split('__', 1)
+        attr = getattr(obj, property_name)
+        if hasattr(attr, 'all'):
+            if not getattr(obj, property_name).filter(**{filter_name: channel_val}).exists():
+                return False
+    return True
