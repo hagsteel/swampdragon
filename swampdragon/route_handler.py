@@ -121,6 +121,9 @@ class BaseRouter(FileUploadHandler):
     def update(self, **kwargs):
         raise NotImplemented('update is not implemented')
 
+    def action_failed(self, **kwargs):
+        self.send_error({self.context['verb']: 'failed'})
+
     def updated(self, obj, **kwargs):
         raise NotImplemented('updated is not implemented')
 
@@ -230,6 +233,8 @@ class BaseModelRouter(BaseRouter):
 
     def get_single(self, **kwargs):
         obj = self.get_object(**kwargs)
+        if not obj:
+            return self.action_failed(**kwargs)
         self.send_single(obj, **kwargs)
         return obj
 
@@ -262,6 +267,8 @@ class BaseModelRouter(BaseRouter):
         kwargs = replace_original_with_data(kwargs)
         initials = self.get_initials('update', **kwargs)
         obj = self.get_object(**kwargs)
+        if not obj:
+            return self.action_failed(**kwargs)
         self.serializer = self.serializer_class(context=self.context, instance=obj, **kwargs)
         past_state = self.serializer.serialize()
         self.serializer.instance = self.serializer.deserialize(obj, initials=initials, **kwargs)
@@ -279,6 +286,8 @@ class BaseModelRouter(BaseRouter):
     def delete(self, **kwargs):
         self.serializer = self.serializer_class(context=self.context, **kwargs)
         obj = self.get_object(**kwargs)
+        if not obj:
+            return self.action_failed(**kwargs)
         self.deleted(obj)
         obj.delete()
 
