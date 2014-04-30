@@ -26,22 +26,31 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
             return callbackName;
         },
 
-        _handleCallback: function (context, data, deferred) {
+        _handleSuccess: function(context, data, deferred) {
+            var response = {data: data};
             if ('client_context' in context) {
-                data['context'] = context['client_context'];
+                response['context'] = context['client_context'];
             }
+            deferred.resolve(response);
+        },
 
+        _handleError: function(context, data, deferred) {
+            var response = {error: data};
+            deferred.reject(response);
+        },
+
+        _handleCallback: function (context, data, deferred) {
             if (context.state == 'success') {
-                deferred.resolve(data);
+                _this.handleSuccess(data, response);
             }
             else if (context.state == 'error') {
-                deferred.reject(data);
+                _this.handleError(data, deferred);
             }
             else if (context.state == 'login_required') {
-                deferred.reject(data);
+                _this.handleError(data, deferred);
                 $rootScope.$broadcast('loginRequired');
             } else {
-                deferred.reject(data);
+                _this.handleError(data, deferred);
             }
         },
 
@@ -52,9 +61,7 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
         on: function (eventName, callback) {
             swampDragon.on(eventName, function () {
                 var args = arguments
-//                $rootScope.$apply(function () {
                     callback.apply(swampDragon, args);
-//                });
             });
         },
 
@@ -63,7 +70,19 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
             var deferred = $q.defer()
             var callbackName = this._getCallbackName()
             swampDragon.on(callbackName, function (context, data) {
-                _this._handleCallback(context, data, deferred);
+                if (context.state == 'success') {
+                    _this._handleSuccess(context, data, deferred);
+                }
+                else if (context.state == 'error') {
+                    _this._handleError(context, data, deferred);
+                }
+                else if (context.state == 'login_required') {
+                    _this._handleError(context, data, deferred);
+                    $rootScope.$broadcast('loginRequired');
+                } else {
+                    _this._handleError(context, data, deferred);
+                }
+//                _this._handleCallback(context, data, deferred);
             });
             swampDragon.callRouter(verb, route, args, callbackName, channel);
             return deferred.promise;
