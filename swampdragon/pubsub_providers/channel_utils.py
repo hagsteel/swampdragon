@@ -117,6 +117,10 @@ def has_related_value(obj, field, channel_val):
     if hasattr(attr, 'all'):
         return getattr(obj, property_name).filter(**{filter_by_val: channel_val}).exists()
     else:
-        return obj.__class__.objects.filter(**{field: channel_val}).exists()
+        filter_query = {
+            'pk': obj.pk,
+            field: channel_val
+        }
+        return obj.__class__.objects.filter(**filter_query).exists()
 
 

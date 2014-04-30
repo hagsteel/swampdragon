@@ -43,7 +43,7 @@ class SelfPublishModel(object):
 
         if self.serializer_class.id_field in relevant_fields:
             relevant_fields.remove(self.serializer_class.id_field)
-        return relevant_fields #- self._ignore_changes_for
+        return relevant_fields
 
     def _get_changes(self):
         changes = dict()
