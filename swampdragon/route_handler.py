@@ -90,7 +90,7 @@ class BaseRouter(FileUploadHandler):
         self.context['client_callback_name'] = client_callback_name
         self.context['verb'] = verb
         if '_page' in kwargs:
-            self.context['page'] = kwargs['_page']
+            self.context['page'] = kwargs.pop('_page')
 
         if verb in self.valid_verbs:
             m = getattr(self, verb)

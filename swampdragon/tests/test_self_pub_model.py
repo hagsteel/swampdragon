@@ -5,7 +5,6 @@ from .models import Company, CompanySerializer, FooWithAbstractBase, FooWithAbst
 from .mock_connection import TestConnection
 from .serializers import DocumentSerializer, DepartmentSerializer, StaffSerializer
 from .dragon_django_test_case import DragonDjangoTestCase
-from . import mock_provider
 
 
 class DocumentRouter(BaseModelPublisherRouter):
