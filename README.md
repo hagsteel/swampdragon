@@ -38,6 +38,8 @@ Routers routes the messages to the right handler.
 
 ## Route permissions
 
+```LoginRequired``` is a built in permission.
+
 Route permissions takes a list of permissions
 
     class FooRoute(BaseRoute):
@@ -60,6 +62,29 @@ You can create your own custom permissions:
 This permission sends an error in case anyone is trying to call the ```update``` verb.
 ** Note ** This permission is an example, if updates weren't allowed, then the ```valid_verbs```
 would be a more suitable option.
+
+
+## Pagination
+
+### Route handler
+Adding pagination is easy.
+Set ```paginate_by=<num>``` in your route handler.
+
+    class FooRoute(BaseModelRouter):
+        ...
+        paginate_by=10
+
+### Javascript
+Set ```_page=<num>``` when calling get_list
+var args = {'_page': 1};
+swampDragon.get_list(route, args, callbackName)
+
+#### Angular
+
+        var page = 1;
+        dataService.getPagedList(route, {}, page).then(function (response) {
+            // handle data
+        });
 
 
 # Sessions

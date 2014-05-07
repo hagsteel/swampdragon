@@ -22,7 +22,9 @@ def contains_compare(term, val):
 
 
 def in_compare(term, val):
-    return val in term
+    if not val or not term:
+        return False
+    return val in [type(val)(t) for t in term]
 
 
 def lt_compare(term, val):

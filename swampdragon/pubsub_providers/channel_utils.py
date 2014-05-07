@@ -65,7 +65,6 @@ def channel_match_check(channel, data):
         key, val = term.split(':')
         if '__' in key and key.split('__')[-1] in filter_options.keys():
             option = key.rsplit('__', 1)[-1]
-        # key = remove_channel_filter(key)
         if not key in data:
             return False
         if not term_match_check(data[key], val, option):
@@ -104,7 +103,7 @@ def has_val(obj, prop, val):
     if not obj_val:
         return False
     channel_filter = get_channel_filter(prop)
-    return channel_filter(obj_val, val)
+    return channel_filter(val, obj_val)
 
 
 def has_related_value(obj, field, channel_val):

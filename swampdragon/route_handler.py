@@ -1,4 +1,5 @@
 import json
+from swampdragon.paginator import Paginator, Page
 from swampdragon.sessions.sessions import get_session_store
 from tornado.web import RequestHandler
 from .pubsub_providers.base_provider import PUBACTIONS
@@ -88,6 +89,9 @@ class BaseRouter(FileUploadHandler):
         client_callback_name = data.get('callbackname')
         self.context['client_callback_name'] = client_callback_name
         self.context['verb'] = verb
+        if '_page' in kwargs:
+            self.context['page'] = kwargs['_page']
+
         if verb in self.valid_verbs:
             m = getattr(self, verb)
             if self.permission_classes:
@@ -101,7 +105,14 @@ class BaseRouter(FileUploadHandler):
                 raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
 
     def get_client_context(self, verb, **kwargs):
-        return None
+        return {}
+
+    def _update_client_context(self, data):
+        if not data:
+            return
+        if not 'client_context' in self.context:
+            self.context['client_context'] = {}
+        self.context['client_context'].update(data)
 
     def get_list(self, **kwargs):
         raise NotImplemented('get_list is not implemented')
@@ -141,8 +152,7 @@ class BaseRouter(FileUploadHandler):
 
         if 'verb' in self.context:
             client_context = self.get_client_context(self.context['verb'], **kwargs)
-            if client_context:
-                self.context['client_context'] = client_context
+            self._update_client_context(client_context)
 
         message = format_message(data=data, context=self.context, channel_setup=channel_setup)
         self.connection.send(message)
@@ -197,6 +207,7 @@ def replace_original_with_data(kwargs):
 class BaseModelRouter(BaseRouter):
     model = None
     instance = None
+    paginate_by = None
     _query_set = None
     _obj = None
 
@@ -224,6 +235,11 @@ class BaseModelRouter(BaseRouter):
 
     def get_list(self, **kwargs):
         obj_list = self.get_query_set(**kwargs)
+        if self.paginate_by and self.context['page']:
+            page = Paginator(obj_list, self.paginate_by).page(self.context['page'])
+            self._update_client_context({'page': page.serialize()})
+            obj_list = page.object_list
+
         self.send_list(obj_list, **kwargs)
         return obj_list
 
@@ -288,7 +304,8 @@ class BaseModelRouter(BaseRouter):
         obj = self.get_object(**kwargs)
         if not obj:
             return self.action_failed(**kwargs)
-        self.deleted(obj)
+        obj_id = obj.pk
+        self.deleted(obj, obj_id)
         obj.delete()
 
     def deleted(self, obj, **kwargs):
@@ -305,7 +322,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
         # publish_data['channel'] = channel
         self.publish(channels, publish_data)
 
-    def created(self, obj):
+    def created(self, obj, **kwargs):
         super(BaseModelPublisherRouter, self).created(obj)
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
@@ -321,13 +338,13 @@ class BaseModelPublisherRouter(BaseModelRouter):
             PUBACTIONS.updated, kwargs.get('past_state')
         )
 
-    def deleted(self, obj, **kwargs):
+    def deleted(self, obj, obj_id, **kwargs):
         super(BaseModelPublisherRouter, self).deleted(obj, **kwargs)
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
         data = dict(self.serializer.serialize(obj))
-        data[self.serializer.id_field] = kwargs.get(self.serializer.id_field)
+        data[self.serializer.id_field] = obj_id
         self.publish_action(channels, data, PUBACTIONS.deleted)
 
     def subscribe(self, **kwargs):

@@ -67,8 +67,8 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
 
         callRouter: function (verb, route, args, channel) {
             var _this = this;
-            var deferred = $q.defer()
-            var callbackName = this._getCallbackName()
+            var deferred = $q.defer();
+            var callbackName = this._getCallbackName();
             swampDragon.on(callbackName, function (context, data) {
                 if (context.state == 'success') {
                     _this._handleSuccess(context, data, deferred);
@@ -82,13 +82,18 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
                 } else {
                     _this._handleError(context, data, deferred);
                 }
-//                _this._handleCallback(context, data, deferred);
             });
             swampDragon.callRouter(verb, route, args, callbackName, channel);
             return deferred.promise;
         },
 
         getList: function (route, data) {
+            return this.callRouter('get_list', route, data)
+        },
+
+        getPagedList: function (route, data, page) {
+            page = page || 1;
+            data['_page'] = page;
             return this.callRouter('get_list', route, data)
         },
 
