@@ -22,10 +22,10 @@ class TestPagination(DragonDjangoTestCase):
     def setUp(self):
         route_handler.register(CompanyRouter)
 
-    def test_paginate_result(self):
         for i in range(10):
             Company.objects.create(name='test co', comp_num=i)
 
+    def test_paginate_result(self):
         self.connection.call_verb(CompanyRouter.route_name, 'get_list', **{'_page': 1})
         page_1 = self.connection.get_last_message()['data']
         self.connection.call_verb(CompanyRouter.route_name, 'get_list', **{'_page': 2})
@@ -51,3 +51,19 @@ class TestPagination(DragonDjangoTestCase):
             [p['id'] for p in page_4],
             [c['pk'] for c in Company.objects.all()[9:].values('pk')]
         )
+
+    def test_paginator(self):
+        self.connection.call_verb(CompanyRouter.route_name, 'get_list', **{'_page': 1})
+        page_1 = self.connection.get_last_message()['context']['client_context']
+        self.assertTrue(page_1['page']['has_next'])
+        self.assertFalse(page_1['page']['has_previous'])
+
+        self.connection.call_verb(CompanyRouter.route_name, 'get_list', **{'_page': 2})
+        page_2 = self.connection.get_last_message()['context']['client_context']
+        self.assertTrue(page_2['page']['has_next'])
+        self.assertTrue(page_2['page']['has_previous'])
+
+        self.connection.call_verb(CompanyRouter.route_name, 'get_list', **{'_page': 4})
+        page_4 = self.connection.get_last_message()['context']['client_context']
+        self.assertFalse(page_4['page']['has_next'])
+        self.assertTrue(page_4['page']['has_previous'])
