@@ -87,10 +87,13 @@ class SelfPublishModel(object):
 
 @receiver(m2m_changed)
 def _self_publish_model_m2m_change(sender, instance, action, **kwargs):
-    if isinstance(instance, SelfPublishModel) and action is 'post_clear':
+    if not isinstance(instance, SelfPublishModel):
+        return
+
+    if action is 'post_clear':
         instance.changes = instance._get_changes()
         instance._publish(instance.action, instance.changes)
-    if isinstance(instance, SelfPublishModel) and action is 'post_add':
+    if action is 'post_add':
         instance.changes = instance._get_changes()
         instance._publish(instance.action, instance.changes)
 

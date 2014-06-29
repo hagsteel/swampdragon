@@ -142,7 +142,15 @@ var SwampDragon = function(options) {
         return swampDragon.conn.send(data);
     };
 
-    swampDragon.sendJSON = function(data) {
+    swampDragon.sendJSON = function (data) {
+        if (data['args']) {
+            if (data['args']['$$hashKey']) {
+                delete data['args']['$$hashKey'];
+            }
+            if (data['args']['_type']) {
+                delete data['args']['_type'];
+            }
+        }
         return swampDragon.send(JSON.stringify(data));
     };
 

@@ -8,7 +8,7 @@ It allows data to be published to channels via routers and does all the heavy li
 
 
 # Important
-**Note**: As Django models are blocking, long queries will prevent other requests to come through.
+**Note**: As Django models are blocking, long queries will prevent other requests from coming through.
 
 **Note**: Currently it's heavily tied to Django
 
@@ -64,7 +64,44 @@ This permission sends an error in case anyone is trying to call the ```update```
 would be a more suitable option.
 
 
+## Subscription
+Subscribe a connection to one or more channel.
+For model subscriptions, the router should inherit from ```BaseModelPublisherRouter```.
+
+
+### BaseModelPublisherRouter
+There are a couple of key functions in the ```BaseModelPublisherRouter```. 
+
+
+#### ```get_subscription_contexts```
+The subscription context should return a dictionary containing keys and values to filter on.
+i.e
+
+    def get_subscription_contexts(self, **kwargs):
+        return {
+            'name__contains': 'foo',
+            'owner_id': self.connection.user.pk
+        }
+    
+In the above code, the router would publish data where the data has a name that contains the word foo, and the 
+owner id is a users primary key.
+
+
+#### ```publish_action```
+
+The ```publish_action``` takes three arguments: ```channels```, ```data```, ```action ```.
+The channels are the channels to publish to, data is a dictionary containing the data to publish, and the action
+is either ```PUBACTIONS.created```, ```PUBACTIONS.updated``` or ```PUBACTIONS.deleted```.
+The action is required for the data mapper in the front end, to know how to handle the incoming data.
+
+If a call to the router is any of the default actions of the router (```create```, ```updated``` or ```delete```) there is no need
+to call ```publish_action``` as these functions will handle it.
+
+In most cases the only reason to call publish_action is when a specific verb has been defined.
+
+
 ## Pagination
+
 
 ### Route handler
 Adding pagination is easy.
@@ -74,10 +111,12 @@ Set ```paginate_by=<num>``` in your route handler.
         ...
         paginate_by=10
 
+
 ### Javascript
 Set ```_page=<num>``` when calling get_list
 var args = {'_page': 1};
 swampDragon.get_list(route, args, callbackName)
+
 
 #### Angular
 

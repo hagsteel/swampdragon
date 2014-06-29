@@ -35,7 +35,7 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
         },
 
         _handleError: function(context, data, deferred) {
-            var response = {error: data};
+            var response = {errors: data};
             deferred.reject(response);
         },
 

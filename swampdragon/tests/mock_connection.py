@@ -33,6 +33,7 @@ class TestConnection(object):
             'verb': verb,
             'args': kwargs
         })
+        return self.get_last_message()
 
     def get_user(self, **kwargs):
         return self.user
