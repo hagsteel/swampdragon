@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
-from chat_example.chat.views import ChatView
+from django.views.generic import TemplateView
 
 urlpatterns = patterns('',
-    url(r'^$', ChatView.as_view(), name='home'),
+    url(r'^$', TemplateView.as_view(template_name='chat.html'), name='home'),
 )

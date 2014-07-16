@@ -4,6 +4,7 @@ ChatControllers.controller('ChatCtrl', ['$scope', 'dataService', function($scope
     $scope.channel = 'chat';
     $scope.messages = [];
 
+    /// Subscribe to the chat router
     $scope.$on('dragonReady', function() {
         dataService.subscribe('chat-route', $scope.channel, {});
     });
@@ -18,9 +19,9 @@ ChatControllers.controller('ChatCtrl', ['$scope', 'dataService', function($scope
     $scope.sendMessage = function() {
         $scope.errors = null;
         dataService.callRouter('chat', 'chat-route', {message: this.message, name: this.name})
-            .then(function(data) { })
-            .catch(function(errors) {
-                $scope.errors = errors;
+            .then(function(response) { })
+            .catch(function(response) {
+                $scope.errors = response.errors;
             });
     }
 }]);

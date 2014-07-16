@@ -32,6 +32,16 @@ i.e ```MyModel.objects.all().update(foo=bar)``` won't trigger a publishing actio
 *  Filter case sensitivity
 
 
+# Tornado 4.0
+If you experience ```Error during WebSocket handshake: Unexpected response code: 403``` you might have to run 
+the latest dev version of sockjs-tornado.
+
+```pip uninstall sockjs-tornado```
+```pip install -e git+https://github.com/mrjoes/sockjs-tornado.git#egg=sockjs-tornado```
+
+This should solve the error message.
+
+
 # Routers
 Routers routes the messages to the right handler.
 

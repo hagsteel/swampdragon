@@ -23,5 +23,4 @@ class ChatRouter(BaseRouter):
             self.publish(self.get_subscription_channels(), kwargs)
 
 
-
 route_handler.register(ChatRouter)
