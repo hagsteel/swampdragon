@@ -13,5 +13,8 @@ class CompanyRouter(BaseModelPublisherRouter):
     def get_query_set(self, **kwargs):
         return self.model.objects.all()
 
+    def get_object(self, **kwargs):
+        return self.model.objects.get(pk=kwargs['pk'])
+
 
 route_handler.register(CompanyRouter)

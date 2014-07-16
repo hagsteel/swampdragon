@@ -89,6 +89,8 @@ class SelfPublishModel(object):
 def _self_publish_model_m2m_change(sender, instance, action, **kwargs):
     if not isinstance(instance, SelfPublishModel):
         return
+    if not hasattr(instance, 'action'):
+        return
 
     if action is 'post_clear':
         instance.changes = instance._get_changes()
