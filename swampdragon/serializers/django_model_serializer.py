@@ -36,7 +36,8 @@ class DjangoModelSerializer(BaseSerializer):
     @classmethod
     def get_related_fields(cls):
         pub_fields = cls.get_publish_fields()
-        return [f for f in pub_fields if hasattr(cls._model(), f)]
+        m = cls._model()
+        return [f for f in pub_fields if hasattr(m, f) and not isinstance(getattr(m, f), property)]
 
     @classmethod
     def _get_publish_m2m_fields(cls):
