@@ -52,8 +52,4 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
 
 class DjangoSubscriberConnection(SubscriberConnection):
     def __init__(self, session):
-        self.user = None
         super(DjangoSubscriberConnection, self).__init__(session)
-
-    def get_user(self):
-        return self.user

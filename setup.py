@@ -26,7 +26,7 @@ setup(
     ],
     classifiers=[
         "Development Status :: Beta",
-        "Topic :: Registration",
+        "Topic :: WebSocket framework",
         "License :: OSI Approved :: BSD License",
     ],
 )
