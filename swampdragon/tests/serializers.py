@@ -1,5 +1,10 @@
 from ..serializers.django_model_serializer import DjangoModelSerializer
 
+################################
+# Old school serializers
+################################
+from swampdragon.serializers.model_serializer import ModelSerializer
+
 
 class DepartmentSerializer(DjangoModelSerializer):
     model = 'tests.Department'
@@ -43,3 +48,31 @@ class DocumentSerializer(DjangoModelSerializer):
 
     def serialize_staff(self, obj=None, serializer=None, ignore_fields=[]):
         return [serializer.serialize(o, ignore_fields=['documents']) for o in obj.staff.all()]
+
+
+################################
+# New serializeres
+################################
+class FooSerializer(ModelSerializer):
+    bars = 'tests.BarSerializer'
+
+    class Meta:
+        publish_fields = ('test_field_a')
+        update_fields = ('test_field_a' ,'test_field_b', 'bars')
+        model = 'tests.FooModel'
+
+
+class BarSerializer(ModelSerializer):
+    foo = FooSerializer
+
+    class Meta:
+        model = 'tests.BarModel'
+        update_fields = ('number', 'foo')
+
+
+class BazSerializer(ModelSerializer):
+    bar = BarSerializer
+
+    class Meta:
+        model = 'tests.BazModel'
+        update_fields = ('name', 'bar')

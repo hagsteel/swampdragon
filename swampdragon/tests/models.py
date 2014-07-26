@@ -82,3 +82,18 @@ class TestUser(object):
 
     def is_anonymous(self):
         return self.id is None
+
+
+class FooModel(models.Model):
+    test_field_a = models.CharField(max_length=100)
+    test_field_b = models.CharField(max_length=100)
+
+
+class BarModel(models.Model):
+    number = models.IntegerField()
+    foo = models.ForeignKey(FooModel, related_name='bars', null=True)
+
+
+class BazModel(models.Model):
+    name = models.CharField(max_length=100)
+    bar = models.OneToOneField(BarModel)
