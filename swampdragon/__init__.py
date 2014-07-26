@@ -1,10 +1,10 @@
 from swampdragon import route_handler
 
 
-def autodiscover_routes():
+def discover_routes():
     """
-    Auto-discover, borrowed from django admin.
-    Returns urls for each route handler (this function needs to be renamed)
+    Discover, borrowed from django admin.
+    Returns urls for each route handler
     """
     from django.conf import settings
     from django.utils.importlib import import_module
@@ -21,4 +21,5 @@ def autodiscover_routes():
     routes = route_handler.registered_handlers
     for route in routes:
         urls.append(('/' + route + '/$', routes[route]))
+    urls.append(('/_sdfileupload/$', route_handler.FileUploadHandler))
     return urls

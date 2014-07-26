@@ -1,31 +1,72 @@
 {% extends 'bootstrap_base.html' %}
 
 {% block main_content %}
-    <div class="col-md-6" ng-controller="WithFileCtrl">
-        <form>
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name" autofocus="autofocus">
-            </div>
-            <div class="form-group">
-                <label for="file">Logo</label>
-                <input type="file" sd-file-uploader route="withfile-route" ng-model="withfile.file" class="form-control" id="file">
-            </div>
-            <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
-        </form>
+<div class="col-md-3" ng-controller="WithFileCtrl">
+    <div class="panel panel-default">
+        <div class="panel-heading">Single file upload</div>
+        <div class="panel-body">
+            <form>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name"
+                           autofocus="autofocus">
+                </div>
+                <div class="form-group">
+                    <label>Picture</label>
+                    <input type="file" sd-file-upload multiple="true" ng-model="withfile.file" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="col-md-6" ng-controller="DateCtrl">
-
+<div class="col-md-3">
+    <div class="panel panel-default">
+        <div class="panel-heading">Multi file upload</div>
+        <div class="panel-body">
+            <form>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name"
+                           autofocus="autofocus">
+                </div>
+                <div class="form-group">
+                    <label>Picture</label>
+                    <input type="file" sd-file-upload multiple="true" ng-model="withfile.file" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="col-md-6" ng-controller="WithFileListCtrl">
-        <table class="table table-striped">
-            <tr ng-repeat="wf in datasource">
-                <td>{$ wf.name $}</td>
-                <td><img ng-src="{$ wf.file $}" height="60"></td>
-                <td><a href="#" ng-click="edit(wf);">edit</a> </td>
-            </tr>
-        </table>
+<div class="col-md-3">
+    <div class="panel panel-default">
+        <div class="panel-heading">Drop file upload</div>
+        <div class="panel-body">
+            <form>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name"
+                           autofocus="autofocus">
+                </div>
+                <div class="form-group">
+                    <label>Picture</label>
+                    <input type="file" sd-file-upload multiple="true" ng-model="withfile.file" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
+            </form>
+        </div>
     </div>
+</div>
+
+<div class="col-md-3" ng-controller="WithFileListCtrl">
+    <table class="table table-striped">
+        <tr ng-repeat="wf in datasource">
+            <td>{$ wf.name $}</td>
+            <td><img ng-src="{$ wf.file $}" height="60"></td>
+        </tr>
+    </table>
+</div>
 {% endblock main_content %}

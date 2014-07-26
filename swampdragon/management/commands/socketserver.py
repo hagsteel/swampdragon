@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils.importlib import import_module
 from tornado import web, ioloop
 from sockjs.tornado import SockJSRouter
-from swampdragon import autodiscover_routes
+from swampdragon import discover_routes
 
 
 class Command(BaseCommand):
@@ -47,7 +47,7 @@ class Command(BaseCommand):
 
         HOST = options['host']
         PORT = int(options['port'])
-        urls = autodiscover_routes()
+        urls = discover_routes()
         for router in routers:
             urls += router.urls
 
