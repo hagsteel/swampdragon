@@ -25,7 +25,6 @@ i.e ```MyModel.objects.all().update(foo=bar)``` won't trigger a publishing actio
 #TODO
 *  Dirty fields in the front end (don't update forms)
 *  Auto discover routes returns URLs and needs to be renamed
-*  Write documentation
 *  Add instructions for swampDragon.call = function(verb, route, channel, args, callbackName)
 *  Add instructions on self publishing models
 *  term_match_check: make sure compared values are of the same type

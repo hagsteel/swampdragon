@@ -1,0 +1,17 @@
+{% extends 'bootstrap_base.html' %}
+
+{% block main_content %}
+    <div class="col-md-6" ng-controller="WithFileCtrl">
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name" autofocus="autofocus">
+            </div>
+            <div class="form-group">
+                <label for="file">Logo</label>
+                <input type="file" ng-model="withfile.file" class="form-control" id="file">
+            </div>
+            <button type="submit" class="btn btn-default">Save</button>
+        </form>
+    </div>
+{% endblock main_content %}

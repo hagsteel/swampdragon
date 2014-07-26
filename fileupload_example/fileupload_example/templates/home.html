@@ -1,0 +1,31 @@
+{% extends 'bootstrap_base.html' %}
+
+{% block main_content %}
+    <div class="col-md-6" ng-controller="WithFileCtrl">
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name" autofocus="autofocus">
+            </div>
+            <div class="form-group">
+                <label for="file">Logo</label>
+                <input type="file" sd-file-uploader route="withfile-route" ng-model="withfile.file" class="form-control" id="file">
+            </div>
+            <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
+        </form>
+    </div>
+
+    <div class="col-md-6" ng-controller="DateCtrl">
+
+    </div>
+
+    <div class="col-md-6" ng-controller="WithFileListCtrl">
+        <table class="table table-striped">
+            <tr ng-repeat="wf in datasource">
+                <td>{$ wf.name $}</td>
+                <td><img ng-src="{$ wf.file $}" height="60"></td>
+                <td><a href="#" ng-click="edit(wf);">edit</a> </td>
+            </tr>
+        </table>
+    </div>
+{% endblock main_content %}

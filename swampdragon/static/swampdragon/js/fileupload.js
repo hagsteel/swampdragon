@@ -1,7 +1,7 @@
 // Originated from http://jsfiddle.net/danielzen/utp7j/
 var uploadFile = function (element, dest, uploadComplete) {
     var that = this;
-    var url = window.swampDragon.url + dest;
+    var url = window.swampDragon.url + '/' + dest + '/';
     var fd = new FormData();
     for (var i in element.files) {
         fd.append("uploadedFile", element.files[i]);

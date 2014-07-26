@@ -6,7 +6,7 @@ SDFileUploader.directive('sdFileUploader', ['$parse', function ($parse) {
         this.scope = scope;
 
         elements.change(function (e) {
-            uploadFile(elements[0], attrs.sdFileUploader, uploadComplete);
+            uploadFile(elements[0], attrs.route, uploadComplete);
         });
 
         function uploadComplete(evt) {
