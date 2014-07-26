@@ -19,10 +19,29 @@ WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', functio
             })
         }
     };
+}]);
 
-//    $scope.$on("editWithFile", function (ev, wf) {
-//        $scope.withfile = wf;
-//    });
+
+WithFileControllers.controller('MultiFileCtrl', ['$scope', 'dataService', function($scope, dataService) {
+    $scope.multifile = {};
+
+    $scope.save = function() {
+        var promise = null;
+        if ('id' in this.multifile) {
+            promise = dataService.update('multifile-route', this.multifile);
+        } else {
+            console.log(this.multifile);
+            promise = dataService.create('multifile-route', this.multifile);
+        }
+
+        if (promise) {
+            promise.then(function(data) {
+                console.log(data);
+            }).catch(function(errors) {
+                console.log(errors);
+            })
+        }
+    };
 }]);
 
 
@@ -36,8 +55,17 @@ WithFileControllers.controller('WithFileListCtrl', ['$scope', 'dataService', fun
             console.log(response.errors);
         })
     });
+}]);
 
-//    $scope.edit = function(wf) {
-//        $scope.$root.$broadcast("editWithFile", wf);
-//    }
+
+WithFileControllers.controller('MultiFileListCtrl', ['$scope', 'dataService', function($scope, dataService) {
+    $scope.datasource = [];
+
+    $scope.$on('dragonReady', function() {
+        dataService.getList('multifile-route').then(function(response) {
+            $scope.datasource = response.data;
+        }).catch(function(response) {
+            console.log(response.errors);
+        })
+    });
 }]);

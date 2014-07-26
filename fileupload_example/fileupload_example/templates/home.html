@@ -1,15 +1,14 @@
 {% extends 'bootstrap_base.html' %}
 
 {% block main_content %}
-<div class="col-md-3" ng-controller="WithFileCtrl">
+<div class="col-md-4" ng-controller="WithFileCtrl">
     <div class="panel panel-default">
         <div class="panel-heading">Single file upload</div>
         <div class="panel-body">
             <form>
                 <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name"
-                           autofocus="autofocus">
+                    <label>Name</label>
+                    <input type="text" ng-model="withfile.name" class="form-control">
                 </div>
                 <div class="form-group">
                     <label>Picture</label>
@@ -21,19 +20,18 @@
     </div>
 </div>
 
-<div class="col-md-3">
+<div class="col-md-4" ng-controller="MultiFileCtrl">
     <div class="panel panel-default">
         <div class="panel-heading">Multi file upload</div>
         <div class="panel-body">
             <form>
                 <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name"
-                           autofocus="autofocus">
+                    <label>Text</label>
+                    <input type="text" ng-model="multifile.text" class="form-control" placeholder="Text">
                 </div>
                 <div class="form-group">
-                    <label>Picture</label>
-                    <input type="file" sd-file-upload multiple="true" ng-model="withfile.file" class="form-control">
+                    <label>Pictures</label>
+                    <input type="file" sd-file-upload multiple="true" ng-model="multifile.files" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
             </form>
@@ -41,15 +39,14 @@
     </div>
 </div>
 
-<div class="col-md-3">
+<div class="col-md-4">
     <div class="panel panel-default">
         <div class="panel-heading">Drop file upload</div>
         <div class="panel-body">
             <form>
                 <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" ng-model="withfile.name" class="form-control" id="name" placeholder="Name"
-                           autofocus="autofocus">
+                    <label>Name</label>
+                    <input type="text" ng-model="withfile.name" class="form-control">
                 </div>
                 <div class="form-group">
                     <label>Picture</label>
@@ -61,12 +58,32 @@
     </div>
 </div>
 
-<div class="col-md-3" ng-controller="WithFileListCtrl">
-    <table class="table table-striped">
-        <tr ng-repeat="wf in datasource">
-            <td>{$ wf.name $}</td>
-            <td><img ng-src="{$ wf.file $}" height="60"></td>
-        </tr>
-    </table>
+<div class="col-md-6" ng-controller="WithFileListCtrl">
+    <div class="panel panel-default">
+        <div class="panel-heading">Single file uploads</div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <tr ng-repeat="wf in datasource">
+                    <td>{$ wf.name $}</td>
+                    <td><img ng-src="{$ wf.file $}" height="60"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-6" ng-controller="MultiFileListCtrl">
+    <div class="panel panel-default">
+        <div class="panel-heading">Multi file uploads</div>
+        <div class="panel-body">
+            <table class="table table-striped">
+                <tr ng-repeat="wf in datasource">
+                    <td>{$ wf.text $}</td>
+                    <td>{$ wf.files $}</td>
+                    <!--<td><img ng-src="{$ wf.file $}" height="60"></td>-->
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock main_content %}

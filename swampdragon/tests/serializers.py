@@ -27,8 +27,8 @@ class LogoSerializer(DjangoModelSerializer):
 
 class CompanySerializer(DjangoModelSerializer):
     model = 'tests.Company'
-    publish_fields = ['name', 'age', 'departments', 'logo', 'custom_field']
-    update_fields = ['name', 'age']
+    publish_fields = ['name', 'comp_num', 'departments', 'logo', 'custom_field']
+    update_fields = ['name', 'comp_num', 'departments']
     departments_serializer = DepartmentSerializer
     logo_serializer = LogoSerializer
 

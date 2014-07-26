@@ -91,6 +91,19 @@ Any functionality after creating an instance of a model can be executed by overr
 The same logic applies to ```create``` and ```created```.
 
 
+If additional data is required for a model, this can be provided by ```get_initials```.
+
+In the following example we are setting the owner of the model when it's created, and the last updated date when it's
+updated:
+
+    ...
+    def get_initials(verb, **kwargs):
+        if verb == 'create':
+            return {'owner': self.connection.get_user()}
+        if verb == 'update':
+            return {'last_update_date': datetime.now()}
+
+
 # BaseModelPublisherRouter
 
 This router handles subscriptions to various channels, allowing data to be pushed to the connected clients.

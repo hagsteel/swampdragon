@@ -1,6 +1,6 @@
 from unittest import TestCase
 from . import mock_provider
-from swampdragon import autodiscover_routes
+from swampdragon import discover_routes
 from swampdragon.models import SelfPublishModel
 from swampdragon.tests.mock_connection import TestConnection
 from swampdragon.tests.mock_provider import MockPubSubProvider
@@ -15,7 +15,7 @@ class DragonTestCase(TestCase):
         mock_provider._channels = []
         mock_provider._subscribers = {}
         self.connection = TestConnection()
-        autodiscover_routes()
+        discover_routes()
 
     def tearDown(self):
         mock_provider._channels = []

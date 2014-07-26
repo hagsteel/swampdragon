@@ -1,9 +1,10 @@
 from django.core.exceptions import ValidationError
-from django.db.models import ManyToManyField
+from django.db.models import ManyToManyField, FieldDoesNotExist
 from django.db.models.loading import get_model
 from ..serializers.field_deserializers import get_deserializer
 from .base_serializer import BaseSerializer
 from .object_map import get_object_map
+from swampdragon.serializers.related_field_deserializer import deserialize_related
 
 
 class DjangoModelSerializer(BaseSerializer):
@@ -76,7 +77,9 @@ class DjangoModelSerializer(BaseSerializer):
         data['_type'] = self._get_type_name()
         return data
 
-    def deserialize(self, obj=None, initials=dict(), **kwargs):
+    def deserialize(self, obj=None, initials=None, **kwargs):
+        if not initials:
+            initials = {}
         if obj is None:
             model_instance = self._model()()
         else:
@@ -89,18 +92,15 @@ class DjangoModelSerializer(BaseSerializer):
             if key not in self.update_fields:
                 continue
             self.deserialize_field(model_instance, key, val)
-            # field = model_instance._meta.get_field(key)
-            # field_type = field.__class__.__name__
-            # deserializer = get_deserializer(field_type)
-            # if deserializer:
-            #     deserializer(model_instance, key, val)
-            # else:
-            #     setattr(model_instance, key, val)
 
         return model_instance
 
     def deserialize_field(self, model_instance, key, val):
-        field = model_instance._meta.get_field(key)
+        try:
+            field = model_instance._meta.get_field(key)
+        except FieldDoesNotExist:
+            deserialize_related(self, model_instance, key, val)
+            return
         field_type = field.__class__.__name__
         deserializer = get_deserializer(field_type)
         if deserializer:

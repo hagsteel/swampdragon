@@ -79,3 +79,17 @@ class SerializerTest(DragonDjangoTestCase):
         ser = get_serializer('tests.DocumentSerializer', self.__class__)
         self.assertEqual(ser, DocumentSerializer)
         self.assertNotEqual(_imported_modules_, {})
+
+
+class DeserializeTest(DragonDjangoTestCase):
+    # def setUp(self):
+    #     self.company = Company.objects.create(name='test co', comp_num=12)
+
+    def test_deserialize_model(self):
+        company_serializer = CompanySerializer()
+        department_data = [{'name': 'dep a'}, {'name': 'dep b'}]
+        company_data = {'logo': None, 'departments': department_data, '_type': 'company', 'id': 1, 'custom_field': 'custom field', 'comp_num': 12, 'name': 'test co'}
+        company = company_serializer.deserialize(**company_data)
+        company.save()
+        self.assertTrue(company.departments.exists())
+
