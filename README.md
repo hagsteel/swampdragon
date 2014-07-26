@@ -43,4 +43,4 @@ This should solve the error message.
 
 # Documentation
 
-see (ReadTheDocs)[swamp-dragon.readthedocs.org]
+see [ReadTheDocs](swamp-dragon.readthedocs.org)
