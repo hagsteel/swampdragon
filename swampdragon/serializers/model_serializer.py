@@ -1,5 +1,7 @@
 from django.db.models import ForeignKey, OneToOneField
 from django.db.models.loading import get_model
+from swampdragon.model_tools import get_property
+from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
 
@@ -80,11 +82,36 @@ class ModelSerializer(object):
                 getattr(self.instance, key).add(related_instance)
 
     def _get_related_serializer(self, key):
-        serializer = getattr(self, key)
+        serializer = getattr(self, key, None)
         if isinstance(serializer, str):
             return get_serializer(serializer, self.__class__)
-
         return serializer
 
-    def serialize(self):
-        pass
+    def serialize(self, ignore_serializers=None):
+        data = {}
+        for field in self.opts.publish_fields:
+            data[field] = self._serialize_value(field, ignore_serializers)
+        return data
+
+    def _serialize_value(self, attr_name, ignore_serializers=None):
+        obj_serializer = self._get_related_serializer(attr_name)
+
+        # To prevent infinite recursion, allow serializers to be ignored
+        if ignore_serializers and obj_serializer in ignore_serializers:
+            return None
+
+        # If there is a specific function
+        if hasattr(self, 'serialize_{}'.format(attr_name)):
+            serialize_function = getattr(self, 'serialize_{}'.format(attr_name))
+            return serialize_function(self.instance, serializer=obj_serializer)
+
+        val = get_property(self.instance, attr_name)
+
+        # If we have one or more related models
+        if obj_serializer and hasattr(val, 'all'):
+            return [obj_serializer(instance=o).serialize(ignore_serializers=[self.__class__]) for o in val.all()]
+        elif obj_serializer:
+            return obj_serializer(instance=val).serialize(ignore_serializers=[self.__class__])
+
+        # Serialize the field
+        return serialize_field(val)

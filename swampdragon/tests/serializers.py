@@ -57,8 +57,8 @@ class FooSerializer(ModelSerializer):
     bars = 'tests.BarSerializer'
 
     class Meta:
-        publish_fields = ('test_field_a')
-        update_fields = ('test_field_a' ,'test_field_b', 'bars')
+        publish_fields = ('test_field_a', 'bars')
+        update_fields = ('test_field_a', 'test_field_b', 'bars')
         model = 'tests.FooModel'
 
 
@@ -68,6 +68,7 @@ class BarSerializer(ModelSerializer):
     class Meta:
         model = 'tests.BarModel'
         update_fields = ('number', 'foo')
+        publish_fields = ('number', 'foo')
 
 
 class BazSerializer(ModelSerializer):
@@ -76,3 +77,4 @@ class BazSerializer(ModelSerializer):
     class Meta:
         model = 'tests.BazModel'
         update_fields = ('name', 'bar')
+        publish_fields = ('name', 'bar')
