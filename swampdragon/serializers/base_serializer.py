@@ -11,7 +11,6 @@ class BaseSerializer(object):
     base_channel = None
     publish_fields = None
     update_fields = None
-    channel_filter_fields = None
     type_name = None
     id_field = 'id'
 
@@ -43,12 +42,6 @@ class BaseSerializer(object):
     @classmethod
     def _get_type_name(cls):
         return cls.type_name
-
-    def get_filter(self, obj):
-        filter_data = self.serialize(obj)
-        if self.channel_filter_fields:
-            filter_data.update({f: self._serialize_value(obj, f) for f in self.channel_filter_fields})
-        return filter_data
 
     @classmethod
     def get_publish_fields(cls):

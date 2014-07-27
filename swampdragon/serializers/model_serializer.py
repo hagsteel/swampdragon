@@ -2,6 +2,7 @@ from django.db.models import ForeignKey, OneToOneField
 from django.db.models.loading import get_model
 from swampdragon.model_tools import get_property
 from swampdragon.serializers.field_serializers import serialize_field
+from swampdragon.serializers.object_map import get_object_map
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
 
@@ -21,6 +22,9 @@ class ModelSerializer(object):
         self.instance = instance or self.opts.model()
         self.data = data
         self.initial = initial or {}
+        self.base_fields = self._get_base_fields()
+        self.m2m_fields = self._get_m2m_fields()
+        self.related_fields = self._get_related_fields()
 
     class Meta(object):
         pass
@@ -29,9 +33,11 @@ class ModelSerializer(object):
         return [f.name for f in self.opts.model._meta.fields]
 
     def _get_related_fields(self):
-        return [f for f in self.opts.update_fields if f not in self.base_fields]
+        return [f for f in self.opts.update_fields if f not in self.base_fields and f not in self.m2m_fields]
 
-    # def _get_fk_fields(self):
+    def _get_m2m_fields(self):
+        m2m_fields = [f.name for f in self.opts.model._meta.local_many_to_many]
+        return [f for f in self.opts.update_fields if f in m2m_fields]
 
     def deserialize(self):
         # Set initial data
@@ -39,7 +45,6 @@ class ModelSerializer(object):
             setattr(self.instance, key, val)
 
         # Serialize base fields
-        self.base_fields = self._get_base_fields()
         for key, val in self.data.items():
             if key not in self.opts.update_fields or key not in self.base_fields:
                 continue
@@ -51,11 +56,16 @@ class ModelSerializer(object):
         self.instance.save()
 
         # Serialize related fields
-        self.related_fields = self._get_related_fields()
         for key, val in self.data.items():
             if key not in self.related_fields:
                 continue
             self._deserialize_related(key, val)
+
+        # Serialize m2m fields
+        for key, val in self.data.items():
+            if key not in self.m2m_fields:
+                continue
+            self._deserialize_related(key, val, save_instance=True)
         return self.instance
 
     def _deserialize_field(self, key, val):
@@ -74,11 +84,13 @@ class ModelSerializer(object):
         else:
             setattr(self.instance, key, val)
 
-    def _deserialize_related(self, key, val):
+    def _deserialize_related(self, key, val, save_instance=False):
         serializer = self._get_related_serializer(key)
         if isinstance(val, list):
             for v in val:
                 related_instance = serializer(v).deserialize()
+                if save_instance:
+                    related_instance.save()
                 getattr(self.instance, key).add(related_instance)
 
     def _get_related_serializer(self, key):
@@ -115,3 +127,7 @@ class ModelSerializer(object):
 
         # Serialize the field
         return serialize_field(val)
+
+    @classmethod
+    def get_object_map(cls, include_serializers=None, ignore_serializers=None):
+        return get_object_map(cls, ignore_serializers)

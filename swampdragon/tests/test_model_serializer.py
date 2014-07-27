@@ -1,5 +1,5 @@
-from .serializers import FooSerializer, BarSerializer, BazSerializer
-from .models import FooModel, BarModel, BazModel
+from .serializers import FooSerializer, BarSerializer, BazSerializer, QuxSerializer
+from .models import FooModel, BarModel, BazModel, QuxModel
 from ..tests.dragon_django_test_case import DragonDjangoTestCase
 
 
@@ -60,6 +60,15 @@ class DeserializerTest(DragonDjangoTestCase):
         self.assertEqual(baz.name, 'this is baz')
         self.assertEqual(baz.bar.number, 25)
 
+    def test_deserialize_m2m(self):
+        data = {
+            'test_field_a': 'foo',
+            'test_field_b': 'bar',
+            'foos': [{'test_field_a': 'a', 'test_field_b': 'b'}]
+        }
+        qux = QuxSerializer(data).save()
+        self.assertTrue(qux.foos.exists())
+
 
 class SerializerTest(DragonDjangoTestCase):
     def test_serialize_simple_model(self):
@@ -103,3 +112,14 @@ class SerializerTest(DragonDjangoTestCase):
         data = serializer.serialize()
         self.assertEqual(data['bar']['number'], 333)
         self.assertEqual(data['name'], 'bazzy')
+
+    def test_serialize_m2m(self):
+        """
+        Serialize a model with m2m fields
+        """
+        qux = QuxModel.objects.create(value='qux')
+        qux.foos.add(FooModel.objects.create(test_field_a='a', test_field_b='b'))
+        serializer = QuxSerializer(instance=qux)
+        data = serializer.serialize()
+        self.assertEqual(data['value'], 'qux')
+        self.assertEqual(data['foos'][0]['test_field_a'], 'a')

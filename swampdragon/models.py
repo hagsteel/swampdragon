@@ -9,6 +9,8 @@ from .pubsub_providers.model_publisher import publish_model
 class SelfPublishModel(object):
     _ignore_changes_for = None
     _should_publish = True
+    serializer_class = None
+    publisher_class = RedisPubSubProvider
 
     def __enter__(self):
         self._should_publish = False
@@ -32,14 +34,15 @@ class SelfPublishModel(object):
     def _set_ignored_fields(self):
         if self.__class__._ignore_changes_for is None:
             self.__class__._ignore_changes_for = set()
-            for f in self.serializer_class.get_related_fields():
+            for f in self._serializer._get_related_fields():
+                self._ignore_changes_for.add(f)
+            for f in self._serializer._get_m2m_fields():
                 self._ignore_changes_for.add(f)
 
     def _get_relevant_fields(self):
-        update_fields = self.serializer_class.update_fields or []
-        filter_fields = self.serializer_class.channel_filter_fields or []
-        publish_fields = self.serializer_class.publish_fields or []
-        relevant_fields = set(update_fields + filter_fields + publish_fields)
+        update_fields = self._serializer.opts.update_fields
+        publish_fields = self._serializer.publish_fields
+        relevant_fields = set(update_fields + publish_fields)
 
         if self.serializer_class.id_field in relevant_fields:
             relevant_fields.remove(self.serializer_class.id_field)
@@ -59,9 +62,6 @@ class SelfPublishModel(object):
             elif val != v:
                 changes[k] = v
         return changes
-
-    serializer_class = None
-    publisher_class = RedisPubSubProvider
 
     def serialize(self):
         serializer = self.serializer_class()

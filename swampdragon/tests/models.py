@@ -97,3 +97,8 @@ class BarModel(models.Model):
 class BazModel(models.Model):
     name = models.CharField(max_length=100)
     bar = models.OneToOneField(BarModel)
+
+
+class QuxModel(models.Model):
+    value = models.CharField(max_length=100)
+    foos = models.ManyToManyField(FooModel)

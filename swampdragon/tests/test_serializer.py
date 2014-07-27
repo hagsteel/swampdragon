@@ -41,17 +41,6 @@ class SerializerTest(DragonDjangoTestCase):
         self.assertTrue(isinstance(data['created'], str))
         self.assertTrue(isinstance(data['dec_value'], str))
 
-    def test_get_object_map(self):
-        company_graph = CompanySerializer().get_object_map()
-        self.assertEqual(len(company_graph), 2)
-        company_graph = CompanySerializer().get_object_map([StaffSerializer])
-        self.assertEqual(len(company_graph), 3)
-        department_graph = DepartmentSerializer.get_object_map()
-        self.assertEqual(len(department_graph), 1)
-        staff_graph = StaffSerializer.get_object_map()
-        self.assertEqual(len(staff_graph), 1)
-        self.assertEqual(staff_graph[0]['via'], 'staff_id')
-
     def test_m2m_serialization(self):
         with Company() as company:
             company.name = 'company a'
