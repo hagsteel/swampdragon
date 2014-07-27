@@ -1,6 +1,4 @@
-from django.db.models import ForeignKey, OneToOneField
-from django.db.models.loading import get_model
-from swampdragon.model_tools import get_property
+from swampdragon.model_tools import get_property, get_model
 from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.object_map import get_object_map
 from swampdragon.serializers.serializer_importer import get_serializer
@@ -11,15 +9,15 @@ class ModelSerializerMeta(object):
     def __init__(self, options):
         self.publish_fields = getattr(options, 'publish_fields', ())
         self.update_fields = getattr(options, 'update_fields', ())
-        self.model = getattr(options, 'model')
-        if isinstance(self.model, str):
-            self.model = get_model(*self.model.split('.', 1))
+        self.model = get_model(getattr(options, 'model'))
+        self.id_field = getattr(options, 'id_field', 'id')
+        self.base_channel = getattr(options, 'base_channel', self.model._meta.model_name)
 
 
 class ModelSerializer(object):
     def __init__(self, data=None, instance=None, initial=None):
         self.opts = ModelSerializerMeta(self.Meta)
-        self.instance = instance or self.opts.model()
+        self._instance = instance
         self.data = data
         self.initial = initial or {}
         self.base_fields = self._get_base_fields()
@@ -28,6 +26,12 @@ class ModelSerializer(object):
 
     class Meta(object):
         pass
+
+    @property
+    def instance(self):
+        if not self._instance:
+            self._instance = self.opts.model()
+        return self._instance
 
     def _get_base_fields(self):
         return [f.name for f in self.opts.model._meta.fields]
@@ -100,7 +104,7 @@ class ModelSerializer(object):
         return serializer
 
     def serialize(self, ignore_serializers=None):
-        data = {}
+        data = {'id': getattr(self.instance, self.opts.id_field)}
         for field in self.opts.publish_fields:
             data[field] = self._serialize_value(field, ignore_serializers)
         return data
@@ -131,3 +135,9 @@ class ModelSerializer(object):
     @classmethod
     def get_object_map(cls, include_serializers=None, ignore_serializers=None):
         return get_object_map(cls, ignore_serializers)
+
+    @classmethod
+    def get_base_channel(cls):
+        if hasattr(cls.Meta, 'base_channel'):
+            return '{}|'.format(getattr(cls.Meta, 'base_channel'))
+        return '{}|'.format(get_model(cls.Meta.model)._meta.model_name)

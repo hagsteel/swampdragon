@@ -23,6 +23,7 @@ class SelfPublishModel(object):
     def __init__(self, *args, **kwargs):
         self._pre_save_state = dict()
         super(SelfPublishModel, self).__init__(*args, **kwargs)
+        self._serializer = self.serializer_class()
         self._set_ignored_fields()
         relevant_fields = self._get_relevant_fields()
         for field in relevant_fields:
@@ -40,12 +41,12 @@ class SelfPublishModel(object):
                 self._ignore_changes_for.add(f)
 
     def _get_relevant_fields(self):
-        update_fields = self._serializer.opts.update_fields
-        publish_fields = self._serializer.publish_fields
+        update_fields = list(self._serializer.opts.update_fields)
+        publish_fields = list(self._serializer.opts.publish_fields)
         relevant_fields = set(update_fields + publish_fields)
 
-        if self.serializer_class.id_field in relevant_fields:
-            relevant_fields.remove(self.serializer_class.id_field)
+        if self._serializer.opts.id_field in relevant_fields:
+            relevant_fields.remove(self._serializer.opts.id_field)
         return relevant_fields
 
     def _get_changes(self):
@@ -70,7 +71,7 @@ class SelfPublishModel(object):
     def _publish(self, action, changes=None):
         if not self.serializer_class:
             return
-        publish_model(self, self.serializer_class(), self.publisher_class(), action, changes)
+        publish_model(self, self._serializer, self.publisher_class(), action, changes)
 
     def save(self, *args, **kwargs):
         if not self.pk:

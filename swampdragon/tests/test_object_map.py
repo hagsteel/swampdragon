@@ -8,3 +8,4 @@ class ObjectMapTest(DragonDjangoTestCase):
         bar_graph = BarSerializer.get_object_map()
         baz_graph = BazSerializer.get_object_map()
         qux_graph = QuxSerializer.get_object_map()
+        

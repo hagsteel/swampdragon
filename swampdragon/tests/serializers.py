@@ -17,14 +17,17 @@ class DepartmentSerializer(ModelSerializer):
 
 
 class StaffSerializer(ModelSerializer):
+    documents = 'serializers.DocumentSerializer'
+
     class Meta:
         model = 'tests.Staff'
         publish_fields = ['name', 'department.company.id', 'documents']
         update_fields = ['name']
         documents_serializer = 'tests.DocumentSerializer'
 
-    def serialize_documents(self, obj=None, serializer=None):
-        return [serializer.serialize(d, ignore_fields=['staff']) for d in obj.documents.all()]
+    # def serialize_documents(self, obj=None, serializer=None):
+    #     import ipdb;ipdb.set_trace()
+    #     return [serializer.serialize(d, ignore_fields=['staff']) for d in obj.documents.all()]
 
 
 class LogoSerializer(ModelSerializer):
@@ -46,13 +49,15 @@ class CompanySerializer(ModelSerializer):
 
 
 class DocumentSerializer(ModelSerializer):
+    staff = StaffSerializer
+
     class Meta:
         model = 'tests.Document'
         publish_fields = ['name', 'content', 'staff']
         staff_serializer = StaffSerializer
 
-    def serialize_staff(self, obj=None, serializer=None, ignore_fields=[]):
-        return [serializer.serialize(o, ignore_fields=['documents']) for o in obj.staff.all()]
+    # def serialize_staff(self, obj=None, serializer=None, ignore_fields=[]):
+    #     return [serializer.serialize(o, ignore_fields=['documents']) for o in obj.staff.all()]
 
 
 ################################

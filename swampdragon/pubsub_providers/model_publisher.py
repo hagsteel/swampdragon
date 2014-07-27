@@ -9,7 +9,7 @@ def publish_model(model_instance, serializer, publisher, action, changes=None):
     base_channel = serializer.get_base_channel()
     all_model_channels = publisher.get_channels(base_channel)
     channels = filter_channels_by_model(all_model_channels, model_instance)
-    serialized_data = serializer.serialize(model_instance)
+    serialized_data = serializer.serialize()
     if channels:
         publish_data = dict({'data': serialized_data})
         publish_data['action'] = action

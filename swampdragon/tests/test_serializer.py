@@ -2,9 +2,9 @@ from datetime import datetime
 from decimal import Decimal
 from ..serializers.base_serializer import BaseSerializer
 from ..serializers.serializer_importer import get_serializer, _imported_modules_
-from .models import CompanySerializer, Company, Department, Staff, Document
+from .models import Company, Department, Staff, Document
 from .mock_connection import TestConnection
-from .serializers import DocumentSerializer, DepartmentSerializer, StaffSerializer
+from .serializers import DocumentSerializer
 from .dragon_django_test_case import DragonDjangoTestCase
 
 
