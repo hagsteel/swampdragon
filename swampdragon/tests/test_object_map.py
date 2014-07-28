@@ -4,8 +4,8 @@ from .serializers import FooSerializer, BarSerializer, BazSerializer, QuxSeriali
 
 class ObjectMapTest(DragonDjangoTestCase):
     def test_get_object_map(self):
-        foo_graph = FooSerializer.get_object_map()
-        bar_graph = BarSerializer.get_object_map()
+        # foo_graph = FooSerializer.get_object_map()
+        # bar_graph = BarSerializer.get_object_map()
         baz_graph = BazSerializer.get_object_map()
-        qux_graph = QuxSerializer.get_object_map()
-        
+        # qux_graph = QuxSerializer.get_object_map()
+        import ipdb;ipdb.set_trace()

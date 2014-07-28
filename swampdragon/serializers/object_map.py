@@ -19,7 +19,7 @@ def _get_serializers(serializer, ignore_serializers=None):
     for attrib in possible_serializers:
         val = getattr(serializer, attrib)
         if hasattr(val, 'serialize') and val not in ignore_serializers:
-            serializers.append(val)
+            serializers.append((val, attrib))
     return serializers
 
 
@@ -29,9 +29,9 @@ def get_object_map(serializer, include_serializers=None, ignore_serializers=None
     m2m_fields = serializer_instance.m2m_fields
     related_fields = serializer_instance.related_fields
 
-    for field_name in m2m_fields:
+    serializers = _get_serializers(serializer, [serializer])
+    for related_serializer, field_name in serializers:
         field = getattr(serializer_instance.opts.model, field_name)
-
         if hasattr(field, 'related'):
             model = field.related.model
             attname = '{}_id'.format(field.related.field.name)
@@ -49,6 +49,28 @@ def get_object_map(serializer, include_serializers=None, ignore_serializers=None
                 field_name
             )
         )
+    import ipdb;ipdb.set_trace()
+
+    # for field_name in m2m_fields:
+    #     field = getattr(serializer_instance.opts.model, field_name)
+    #
+    #     if hasattr(field, 'related'):
+    #         model = field.related.model
+    #         attname = '{}_id'.format(field.related.field.name)
+    #     else:
+    #         model = field.field.related.parent_model
+    #         attname = '{}_id'.format(field.field.related.var_name)
+    #     if ignore_serializers and model in [s._model() for s in ignore_serializers]:
+    #         continue
+    #     graph.append(
+    #         _construct_graph(
+    #             serializer_instance.opts.model._meta.model_name,
+    #             model._meta.model_name,
+    #             attname,
+    #             True,
+    #             field_name
+    #         )
+    #     )
 
     for field_name in related_fields:
         field = getattr(serializer_instance.opts.model, field_name)
