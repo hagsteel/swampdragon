@@ -79,3 +79,8 @@ class SerializerTest(DragonDjangoTestCase):
         ser = get_serializer('tests.DocumentSerializer', self.__class__)
         self.assertEqual(ser, DocumentSerializer)
         self.assertNotEqual(_imported_modules_, {})
+
+
+class TestGetObjectGraph(DragonDjangoTestCase):
+    # def test_get_object_map(self):
+    #     Foo

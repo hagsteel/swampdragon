@@ -43,3 +43,34 @@ class DocumentSerializer(DjangoModelSerializer):
 
     def serialize_staff(self, obj=None, serializer=None, ignore_fields=[]):
         return [serializer.serialize(o, ignore_fields=['documents']) for o in obj.staff.all()]
+
+
+################################
+# New serializeres
+################################
+class FooSerializer(DjangoModelSerializer):
+    bars = 'tests.BarSerializer'
+    publish_fields = ('test_field_a', 'bars')
+    update_fields = ('test_field_a', 'test_field_b', 'bars')
+    model = 'tests.FooModel'
+
+
+class BarSerializer(DjangoModelSerializer):
+    foo = FooSerializer
+    model = 'tests.BarModel'
+    update_fields = ('number', 'foo')
+    publish_fields = ('number', 'foo')
+
+
+class BazSerializer(DjangoModelSerializer):
+    bar = BarSerializer
+    model = 'tests.BazModel'
+    update_fields = ('name', 'bar')
+    publish_fields = ('name', 'bar')
+
+
+class QuxSerializer(DjangoModelSerializer):
+    foos = FooSerializer
+    model = 'tests.QuxModel'
+    publish_fields = ('value', 'foos')
+    update_fields = ('value', 'foos')
