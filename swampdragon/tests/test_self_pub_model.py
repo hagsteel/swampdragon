@@ -71,8 +71,7 @@ class TestSelfPubModel(DragonDjangoTestCase):
         self.company_handler(self.connection).subscribe(**kwargs)
         foo = Company.objects.create(name='foo', comp_num=33)
         json_data = self.connection.get_last_published_data()
-        import ipdb;ipdb.set_trace()
-        serialized_foo = foo.serializer_class().serialize(foo)
+        serialized_foo = foo.serialize()
         self.assertDictEqual(serialized_foo, json_data)
 
     def test_self_publish_with_abstract(self):
@@ -80,13 +79,17 @@ class TestSelfPubModel(DragonDjangoTestCase):
         self.foo_abs_handler(self.connection).subscribe(**kwargs)
         foo = FooWithAbstractBase.objects.create(name='foo')
         json_data = self.connection.get_last_published_data()
-        serialized_foo = foo.serializer_class().serialize(foo)
+        serialized_foo = foo.serialize()
         self.assertDictEqual(serialized_foo, json_data)
 
     def test_self_publish_with_abstract_without_serializer(self):
+        '''
+        Assure it raises an exception, as the BarWithAbstractBase does not have
+        a serializer class
+        '''
         kwargs = {'channel': 'client_chan', }
         self.bar_abs_handler(self.connection).subscribe(**kwargs)
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             BarWithAbstractBase.objects.create(name='foo')
 
     def test_only_publish_changes(self):

@@ -23,13 +23,9 @@ class StaffSerializer(ModelSerializer):
 
     class Meta:
         model = 'tests.Staff'
-        publish_fields = ['name', 'department.company.id', 'documents']
-        update_fields = ['name']
+        publish_fields = ('name', 'department.company.id', 'documents')
+        update_fields = ('name', )
         documents_serializer = 'tests.DocumentSerializer'
-
-    # def serialize_documents(self, obj=None, serializer=None):
-    #     import ipdb;ipdb.set_trace()
-    #     return [serializer.serialize(d, ignore_fields=['staff']) for d in obj.documents.all()]
 
 
 class LogoSerializer(ModelSerializer):

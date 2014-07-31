@@ -5,12 +5,21 @@ from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
 
 
+class ValidationError(Exception):
+    def __init__(self, errors={}, *args, **kwargs):
+        super(ValidationError, self).__init__(*args, **kwargs)
+        self.errors = errors
+
+    def get_error_dict(self):
+        return self.errors
+
+
 class ModelSerializerMeta(object):
     def __init__(self, options):
         self.publish_fields = getattr(options, 'publish_fields', ())
         self.update_fields = getattr(options, 'update_fields', ())
         self.model = get_model(getattr(options, 'model'))
-        self.id_field = getattr(options, 'id_field', 'id')
+        self.id_field = getattr(options, 'id_field', 'pk')
         self.base_channel = getattr(options, 'base_channel', self.model._meta.model_name)
 
 

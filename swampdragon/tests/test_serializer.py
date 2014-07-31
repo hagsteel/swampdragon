@@ -45,6 +45,7 @@ class SerializerTest(DragonDjangoTestCase):
         with Company() as company:
             company.name = 'company a'
             company.comp_num = 33
+            company.pk = 321
 
         with Department() as department:
             department.name = 'dep a'
@@ -52,7 +53,6 @@ class SerializerTest(DragonDjangoTestCase):
 
         with Document() as document:
             document.name = 'test doc'
-            document.pk = 100
 
         with Staff() as staff:
             staff.name = 'John Doe'
@@ -60,9 +60,8 @@ class SerializerTest(DragonDjangoTestCase):
             staff.pk = 123
 
         staff.documents.add(document)
-        doc_ser = DocumentSerializer(document).serialize()
-        self.assertIn(staff.pk, doc_ser['staff_id'])
-        self.assertIn(document.pk, doc_ser['staff'][0]['document_id'])
+        doc_ser = DocumentSerializer(instance=document).serialize()
+        self.assertEqual(staff.pk, doc_ser['staff'][0]['id'])
 
     def test_get_serializer_from_string(self):
         ser = get_serializer('tests.DocumentSerializer', self.__class__)

@@ -1,12 +1,13 @@
 import json
-from swampdragon.paginator import Paginator, Page
-from swampdragon.sessions.sessions import get_session_store
 from tornado.web import RequestHandler
+from .file_upload_handler import get_file_location, make_file_id, get_file_url
+from .paginator import Paginator, Page
+from .serializers.model_serializer import ValidationError
+from .sessions.sessions import get_session_store
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
 from .pubsub_providers.model_publisher import publish_model
-from .file_upload_handler import get_file_location, get_file_url, make_file_id
 
 registered_handlers = {}
 
@@ -217,8 +218,8 @@ class BaseModelRouter(BaseRouter):
         for o in current_state:
             if past_state[o] != current_state[o]:
                 changed_state[o] = current_state[o]
-        if self.serializer.id_field not in changed_state:
-            changed_state[self.serializer.id_field] = current_state[self.serializer.id_field]
+        if self.serializer.opts.id_field not in changed_state:
+            changed_state['id'] = current_state['id']
         return changed_state
 
     def _get_query_set(self, **kwargs):
@@ -244,8 +245,7 @@ class BaseModelRouter(BaseRouter):
         return obj_list
 
     def send_list(self, object_list, **kwargs):
-        self.serializer = self.serializer_class(context=self.context, **kwargs)
-        self.send([self.serializer.serialize(o) for o in object_list], **kwargs)
+        self.send([self.serializer_class(instance=o).serialize() for o in object_list], **kwargs)
 
     def get_single(self, **kwargs):
         obj = self.get_object(**kwargs)
@@ -255,7 +255,7 @@ class BaseModelRouter(BaseRouter):
         return obj
 
     def send_single(self, obj, **kwargs):
-        self.serializer = self.serializer_class(context=self.context, instance=obj, **kwargs)
+        self.serializer = self.serializer_class(instance=obj)
         self.send(self.serializer.serialize(), **kwargs)
 
     def on_error(self, errors):
@@ -264,11 +264,12 @@ class BaseModelRouter(BaseRouter):
     def create(self, **kwargs):
         kwargs = replace_original_with_data(kwargs)
         initials = self.get_initials('create', **kwargs)
-        self.serializer = self.serializer_class(context=self.context, **kwargs)
-        obj = self.serializer.deserialize(initials=initials, **kwargs)
-        errors = self.serializer.is_valid(obj)
-        if errors:
-            self.on_error(errors)
+        # self.serializer = self.serializer_class(context=self.context, **kwargs)
+        self.serializer = self.serializer_class(data=kwargs, initial=initials)
+        try:
+            obj = self.serializer.save()
+        except ValidationError as error:
+            self.on_error(error.get_error_dict())
             return
 
         obj.save()
@@ -276,32 +277,32 @@ class BaseModelRouter(BaseRouter):
 
     def created(self, obj, **kwargs):
         if not self.serializer:
-            self.serializer = self.serializer_class()
-        self.send(self.serializer.serialize(obj))
+            self.serializer = self.serializer_class(obj)
+        self.send(self.serializer.serialize())
 
     def update(self, **kwargs):
         kwargs = replace_original_with_data(kwargs)
-        initials = self.get_initials('update', **kwargs)
+        initial = self.get_initials('update', **kwargs)
         obj = self.get_object(**kwargs)
         if not obj:
             return self.action_failed(**kwargs)
-        self.serializer = self.serializer_class(context=self.context, instance=obj, **kwargs)
+        self.serializer = self.serializer_class(instance=obj, data=kwargs, initial=initial)
         past_state = self.serializer.serialize()
-        self.serializer.instance = self.serializer.deserialize(obj, initials=initials, **kwargs)
-        errors = self.serializer.is_valid(self.serializer.instance)
-        if errors:
+        try:
+            self.serializer.save()
+        except ValidationError as error:
+            errors = error.get_error_dict()
             self.on_error(errors)
             return
         updated_data = self._get_changes(self.serializer.serialize(), past_state)
-        self.serializer.instance.save()
         self.updated(self.serializer.instance, updated_data=updated_data, past_state=past_state)
 
     def updated(self, obj, **kwargs):
         self.send(kwargs.get('updated_data'), **kwargs)
 
     def delete(self, **kwargs):
-        self.serializer = self.serializer_class(context=self.context, **kwargs)
         obj = self.get_object(**kwargs)
+        self.serializer = self.serializer_class(instance=obj, data=kwargs)
         if not obj:
             return self.action_failed(**kwargs)
         obj_id = obj.pk
@@ -309,7 +310,7 @@ class BaseModelRouter(BaseRouter):
         obj.delete()
 
     def deleted(self, obj, **kwargs):
-        serialized_obj = self.serializer.serialize(obj)
+        serialized_obj = self.serializer.serialize()
         self.send(serialized_obj, **kwargs)
 
 
@@ -327,7 +328,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
-        self.publish_action(channels, self.serializer.serialize(obj), PUBACTIONS.created)
+        self.publish_action(channels, self.serializer_class(obj).serialize(), PUBACTIONS.created)
 
     def updated(self, obj, **kwargs):
         super(BaseModelPublisherRouter, self).updated(obj, **kwargs)
@@ -343,8 +344,8 @@ class BaseModelPublisherRouter(BaseModelRouter):
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
-        data = dict(self.serializer.serialize(obj))
-        data[self.serializer.id_field] = obj_id
+        data = self.serializer.serialize()
+        data[self.serializer.opts.id_field] = obj_id
         self.publish_action(channels, data, PUBACTIONS.deleted)
 
     def subscribe(self, **kwargs):

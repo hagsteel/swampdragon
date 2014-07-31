@@ -1,8 +1,8 @@
 from django.db import models
-from ..serializers.django_model_serializer import DjangoModelSerializer
 from ..models import SelfPublishModel
 from .mock_provider import MockPubSubProvider
 from .serializers import CompanySerializer, DepartmentSerializer, StaffSerializer, DocumentSerializer, LogoSerializer
+from ..serializers.model_serializer import ModelSerializer
 
 
 class TestSelfPublishModel(SelfPublishModel):
@@ -40,16 +40,18 @@ class Document(TestSelfPublishModel, models.Model):
     serializer_class = DocumentSerializer
 
 
-class FooWithAbstractSerializer(DjangoModelSerializer):
-    model = 'tests.FooWithAbstractBase'
-    publish_fields = ['name']
-    update_fields = ['name']
+class FooWithAbstractSerializer(ModelSerializer):
+    class Meta:
+        model = 'tests.FooWithAbstractBase'
+        publish_fields = ['name']
+        update_fields = ['name']
 
 
-class BarWithAbstractSerializer(DjangoModelSerializer):
-    model = 'tests.BarWithAbstractBase'
-    publish_fields = ['name', 'is_something']
-    update_fields = ['name', 'is_something']
+class BarWithAbstractSerializer(ModelSerializer):
+    class Meta:
+        model = 'tests.BarWithAbstractBase'
+        publish_fields = ['name', 'is_something']
+        update_fields = ['name', 'is_something']
 
 
 class FooAbstract(TestSelfPublishModel, models.Model):

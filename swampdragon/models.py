@@ -23,7 +23,7 @@ class SelfPublishModel(object):
     def __init__(self, *args, **kwargs):
         self._pre_save_state = dict()
         super(SelfPublishModel, self).__init__(*args, **kwargs)
-        self._serializer = self.serializer_class()
+        self._serializer = self.serializer_class(instance=self)
         self._set_ignored_fields()
         relevant_fields = self._get_relevant_fields()
         for field in relevant_fields:
@@ -65,8 +65,7 @@ class SelfPublishModel(object):
         return changes
 
     def serialize(self):
-        serializer = self.serializer_class()
-        return serializer.serialize(self)
+        return self._serializer.serialize()
 
     def _publish(self, action, changes=None):
         if not self.serializer_class:
