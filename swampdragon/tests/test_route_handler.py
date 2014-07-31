@@ -1,12 +1,10 @@
 import json
 from .. import route_handler
 from ..route_handler import BaseModelPublisherRouter, UnexpectedVerbException
-from ..serializers.model_serializer import ModelSerializer
-from ..tests import ParentModel, ChildModel, SubChildModel
 from .mock_connection import TestConnection
 from .dragon_django_test_case import DragonDjangoTestCase
 from .models import FooModel, BarModel
-from .serializers import FooSerializer
+from .serializers import FooSerializer, BarSerializer
 
 
 class FooRouter(BaseModelPublisherRouter):
@@ -14,7 +12,7 @@ class FooRouter(BaseModelPublisherRouter):
     model = FooModel
     route_name = 'test_parent_router'
     serializer_class = FooSerializer
-    # include_related = [ChildModelSerializer, SubChildModelSerializer]
+    include_related = [BarSerializer]
 
     def get_query_set(self, **kwargs):
         return self.model.objects.filter(**kwargs)
@@ -30,12 +28,8 @@ class FooRouter(BaseModelPublisherRouter):
 class TestModelRouter(DragonDjangoTestCase):
     def setUp(self):
         route_handler.register(FooRouter)
-        # route_handler.register(ChildRouter)
-        # route_handler.register(SubChildRouter)
         self.connection = TestConnection()
         self.foo_router = route_handler.get_route_handler(FooRouter.route_name)
-        # self.child_handler = route_handler.get_route_handler(ChildRouter.route_name)
-        # self.subchild_handler = route_handler.get_route_handler(SubChildRouter.route_name)
 
     def test_subscribe(self):
         '''
@@ -143,24 +137,25 @@ class TestModelRouter(DragonDjangoTestCase):
         FooModel.objects.create(test_field_a='hello', test_field_b='world',)
         foo = FooModel.objects.create(test_field_a='findme', test_field_b='world',)
         data = {'verb': 'get_list', 'args': {'test_field_a__contains': 'find'}}
-        # data = {'verb': 'get_list'}
         self.foo_router(self.connection).handle(data)
         received_data = self.connection.get_last_message()
         self.assertTrue(len(received_data), 1)
         self.assertEqual(received_data['data'][0]['test_field_a'], foo.test_field_a)
 
-    # def test_subscribe_to_related(self):
-    #     parent = ParentModel.objects.create(name='foo', age=55)
-    #     kwargs = {'channel': 'client_chan', 'parent_id': parent.pk, }
-    #     self.parent_handler(self.connection).subscribe(**kwargs)
-    #     expected_channels = [
-    #         '{}parent_id:1'.format(ParentModelSerializer.get_base_channel()),
-    #         '{}parent__parent_id:1'.format(ChildModelSerializer.get_base_channel()),
-    #         '{}child__parent__parent_id:1'.format(SubChildModelSerializer.get_base_channel()),
-    #     ]
-    #     json_data = json.loads(self.connection.sent_data[-1])
-    #     remote_channels = json_data['channel_data']['remote_channels']
-    #     self.assertListEqual(remote_channels, expected_channels)
+    def test_subscribe_to_related(self):
+        '''
+        Test channels from related serializers are included
+        '''
+        foo = FooModel.objects.create(test_field_a='hello', test_field_b='world',)
+        kwargs = {'channel': 'client_chan', 'id': foo.pk, }
+        self.foo_router(self.connection).subscribe(**kwargs)
+        expected_channels = [
+            '{}id:1'.format(FooSerializer.get_base_channel()),
+            '{}foo__id:1'.format(BarSerializer.get_base_channel()),
+        ]
+        data = self.connection.get_last_message()
+        remote_channels = data['channel_data']['remote_channels']
+        self.assertListEqual(remote_channels, expected_channels)
 
     def test_custom_get_method(self):
         FooModel.objects.create(test_field_a='hello', test_field_b='world',)
@@ -170,18 +165,22 @@ class TestModelRouter(DragonDjangoTestCase):
         self.foo_router(self.connection).handle(data)
         data = self.connection.get_last_message()['data']
         self.assertDictEqual(data, {'foo': 'bar'})
-#
-#     def test_remove_on_update(self):
-#         parent = ParentModel.objects.create(name='foo', age=55)
-#         kwargs = {'channel': 'client_chan', 'name': 'foo', }
-#         self.parent_handler(self.connection).subscribe(**kwargs)
-#         self.parent_handler(self.connection).update(**{'id': parent.pk, 'name': 'updated'})
-#         last_update = self.connection.get_last_published()
-#         self.assertEqual(last_update['action'], 'deleted')
-#
-#     def test_specify_related_models_on_subscribe(self):
-#         self.parent_handler(self.connection).subscribe(**{'channel': 'parent', 'id': 1})
-#         obj_map = json.loads(self.connection.sent_data[-1])['data']
-#         self.assertEqual(len(obj_map), 2)
-#         self.assertEqual(len(self.connection.pub_sub._channels), 3)
+
+    def test_remove_on_update(self):
+        '''
+        Causing a change in a model where it no longer matches a subscription
+        should remove the model from the subscriber
+        '''
+        foo = FooModel.objects.create(test_field_a='hello', test_field_b='world',)
+        kwargs = {'channel': 'client_chan', 'test_field_a': 'hello', }
+        self.foo_router(self.connection).subscribe(**kwargs)
+        self.foo_router(self.connection).update(**{'id': foo.pk, 'test_field_a': 'updated'})
+        last_update = self.connection.get_last_published()
+        self.assertEqual(last_update['action'], 'deleted')
+
+    def test_specify_related_models_on_subscribe(self):
+        self.foo_router(self.connection).subscribe(**{'channel': 'bar', 'id': 1})
+        obj_map = json.loads(self.connection.sent_data[-1])['data']
+        self.assertEqual(len(obj_map), 2)
+        self.assertEqual(len(self.connection.pub_sub._channels), 2)
 
