@@ -141,3 +141,15 @@ class ModelSerializer(object):
         if hasattr(cls.Meta, 'base_channel'):
             return '{}|'.format(getattr(cls.Meta, 'base_channel'))
         return '{}|'.format(get_model(cls.Meta.model)._meta.model_name)
+
+    @classmethod
+    def get_related_serializers(cls):
+        possible_serializers = [k for k in cls.__dict__.keys() if not k.startswith('_') and not k == 'Meta']
+        serializers = []
+        for possible_serializer in possible_serializers:
+            val = getattr(cls, possible_serializer)
+            if isinstance(val, str):
+                val = get_serializer(val, cls)
+            if hasattr(val, 'serialize'):
+                serializers.append((val, possible_serializer))
+        return serializers

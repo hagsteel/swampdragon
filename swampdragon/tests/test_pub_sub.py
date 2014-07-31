@@ -34,8 +34,8 @@ class PubSubTest(DragonTestCase):
             'name': 'test'
         }
         context_b = [{'id': 1,}, {'name': 'test'}]
-        channels_a = make_channels(CompanySerializer, None, context_a)
-        channels_b = make_channels(CompanySerializer, None, context_b)
+        channels_a = make_channels(CompanySerializer, context_a)
+        channels_b = make_channels(CompanySerializer, context_b)
         self.assertEqual(channels_a, ['company|id:1|name:test'])
         self.assertListEqual(channels_b, [
             'company|id:1',

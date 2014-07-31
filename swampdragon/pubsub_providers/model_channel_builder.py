@@ -1,5 +1,4 @@
-from django.db.models import OneToOneField, ManyToManyField
-from django.db.models.related import RelatedObject
+from ..serializers.serializer_tools import get_serializer_relationship_field
 from .channel_utils import make_safe, get_property_and_value_from_channel, properties_match_channel_by_object, properties_match_channel_by_dict
 
 
@@ -10,60 +9,32 @@ def _construct_channel(base_channel, **channel_filter):
     return complete_channel
 
 
-def _prefix_channel_filter(var_name, **channel_filter):
+def _prefix_channel_filter(var_name, channel_filter):
     """
     Prefix the property with the related var name
     """
-    cf = dict()
-    for k, v in channel_filter.items():
-        key = '{}__{}'.format(var_name, k)
-        cf[key] = v
-    return cf
+    return channel_filter.replace('|', '|{}__'.format(var_name))
 
 
-def get_related_channels(serializer, related_serializers=None, **channel_filter):
-    if related_serializers and serializer in related_serializers:
-        related_serializers.remove(serializer)
-    related_fields = [serializer._model()._meta.get_field_by_name(f)[0] for f in serializer.get_related_fields()]
-    related_channels = []
-    for field in related_fields:
-        if isinstance(field, RelatedObject) or isinstance(field, OneToOneField) or isinstance(field, ManyToManyField):
-            if hasattr(field, 'field'):
-                field = field.field
-                model = field.model
-                var_name = field.name
-            elif hasattr(field, 'related'):
-                model = field.related.parent_model
-                var_name = field.related.var_name
-            else:
-                continue
-            if related_serializers:
-                for rs in related_serializers:
-                    if rs._model() == model:
-                        channel = _construct_channel(rs.get_base_channel(), **_prefix_channel_filter(var_name, **channel_filter))
-                        related_channels.append(channel)
-                        related_channels += get_related_channels(rs, related_serializers, **_prefix_channel_filter(var_name, **channel_filter))
-    return related_channels
-
-
-def make_channels(serializer, related_serializers=None, property_filter=None):
-    if related_serializers:
-        copy_of_related_serializers = list(related_serializers)
-    else:
-        copy_of_related_serializers = None
+def make_channels(serializer, related_serializers=None, property_filter=None, prefix=None):
     channels = []
     base_channel = serializer.get_base_channel()
+
     if property_filter:
-        if isinstance(property_filter, list):
-            for p in property_filter:
-                channels.append(_construct_channel(base_channel, **p))
-                channels += get_related_channels(serializer, copy_of_related_serializers, **p)
-        else:
-            channels.append(_construct_channel(base_channel, **property_filter))
-            channels += get_related_channels(serializer, copy_of_related_serializers, **property_filter)
+        if not isinstance(property_filter, list):
+            property_filter = [property_filter]
+        for p in property_filter:
+            channel_data = _construct_channel(base_channel, **p)
+            if prefix:
+                channel_data = _prefix_channel_filter(prefix, channel_data)
+            channels.append(channel_data)
     else:
         channels.append(_construct_channel(base_channel))
-        channels += get_related_channels(serializer, copy_of_related_serializers)
+
+    if related_serializers:
+        for related_serializer in related_serializers:
+            field_name = get_serializer_relationship_field(serializer, related_serializer)
+            channels += make_channels(related_serializer, None, property_filter, field_name)
     return channels
 
 

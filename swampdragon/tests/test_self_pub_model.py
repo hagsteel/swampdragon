@@ -71,6 +71,7 @@ class TestSelfPubModel(DragonDjangoTestCase):
         self.company_handler(self.connection).subscribe(**kwargs)
         foo = Company.objects.create(name='foo', comp_num=33)
         json_data = self.connection.get_last_published_data()
+        import ipdb;ipdb.set_trace()
         serialized_foo = foo.serializer_class().serialize(foo)
         self.assertDictEqual(serialized_foo, json_data)
 
@@ -155,28 +156,6 @@ class TestSelfPubModel(DragonDjangoTestCase):
         document.name = 'test doc updated'
         document.save()
         self.assertEqual(len(self.connection.published_data), 3)
-
-    def test_get_m2m_fields(self):
-        fields = DocumentSerializer._get_publish_m2m_fields()
-        expected = ['staff']
-        self.assertListEqual(fields, expected)
-        fields = StaffSerializer._get_publish_m2m_fields()
-        expected = ['documents']
-        self.assertListEqual(fields, expected)
-
-    def test_get_related_fields(self):
-        fields = CompanySerializer.get_related_fields()
-        expected = ['departments', 'logo']
-        self.assertListEqual(fields, expected)
-        fields = DepartmentSerializer.get_related_fields()
-        expected = ['staff']
-        self.assertListEqual(fields, expected)
-        fields = StaffSerializer.get_related_fields()
-        expected = ['documents']
-        self.assertListEqual(fields, expected)
-        fields = DocumentSerializer.get_related_fields()
-        expected = ['staff']
-        self.assertListEqual(fields, expected)
 
     def test_remove_on_update(self):
         with Company(name='foo', comp_num=55) as company:

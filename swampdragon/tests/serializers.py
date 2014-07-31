@@ -7,6 +7,8 @@ from ..serializers.model_serializer import ModelSerializer
 
 
 class DepartmentSerializer(ModelSerializer):
+    staff = 'tests.StaffSerializer'
+
     class Meta:
         model = 'tests.Department'
         publish_fields = ['name', 'company_id', 'staff']
@@ -17,7 +19,7 @@ class DepartmentSerializer(ModelSerializer):
 
 
 class StaffSerializer(ModelSerializer):
-    documents = 'serializers.DocumentSerializer'
+    documents = 'tests.DocumentSerializer'
 
     class Meta:
         model = 'tests.Staff'
@@ -37,12 +39,13 @@ class LogoSerializer(ModelSerializer):
 
 
 class CompanySerializer(ModelSerializer):
+    departments = DepartmentSerializer
+    logo = LogoSerializer
+
     class Meta:
         model = 'tests.Company'
-        publish_fields = ['name', 'age', 'departments', 'logo', 'custom_field']
-        update_fields = ['name', 'age']
-        departments_serializer = DepartmentSerializer
-        logo_serializer = LogoSerializer
+        publish_fields = ['name', 'comp_num', 'departments', 'logo', 'custom_field']
+        update_fields = ['name', 'comp_num']
 
     def serialize_custom_field(self, obj=None, serializer=None, ignore_fields=[]):
         return 'custom field'
