@@ -1,28 +1,35 @@
-from swampdragon.serializers.django_model_serializer import DjangoModelSerializer
+from swampdragon.serializers.model_serializer import ModelSerializer
 
 
-class CompanyOwnerSerializer(DjangoModelSerializer):
-    model = 'app.CompanyOwner'
-    publish_fields = ['name', 'company_id']
+class CompanyOwnerSerializer(ModelSerializer):
+    class Meta:
+        model = 'app.CompanyOwner'
+        publish_fields = ['name', 'company_id']
 
 
-class CompanySerializer(DjangoModelSerializer):
-    model = 'app.Company'
-    publish_fields = ['name', 'staff', 'companyowner']
-    staff_serializer = 'app.StaffSerializer'
-    companyowner_serializer = CompanyOwnerSerializer
+class CompanySerializer(ModelSerializer):
+    companyowner = CompanyOwnerSerializer
+    staff = 'app.StaffSerializer'
+
+    class Meta:
+        model = 'app.Company'
+        publish_fields = ['name', 'staff', 'companyowner']
 
 
-class StaffSerializer(DjangoModelSerializer):
-    model = 'app.Staff'
-    publish_fields = ['name', 'documents', 'company_id']
-    documents_serializer = 'app.DocumentSerializer'
+class StaffSerializer(ModelSerializer):
+    documents = 'app.DocumentSerializer'
+
+    class Meta:
+        model = 'app.Staff'
+        publish_fields = ['name', 'documents', 'company_id']
 
 
-class DocumentSerializer(DjangoModelSerializer):
-    model = 'app.Document'
-    publish_fields = ['title', 'content', 'staff']
-    staff_serializer = StaffSerializer
+class DocumentSerializer(ModelSerializer):
+    staff = StaffSerializer
+
+    class Meta:
+        model = 'app.Document'
+        publish_fields = ['title', 'content', 'staff']
 
     def serialize_staff(self, obj=None, serializer=None, ignore_fields=[]):
         return [serializer.serialize(o, ignore_fields=['documents']) for o in obj.staff.all()]

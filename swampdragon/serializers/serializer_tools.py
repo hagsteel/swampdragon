@@ -26,8 +26,14 @@ class FieldType(namedtuple('FieldType', 'field, model, fk, m2m')):
 
 
 def get_serializer_relationship_field(serializer, related_serializer):
-    model = serializer().opts.model
-    related_model = related_serializer().opts.model
+    if isinstance(serializer, type):
+        model = serializer().opts.model
+    else:
+        model = serializer.opts.model
+    if isinstance(related_serializer, type):
+        related_model = related_serializer().opts.model
+    else:
+        related_model = related_serializer.opts.model
 
     for field_name in related_model._meta.get_all_field_names():
         field_type = FieldType(*related_model._meta.get_field_by_name(field_name))

@@ -26,8 +26,12 @@ class SelfPublishModel(object):
         self._serializer = self.serializer_class(instance=self)
         self._set_ignored_fields()
         relevant_fields = self._get_relevant_fields()
+
         for field in relevant_fields:
             val = get_property(self, field)
+            if val is None:
+                self._pre_save_state[field] = val
+                continue
             if hasattr(val, 'all'):
                 val = val.all()
             self._pre_save_state[field] = val

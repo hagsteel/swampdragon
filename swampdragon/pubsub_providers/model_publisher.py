@@ -11,6 +11,10 @@ def publish_model(model_instance, serializer, publisher, action, changes=None):
     channels = filter_channels_by_model(all_model_channels, model_instance)
     serialized_data = serializer.serialize()
     if channels:
+        # if changes:
+        #     publish_data = dict({'data': {'id': model_instance.pk}})
+        #     publish_data.update(changes)
+        # else:
         publish_data = dict({'data': serialized_data})
         publish_data['action'] = action
         for c in channels:

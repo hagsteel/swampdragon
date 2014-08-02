@@ -298,6 +298,7 @@ class BaseModelRouter(BaseRouter):
         self.updated(self.serializer.instance, updated_data=updated_data, past_state=past_state)
 
     def updated(self, obj, **kwargs):
+        import ipdb;ipdb.set_trace()
         self.send(kwargs.get('updated_data'), **kwargs)
 
     def delete(self, **kwargs):
@@ -328,7 +329,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
-        self.publish_action(channels, self.serializer_class(obj).serialize(), PUBACTIONS.created)
+        self.publish_action(channels, self.serializer_class(instance=obj).serialize(), PUBACTIONS.created)
 
     def updated(self, obj, **kwargs):
         super(BaseModelPublisherRouter, self).updated(obj, **kwargs)

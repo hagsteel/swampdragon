@@ -104,8 +104,8 @@ class TestSelfPubModel(DragonDjangoTestCase):
 
         foo.comp_num = 34
         foo.save()
-
-        self.assertGreater(len(self.connection.published_data), 0)
+        data = self.connection.get_last_published_data()
+        self.assertEqual(data['comp_num'], foo.comp_num)
 
     def test_publish_based_on_children(self):
         with Company(name='foo company', comp_num=33) as company:

@@ -2,9 +2,9 @@ from datetime import datetime
 from decimal import Decimal
 from ..serializers.base_serializer import BaseSerializer
 from ..serializers.serializer_importer import get_serializer, _imported_modules_
-from .models import Company, Department, Staff, Document
+from .models import Company, Department, Staff, Document, FooModel, BarModel
 from .mock_connection import TestConnection
-from .serializers import DocumentSerializer
+from .serializers import DocumentSerializer, FooSerializer
 from .dragon_django_test_case import DragonDjangoTestCase
 
 
@@ -67,3 +67,13 @@ class SerializerTest(DragonDjangoTestCase):
         ser = get_serializer('tests.DocumentSerializer', self.__class__)
         self.assertEqual(ser, DocumentSerializer)
         self.assertNotEqual(_imported_modules_, {})
+
+    def test_serialize_include_via(self):
+        '''
+        Ensure serializing related models includes the 'via' field
+        to help with the object mapper
+        '''
+        foo = FooModel.objects.create(test_field_a='test')
+        bar = BarModel.objects.create(number=123, foo=foo)
+        data = FooSerializer(instance=foo).serialize()
+        self.assertEqual(data['bars'][0]['foo_id'], foo.pk)

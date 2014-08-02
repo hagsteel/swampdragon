@@ -90,7 +90,7 @@ function generateStaffDocuments() {
     for (var i = 1; i < 4; i++) {
         var documents = []
         for (var j = 1; j < 4; j++) {
-            var doc = createDocument(j, [1,2,3]);
+            var doc = createDocument(j, [1, 2, 3]);
             documents.push(doc);
         }
 
@@ -99,4 +99,89 @@ function generateStaffDocuments() {
         staff.push(staffMember);
     }
     return staff;
+}
+
+
+function aatestMapper() {
+    return [
+        {
+            "parent_type": "company",
+            "via": "company_id",
+            "prop_name": "staff",
+            "child_type": "staff",
+            "is_collection": true
+        },
+        {
+            "parent_type": "staff",
+            "via": "staff_id",
+            "prop_name": "documents",
+            "child_type": "document",
+            "is_collection": true
+        },
+        {
+            "parent_type": "document",
+            "via": "document_id",
+            "prop_name": "staff",
+            "child_type": "staff",
+            "is_collection": false
+        },
+        {
+            "parent_type": "company",
+            "via": "company_id",
+            "prop_name": "companyowner",
+            "child_type": "companyowner",
+            "is_collection": true
+        }
+    ];
+}
+
+function aadataPackage() {
+    return [
+        {
+            "staff": [
+                {
+                    "documents": [
+                        {
+                            "staff": null,
+                            "content": "hello world",
+                            "title": "test",
+                            "id": 1,
+                            "$$hashKey": "008"
+                        }
+                    ],
+                    "company_id": 1,
+                    "id": 1,
+                    "name": "hila",
+                    "$$hashKey": "006"
+                }
+            ],
+            "companyowner": {
+                "company_id": null,
+                "id": null,
+                "name": ""
+            },
+            "name": "test",
+            "id": 1,
+            "$$hashKey": "004"
+        }
+    ]
+}
+
+function aadataSource() {
+    return {
+        "action": "updated",
+        "data": {
+            "name": "ahila",
+            "documents": [
+                {
+                    "staff": null,
+                    "content": "hello world",
+                    "id": 1,
+                    "title": "test"
+                }
+            ],
+            "company_id": 1,
+            "id": 1
+        }
+    }
 }

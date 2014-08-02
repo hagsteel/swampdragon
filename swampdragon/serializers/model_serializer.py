@@ -3,6 +3,7 @@ from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.object_map import get_object_map
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
+from swampdragon.serializers.serializer_tools import get_serializer_relationship_field
 
 
 class ValidationError(Exception):
@@ -25,6 +26,8 @@ class ModelSerializerMeta(object):
 
 class ModelSerializer(object):
     def __init__(self, data=None, instance=None, initial=None):
+        if data and not isinstance(data, dict):
+            raise Exception('data needs to be a dictionary')
         self.opts = ModelSerializerMeta(self.Meta)
         self._instance = instance
         self.data = data
@@ -38,8 +41,8 @@ class ModelSerializer(object):
 
     @property
     def instance(self):
-        if not self._instance:
-            self._instance = self.opts.model()
+        # if not self._instance:
+        #     self._instance = self.opts.model()
         return self._instance
 
     def _get_base_fields(self):
@@ -113,7 +116,14 @@ class ModelSerializer(object):
         return serializer
 
     def serialize(self, ignore_serializers=None):
+        if not self.instance:
+            return None
         data = {'id': getattr(self.instance, self.opts.id_field)}
+        if ignore_serializers:
+            for ser in ignore_serializers:
+                via = '{}_id'.format(get_serializer_relationship_field(ser, self))
+                if hasattr(self.instance, via):
+                    data[via] = getattr(self.instance, via)
         for field in self.opts.publish_fields:
             data[field] = self._serialize_value(field, ignore_serializers)
         return data
