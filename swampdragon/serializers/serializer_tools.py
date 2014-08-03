@@ -77,8 +77,15 @@ def get_id_mappings(serializer):
                 data['{}_id'.format(field.verbose_name)] = [val.pk]
 
         if field_type.is_reverse_fk:
-            qs = getattr(serializer.instance, field_name).all()
-            data['{}_id'.format(field.var_name)] = [v[0] for v in qs.values_list('pk')]
+            # Check if this is a one 2 one field first
+            try:
+                val = getattr(serializer.instance, field_name)
+            except field.model.DoesNotExist:
+                continue
+
+            if hasattr(val, 'all'):
+                qs = val.all()
+                data['{}_id'.format(field.var_name)] = [v[0] for v in qs.values_list('pk')]
 
         if field_type.is_m2m:
             qs = getattr(serializer.instance, field_name).all()

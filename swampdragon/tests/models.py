@@ -110,14 +110,12 @@ class QuxModel(models.Model):
 
 
 class CacheFooModel(TestSelfPublishModel, models.Model):
-# class CacheFooModel(models.Model):
     serializer_class = CacheFooSerializer
     test_field_a = models.CharField(max_length=100)
     test_field_b = models.CharField(max_length=100)
 
 
 class CacheBarModel(TestSelfPublishModel, models.Model):
-# class CacheBarModel(models.Model):
     serializer_class = CacheBarSerializer
     number = models.IntegerField()
     foo = models.ForeignKey(CacheFooModel, related_name='bars', null=True)

@@ -1,5 +1,6 @@
 from .dragon_django_test_case import DragonDjangoTestCase
 from .serializers import FooSerializer, BarSerializer, BazSerializer, QuxSerializer, CompanySerializer, DepartmentSerializer, StaffSerializer
+from .models import Company, CompanyLogo, Department, Staff
 
 
 class ObjectMapTest(DragonDjangoTestCase):
@@ -12,3 +13,8 @@ class ObjectMapTest(DragonDjangoTestCase):
         company_graph = CompanySerializer.get_object_map()
         dep_graph = DepartmentSerializer.get_object_map()
         staff_graph = StaffSerializer.get_object_map()
+
+        company = Company.objects.create(name='test co', comp_num=1)
+        dep = Department.objects.create(company=company)
+
+        import ipdb;ipdb.set_trace()

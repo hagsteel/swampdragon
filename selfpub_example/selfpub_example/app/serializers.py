@@ -31,5 +31,5 @@ class DocumentSerializer(ModelSerializer):
         model = 'app.Document'
         publish_fields = ['title', 'content', 'staff']
 
-    def serialize_staff(self, obj=None, serializer=None, ignore_fields=[]):
-        return [serializer.serialize(o, ignore_fields=['documents']) for o in obj.staff.all()]
+    # def serialize_staff(self, obj=None, serializer=None):
+    #     return [serializer(o).serialize for o in obj.staff.all()]
