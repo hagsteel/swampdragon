@@ -30,6 +30,3 @@ class DocumentSerializer(ModelSerializer):
     class Meta:
         model = 'app.Document'
         publish_fields = ['title', 'content', 'staff']
-
-    # def serialize_staff(self, obj=None, serializer=None):
-    #     return [serializer(o).serialize for o in obj.staff.all()]
