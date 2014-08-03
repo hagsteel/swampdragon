@@ -16,5 +16,3 @@ class ObjectMapTest(DragonDjangoTestCase):
 
         company = Company.objects.create(name='test co', comp_num=1)
         dep = Department.objects.create(company=company)
-
-        import ipdb;ipdb.set_trace()

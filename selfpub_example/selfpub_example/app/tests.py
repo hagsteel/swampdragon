@@ -6,4 +6,3 @@ class SelfPubExampleTest(DragonDjangoTestCase):
     def test_serialize_models(self):
         company = Company.objects.create(name='test co')
         owner = CompanyOwner.objects.create(company=company, name='John Doe')
-        import ipdb;ipdb.set_trace()
