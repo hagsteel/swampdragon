@@ -1,5 +1,5 @@
-from .serializers import FooSerializer, BarSerializer, BazSerializer, QuxSerializer
-from .models import FooModel, BarModel, BazModel, QuxModel
+from .serializers import FooSerializer, BarSerializer, BazSerializer, QuxSerializer, StaffSerializer, DocumentSerializer
+from .models import FooModel, BarModel, BazModel, QuxModel, Company, Document, Staff
 from ..tests.dragon_django_test_case import DragonDjangoTestCase
 
 
@@ -39,8 +39,8 @@ class DeserializerTest(DragonDjangoTestCase):
             'test_field_a': 'foo',
             'test_field_b': 'bar',
             'bars': [
-                {'number': 52,},
-                {'number': 42,},
+                {'number': 52, },
+                {'number': 42, },
             ]
         }
         serializer = FooSerializer(data)
@@ -123,3 +123,52 @@ class SerializerTest(DragonDjangoTestCase):
         data = serializer.serialize()
         self.assertEqual(data['value'], 'qux')
         self.assertEqual(data['foos'][0]['test_field_a'], 'a')
+
+
+class SerializerExtraDataTest(DragonDjangoTestCase):
+    '''
+    Test that serializers include mappings for ids and _type values
+    '''
+    def test_serialize_contains_type(self):
+        '''
+        Ensure that the serializer includes the '_type' property
+        as required by the data mapper
+        '''
+        foo_ser = FooSerializer(instance=FooModel.objects.create(test_field_a='hello', test_field_b='world'))
+        data = foo_ser.serialize()
+        self.assertEqual(data['_type'], 'foomodel')
+
+    def test_serialize_contains_list_of_related_ids_reverse_m2m(self):
+        '''
+        Ensure that the serializer include related objects ids
+        on a reverse many 2 many relation
+        '''
+        staff = Staff.objects.create(name='staffy duck')
+        document = Document.objects.create(content='test 123')
+        staff.documents.add(document)
+        ser = StaffSerializer(instance=staff)
+        data = ser.serialize()
+        self.assertListEqual([staff.pk], data['documents'][0]['staff_id'])
+
+    def test_serialize_contains_list_of_related_ids_m2m(self):
+        '''
+        Ensure that the serializer include related objects ids
+        on a many 2 many relation
+        '''
+        staff = Staff.objects.create(name='staffy duck')
+        document = Document.objects.create(content='test 123')
+        staff.documents.add(document)
+        ser = DocumentSerializer(instance=document)
+        data = ser.serialize()
+        self.assertListEqual([document.pk], data['staff_id'])
+
+    def test_serialize_contains_list_of_related_ids_related(self):
+        '''
+        Ensure that the serializer include related objects ids
+        on a many 2 many relation
+        '''
+        foo = FooModel.objects.create(test_field_a='hello', test_field_b='world', pk=100)
+        bar = BarModel.objects.create(number=123, foo=foo)
+        ser = BarSerializer(instance=bar)
+        data = ser.serialize()
+        self.assertListEqual([foo.pk], data['foo_id'])

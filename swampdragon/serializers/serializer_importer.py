@@ -1,4 +1,5 @@
 _imported_modules_ = {}
+_imported_serializers_ = {}
 
 
 def add_module_to_imported_modules(src, mod):
@@ -12,6 +13,9 @@ def get_module(src):
 
 
 def get_serializer(ser, f):
+    if ser in _imported_serializers_:
+        return _imported_serializers_[ser]
+
     root = f.__module__.split('.')[0]
     package_name = ser.rsplit('.', 1)[0]
     serializer_class_name = ser.rsplit('.', 1)[1]
@@ -22,6 +26,7 @@ def get_serializer(ser, f):
             mod = __import__(src, fromlist=[serializer_class_name])
             add_module_to_imported_modules(src, mod)
         klass = getattr(mod, serializer_class_name)
+        _imported_serializers_[ser] = klass
         return klass
     except:
         pass

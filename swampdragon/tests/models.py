@@ -1,7 +1,8 @@
 from django.db import models
 from ..models import SelfPublishModel
 from .mock_provider import MockPubSubProvider
-from .serializers import CompanySerializer, DepartmentSerializer, StaffSerializer, DocumentSerializer, LogoSerializer
+from .serializers import CompanySerializer, DepartmentSerializer, StaffSerializer, DocumentSerializer, LogoSerializer, \
+    FooSerializer, BarSerializer, CacheFooSerializer, CacheBarSerializer
 from ..serializers.model_serializer import ModelSerializer
 
 
@@ -86,12 +87,14 @@ class TestUser(object):
         return self.id is None
 
 
-class FooModel(models.Model):
+class FooModel(TestSelfPublishModel, models.Model):
+    serializer_class = FooSerializer
     test_field_a = models.CharField(max_length=100)
     test_field_b = models.CharField(max_length=100)
 
 
-class BarModel(models.Model):
+class BarModel(TestSelfPublishModel, models.Model):
+    serializer_class = BarSerializer
     number = models.IntegerField()
     foo = models.ForeignKey(FooModel, related_name='bars', null=True)
 
@@ -104,3 +107,17 @@ class BazModel(models.Model):
 class QuxModel(models.Model):
     value = models.CharField(max_length=100)
     foos = models.ManyToManyField(FooModel)
+
+
+class CacheFooModel(TestSelfPublishModel, models.Model):
+# class CacheFooModel(models.Model):
+    serializer_class = CacheFooSerializer
+    test_field_a = models.CharField(max_length=100)
+    test_field_b = models.CharField(max_length=100)
+
+
+class CacheBarModel(TestSelfPublishModel, models.Model):
+# class CacheBarModel(models.Model):
+    serializer_class = CacheBarSerializer
+    number = models.IntegerField()
+    foo = models.ForeignKey(CacheFooModel, related_name='bars', null=True)

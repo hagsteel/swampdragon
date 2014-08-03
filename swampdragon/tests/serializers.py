@@ -1,4 +1,4 @@
-from ..serializers.django_model_serializer import DjangoModelSerializer
+from ..serializers.cached_serializer import CacheModelSerializer
 from ..serializers.model_serializer import ModelSerializer
 
 ################################
@@ -23,7 +23,7 @@ class StaffSerializer(ModelSerializer):
 
     class Meta:
         model = 'tests.Staff'
-        publish_fields = ('name', 'department.company.id', 'documents')
+        publish_fields = ('name', 'documents')
         update_fields = ('name', )
         documents_serializer = 'tests.DocumentSerializer'
 
@@ -96,3 +96,21 @@ class QuxSerializer(ModelSerializer):
         model = 'tests.QuxModel'
         publish_fields = ('value', 'foos')
         update_fields = ('value', 'foos')
+
+
+class CacheFooSerializer(CacheModelSerializer):
+    bars = 'tests.CacheBarSerializer'
+
+    class Meta:
+        model = 'tests.CacheFooModel'
+        publish_fields = ('test_field_a', 'bars')
+        update_fields = ('test_field_a', 'test_field_b', 'bars')
+
+
+class CacheBarSerializer(CacheModelSerializer):
+    foo = CacheFooSerializer
+
+    class Meta:
+        model = 'tests.CacheBarModel'
+        update_fields = ('number', 'foo')
+        publish_fields = ('number', 'foo')

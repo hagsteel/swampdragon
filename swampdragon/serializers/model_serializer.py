@@ -3,7 +3,41 @@ from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.object_map import get_object_map
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
-from swampdragon.serializers.serializer_tools import get_serializer_relationship_field
+from swampdragon.serializers.serializer_tools import get_serializer_relationship_field, get_id_mappings
+
+
+def _get_id_mappers(serializer):
+    '''
+    Map the ids from the model to it's related models
+    '''
+    for field in serializer.opts.publish_fields:
+        data = {}
+        import ipdb;ipdb.set_trace()
+        if not hasattr(serializer.opts.model, field):
+            continue
+        prop = getattr(serializer.opts.model, field)
+        prop = getattr(serializer.instance, field)
+
+        if hasattr(prop, 'related'):
+            model = prop.related.model
+            attname = '{}_id'.format(prop.related.field.name)
+            data[attname] = [p.pk for p in getattr(serializer.instance, prop.related.field.name).all()]
+            continue
+
+        if hasattr(prop.field, 'verbose_name'):
+            data['{}_id'.format(prop.field.verbose_name)] = [getattr(serializer.instance, field).pk]
+            continue
+        # if hasattr(prop, 'related'):
+        #     model = prop.related.model
+        #     attname = '{}_id'.format(field.related.field.name)
+        # else:
+        #     model = prop.field.related.parent_model
+        #     attname = '{}_id'.format(field.field.related.var_name)
+
+        # if prop and hasattr(prop, 'all'):
+        #     if hasattr(prop, 'target_field_name'):
+        #         data['{}_id'.format(prop.target_field_name)] = [p.pk for p in prop.all()]
+    return data
 
 
 class ValidationError(Exception):
@@ -57,6 +91,9 @@ class ModelSerializer(object):
 
     def deserialize(self):
         # Set initial data
+        if not self._instance:
+            self._instance = self.opts.model()
+
         for key, val in self.initial.items():
             setattr(self.instance, key, val)
 
@@ -119,11 +156,19 @@ class ModelSerializer(object):
         if not self.instance:
             return None
         data = {'id': getattr(self.instance, self.opts.id_field)}
+        data['_type'] = self.opts.model._meta.model_name
+
+        # Set all the ids for related models
+        # so the datamapper can find the connection
+        data.update(get_id_mappings(self))
+        # Set the id value for related models, for the data mapper
         if ignore_serializers:
             for ser in ignore_serializers:
                 via = '{}_id'.format(get_serializer_relationship_field(ser, self))
                 if hasattr(self.instance, via):
                     data[via] = getattr(self.instance, via)
+
+        # Serialize the fields
         for field in self.opts.publish_fields:
             data[field] = self._serialize_value(field, ignore_serializers)
         return data

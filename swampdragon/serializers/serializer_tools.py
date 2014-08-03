@@ -54,3 +54,38 @@ def get_serializer_relationship_field(serializer, related_serializer):
         # Reverse m2m field
         if field_type.is_reverse_m2m and field.rel.to is model:
             return field.attname
+
+
+def get_id_mappings(serializer):
+    if not serializer.instance:
+        return {}
+
+    data = {}
+    for field_name in serializer.opts.publish_fields:
+        if not hasattr(serializer, field_name):
+            continue
+        serializable_field = getattr(serializer, field_name)
+        if not hasattr(serializable_field, 'serialize'):
+            continue
+
+        field_type = FieldType(*serializer.opts.model._meta.get_field_by_name(field_name))
+        field = field_type.field
+
+        if field_type.is_fk:
+            val = getattr(serializer.instance, field_name)
+            if val:
+                data['{}_id'.format(field.verbose_name)] = [val.pk]
+
+        if field_type.is_reverse_fk:
+            qs = getattr(serializer.instance, field_name).all()
+            data['{}_id'.format(field.var_name)] = [v[0] for v in qs.values_list('pk')]
+
+        if field_type.is_m2m:
+            qs = getattr(serializer.instance, field_name).all()
+            data['{}_id'.format(field.var_name)] = [v[0] for v in qs.values_list('pk')]
+
+        if field_type.is_reverse_m2m:
+            qs = getattr(serializer.instance, field_name).all()
+            data['{}_id'.format(field.attname)] = [v[0] for v in qs.values_list('pk')]
+
+    return data

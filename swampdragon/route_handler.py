@@ -298,7 +298,6 @@ class BaseModelRouter(BaseRouter):
         self.updated(self.serializer.instance, updated_data=updated_data, past_state=past_state)
 
     def updated(self, obj, **kwargs):
-        import ipdb;ipdb.set_trace()
         self.send(kwargs.get('updated_data'), **kwargs)
 
     def delete(self, **kwargs):

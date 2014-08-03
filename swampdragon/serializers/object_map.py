@@ -15,6 +15,7 @@ def _serializer_is_ignored(serializer, related_serializer, ignore_serializer_pai
         return True
     return False
 
+
 def get_object_map(serializer, ignore_serializer_pairs=None):
     """
     Create an object map from the serializer and it's related serializers.
