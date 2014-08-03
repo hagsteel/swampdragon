@@ -1,6 +1,8 @@
 Swamp Dragon
 ============
 
+The best of both world: Django models and tornado sock-js
+
 # UNDER DEVELOPMENT
 
 Swamp Dragon is a pub/sub solution running on top of Tornado, and is compatible with Django models.

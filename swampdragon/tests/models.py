@@ -1,8 +1,9 @@
 from django.db import models
-from ..serializers.django_model_serializer import DjangoModelSerializer
 from ..models import SelfPublishModel
 from .mock_provider import MockPubSubProvider
-from .serializers import CompanySerializer, DepartmentSerializer, StaffSerializer, DocumentSerializer, LogoSerializer
+from .serializers import CompanySerializer, DepartmentSerializer, StaffSerializer, DocumentSerializer, LogoSerializer, \
+    FooSerializer, BarSerializer, CacheFooSerializer, CacheBarSerializer
+from ..serializers.model_serializer import ModelSerializer
 
 
 class TestSelfPublishModel(SelfPublishModel):
@@ -40,16 +41,18 @@ class Document(TestSelfPublishModel, models.Model):
     serializer_class = DocumentSerializer
 
 
-class FooWithAbstractSerializer(DjangoModelSerializer):
-    model = 'tests.FooWithAbstractBase'
-    publish_fields = ['name']
-    update_fields = ['name']
+class FooWithAbstractSerializer(ModelSerializer):
+    class Meta:
+        model = 'tests.FooWithAbstractBase'
+        publish_fields = ['name']
+        update_fields = ['name']
 
 
-class BarWithAbstractSerializer(DjangoModelSerializer):
-    model = 'tests.BarWithAbstractBase'
-    publish_fields = ['name', 'is_something']
-    update_fields = ['name', 'is_something']
+class BarWithAbstractSerializer(ModelSerializer):
+    class Meta:
+        model = 'tests.BarWithAbstractBase'
+        publish_fields = ['name', 'is_something']
+        update_fields = ['name', 'is_something']
 
 
 class FooAbstract(TestSelfPublishModel, models.Model):
@@ -82,3 +85,37 @@ class TestUser(object):
 
     def is_anonymous(self):
         return self.id is None
+
+
+class FooModel(TestSelfPublishModel, models.Model):
+    serializer_class = FooSerializer
+    test_field_a = models.CharField(max_length=100)
+    test_field_b = models.CharField(max_length=100)
+
+
+class BarModel(TestSelfPublishModel, models.Model):
+    serializer_class = BarSerializer
+    number = models.IntegerField()
+    foo = models.ForeignKey(FooModel, related_name='bars', null=True)
+
+
+class BazModel(models.Model):
+    name = models.CharField(max_length=100)
+    bar = models.OneToOneField(BarModel)
+
+
+class QuxModel(models.Model):
+    value = models.CharField(max_length=100)
+    foos = models.ManyToManyField(FooModel)
+
+
+class CacheFooModel(TestSelfPublishModel, models.Model):
+    serializer_class = CacheFooSerializer
+    test_field_a = models.CharField(max_length=100)
+    test_field_b = models.CharField(max_length=100)
+
+
+class CacheBarModel(TestSelfPublishModel, models.Model):
+    serializer_class = CacheBarSerializer
+    number = models.IntegerField()
+    foo = models.ForeignKey(CacheFooModel, related_name='bars', null=True)

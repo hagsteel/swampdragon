@@ -9,6 +9,8 @@ from .pubsub_providers.model_publisher import publish_model
 class SelfPublishModel(object):
     _ignore_changes_for = None
     _should_publish = True
+    serializer_class = None
+    publisher_class = RedisPubSubProvider
 
     def __enter__(self):
         self._should_publish = False
@@ -21,10 +23,15 @@ class SelfPublishModel(object):
     def __init__(self, *args, **kwargs):
         self._pre_save_state = dict()
         super(SelfPublishModel, self).__init__(*args, **kwargs)
+        self._serializer = self.serializer_class(instance=self)
         self._set_ignored_fields()
         relevant_fields = self._get_relevant_fields()
+
         for field in relevant_fields:
             val = get_property(self, field)
+            if val is None:
+                self._pre_save_state[field] = val
+                continue
             if hasattr(val, 'all'):
                 val = val.all()
             self._pre_save_state[field] = val
@@ -32,17 +39,18 @@ class SelfPublishModel(object):
     def _set_ignored_fields(self):
         if self.__class__._ignore_changes_for is None:
             self.__class__._ignore_changes_for = set()
-            for f in self.serializer_class.get_related_fields():
+            for f in self._serializer._get_related_fields():
+                self._ignore_changes_for.add(f)
+            for f in self._serializer._get_m2m_fields():
                 self._ignore_changes_for.add(f)
 
     def _get_relevant_fields(self):
-        update_fields = self.serializer_class.update_fields or []
-        filter_fields = self.serializer_class.channel_filter_fields or []
-        publish_fields = self.serializer_class.publish_fields or []
-        relevant_fields = set(update_fields + filter_fields + publish_fields)
+        update_fields = list(self._serializer.opts.update_fields)
+        publish_fields = list(self._serializer.opts.publish_fields)
+        relevant_fields = set(update_fields + publish_fields)
 
-        if self.serializer_class.id_field in relevant_fields:
-            relevant_fields.remove(self.serializer_class.id_field)
+        if self._serializer.opts.id_field in relevant_fields:
+            relevant_fields.remove(self._serializer.opts.id_field)
         return relevant_fields
 
     def _get_changes(self):
@@ -60,17 +68,13 @@ class SelfPublishModel(object):
                 changes[k] = v
         return changes
 
-    serializer_class = None
-    publisher_class = RedisPubSubProvider
-
     def serialize(self):
-        serializer = self.serializer_class()
-        return serializer.serialize(self)
+        return self._serializer.serialize()
 
     def _publish(self, action, changes=None):
         if not self.serializer_class:
             return
-        publish_model(self, self.serializer_class(), self.publisher_class(), action, changes)
+        publish_model(self, self._serializer, self.publisher_class(), action, changes)
 
     def save(self, *args, **kwargs):
         if not self.pk:

@@ -2,9 +2,9 @@ from datetime import datetime
 from decimal import Decimal
 from ..serializers.base_serializer import BaseSerializer
 from ..serializers.serializer_importer import get_serializer, _imported_modules_
-from .models import CompanySerializer, Company, Department, Staff, Document
+from .models import Company, Department, Staff, Document, FooModel, BarModel
 from .mock_connection import TestConnection
-from .serializers import DocumentSerializer, DepartmentSerializer, StaffSerializer
+from .serializers import DocumentSerializer, FooSerializer
 from .dragon_django_test_case import DragonDjangoTestCase
 
 
@@ -41,21 +41,11 @@ class SerializerTest(DragonDjangoTestCase):
         self.assertTrue(isinstance(data['created'], str))
         self.assertTrue(isinstance(data['dec_value'], str))
 
-    def test_get_object_map(self):
-        company_graph = CompanySerializer().get_object_map()
-        self.assertEqual(len(company_graph), 2)
-        company_graph = CompanySerializer().get_object_map([StaffSerializer])
-        self.assertEqual(len(company_graph), 3)
-        department_graph = DepartmentSerializer.get_object_map()
-        self.assertEqual(len(department_graph), 1)
-        staff_graph = StaffSerializer.get_object_map()
-        self.assertEqual(len(staff_graph), 1)
-        self.assertEqual(staff_graph[0]['via'], 'staff_id')
-
     def test_m2m_serialization(self):
         with Company() as company:
             company.name = 'company a'
             company.comp_num = 33
+            company.pk = 321
 
         with Department() as department:
             department.name = 'dep a'
@@ -63,7 +53,6 @@ class SerializerTest(DragonDjangoTestCase):
 
         with Document() as document:
             document.name = 'test doc'
-            document.pk = 100
 
         with Staff() as staff:
             staff.name = 'John Doe'
@@ -71,25 +60,20 @@ class SerializerTest(DragonDjangoTestCase):
             staff.pk = 123
 
         staff.documents.add(document)
-        doc_ser = DocumentSerializer(document).serialize()
-        self.assertIn(staff.pk, doc_ser['staff_id'])
-        self.assertIn(document.pk, doc_ser['staff'][0]['document_id'])
+        doc_ser = DocumentSerializer(instance=document).serialize()
+        self.assertEqual(staff.pk, doc_ser['staff'][0]['id'])
 
     def test_get_serializer_from_string(self):
         ser = get_serializer('tests.DocumentSerializer', self.__class__)
         self.assertEqual(ser, DocumentSerializer)
         self.assertNotEqual(_imported_modules_, {})
 
-
-class DeserializeTest(DragonDjangoTestCase):
-    # def setUp(self):
-    #     self.company = Company.objects.create(name='test co', comp_num=12)
-
-    def test_deserialize_model(self):
-        company_serializer = CompanySerializer()
-        department_data = [{'name': 'dep a'}, {'name': 'dep b'}]
-        company_data = {'logo': None, 'departments': department_data, '_type': 'company', 'id': 1, 'custom_field': 'custom field', 'comp_num': 12, 'name': 'test co'}
-        company = company_serializer.deserialize(**company_data)
-        company.save()
-        self.assertTrue(company.departments.exists())
-
+    def test_serialize_include_via(self):
+        '''
+        Ensure serializing related models includes the 'via' field
+        to help with the object mapper
+        '''
+        foo = FooModel.objects.create(test_field_a='test')
+        bar = BarModel.objects.create(number=123, foo=foo)
+        data = FooSerializer(instance=foo).serialize()
+        self.assertEqual(data['bars'][0]['foo_id'], foo.pk)

@@ -19,7 +19,7 @@ var oneToOneMaps = [{
     prop_name: 'bar',
     is_collection: false,
     via: 'foo_id'
-}]
+}];
 
 var staffDocMaps = [{
     parent_type: 'staff',
@@ -27,7 +27,7 @@ var staffDocMaps = [{
     prop_name: 'documents',
     is_collection: true,
     via: 'staff_id'
-}]
+}];
 
 describe('dataMapper with one to many', function () {
     it('should find parent with id 2', function() {
