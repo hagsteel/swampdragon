@@ -8,7 +8,7 @@ from .models import Company, Department
 class TestChannelConstructor(DragonTestCase):
     def test_channels_from_company(self):
         property_filter = {'name__contains': 'foo'}
-        channels = make_channels(CompanySerializer, [DepartmentSerializer, LogoSerializer], property_filter)
+        channels = make_channels(CompanySerializer, [DepartmentSerializer, LogoSerializer], {'name__contains': 'foo'})
         expecpted = [
             'company|name__contains:foo',
             'department|company__name__contains:foo',
@@ -25,8 +25,7 @@ class TestChannelConstructor(DragonTestCase):
         self.assertListEqual(channels, expecpted)
 
     def test_channels_from_department(self):
-        property_filter = {'name__contains': 'foo'}
-        channels = make_channels(DepartmentSerializer, [StaffSerializer], property_filter)
+        channels = make_channels(DepartmentSerializer, [StaffSerializer], {'name__contains': 'foo'})
         expecpted = [
             'department|name__contains:foo',
             'staff|department__name__contains:foo'
@@ -36,11 +35,11 @@ class TestChannelConstructor(DragonTestCase):
     def test_channels_from_staff(self):
         property_filter = {'name__contains': 'foo'}
         channels = make_channels(StaffSerializer, [DocumentSerializer], property_filter)
-        expecpted = [
+        expected = [
             'staff|name__contains:foo',
             'document|staff__name__contains:foo'
         ]
-        self.assertListEqual(channels, expecpted)
+        self.assertListEqual(channels, expected)
 
     def test_channels_from_document(self):
         property_filter = {'content__contains': 'foo'}

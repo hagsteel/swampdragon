@@ -71,7 +71,7 @@ class TestSelfPubModel(DragonDjangoTestCase):
         self.company_handler(self.connection).subscribe(**kwargs)
         foo = Company.objects.create(name='foo', comp_num=33)
         json_data = self.connection.get_last_published_data()
-        serialized_foo = foo.serializer_class().serialize(foo)
+        serialized_foo = foo.serialize()
         self.assertDictEqual(serialized_foo, json_data)
 
     def test_self_publish_with_abstract(self):
@@ -79,13 +79,17 @@ class TestSelfPubModel(DragonDjangoTestCase):
         self.foo_abs_handler(self.connection).subscribe(**kwargs)
         foo = FooWithAbstractBase.objects.create(name='foo')
         json_data = self.connection.get_last_published_data()
-        serialized_foo = foo.serializer_class().serialize(foo)
+        serialized_foo = foo.serialize()
         self.assertDictEqual(serialized_foo, json_data)
 
     def test_self_publish_with_abstract_without_serializer(self):
+        '''
+        Assure it raises an exception, as the BarWithAbstractBase does not have
+        a serializer class
+        '''
         kwargs = {'channel': 'client_chan', }
         self.bar_abs_handler(self.connection).subscribe(**kwargs)
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             BarWithAbstractBase.objects.create(name='foo')
 
     def test_only_publish_changes(self):
@@ -100,8 +104,8 @@ class TestSelfPubModel(DragonDjangoTestCase):
 
         foo.comp_num = 34
         foo.save()
-
-        self.assertGreater(len(self.connection.published_data), 0)
+        data = self.connection.get_last_published_data()
+        self.assertEqual(data['comp_num'], foo.comp_num)
 
     def test_publish_based_on_children(self):
         with Company(name='foo company', comp_num=33) as company:
@@ -155,28 +159,6 @@ class TestSelfPubModel(DragonDjangoTestCase):
         document.name = 'test doc updated'
         document.save()
         self.assertEqual(len(self.connection.published_data), 3)
-
-    def test_get_m2m_fields(self):
-        fields = DocumentSerializer._get_publish_m2m_fields()
-        expected = ['staff']
-        self.assertListEqual(fields, expected)
-        fields = StaffSerializer._get_publish_m2m_fields()
-        expected = ['documents']
-        self.assertListEqual(fields, expected)
-
-    def test_get_related_fields(self):
-        fields = CompanySerializer.get_related_fields()
-        expected = ['departments', 'logo']
-        self.assertListEqual(fields, expected)
-        fields = DepartmentSerializer.get_related_fields()
-        expected = ['staff']
-        self.assertListEqual(fields, expected)
-        fields = StaffSerializer.get_related_fields()
-        expected = ['documents']
-        self.assertListEqual(fields, expected)
-        fields = DocumentSerializer.get_related_fields()
-        expected = ['staff']
-        self.assertListEqual(fields, expected)
 
     def test_remove_on_update(self):
         with Company(name='foo', comp_num=55) as company:
