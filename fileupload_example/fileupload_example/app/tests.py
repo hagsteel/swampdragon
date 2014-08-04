@@ -45,7 +45,8 @@ class SelfPubExampleTest(DragonDjangoTestCase, AsyncHTTPTestCase):
     def test_single_file_upload(self):
         tmp_text_file = self._generate_text_file()
         fur = FileUploadRequestData([tmp_text_file])
-        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(),
+                                              headers=fur.get_headers())
         data = json.loads(response.body.decode())
         self.assertEqual(data['files'][0]['file_name'], tmp_text_file.name.split('/')[-1])
 
@@ -54,18 +55,20 @@ class SelfPubExampleTest(DragonDjangoTestCase, AsyncHTTPTestCase):
         tmp_text_file = self._generate_text_file()
         tmp_img_file = self._generate_image_file()
         fur = FileUploadRequestData([tmp_text_file, tmp_img_file])
-        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(),
+                                              headers=fur.get_headers())
         data = json.loads(response.body.decode())
 
     @tornado.testing.gen_test
     def test_create_with_file(self):
         tmp_text_file = self._generate_text_file()
         fur = FileUploadRequestData([tmp_text_file])
-        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(),
+                                              headers=fur.get_headers())
         file_data = json.loads(response.body.decode())
         data = {
             'name': 'foo',
-            'file': file_data['files'][0]
+            'file': [file_data['files'][0]]
         }
         self.connection.call_verb('withfile-route', 'create', **data)
         last_data = self.connection.get_last_message()['data']
@@ -76,12 +79,14 @@ class SelfPubExampleTest(DragonDjangoTestCase, AsyncHTTPTestCase):
         tmp_text_file = self._generate_text_file()
         tmp_img_file = self._generate_image_file()
         fur = FileUploadRequestData([tmp_text_file, tmp_img_file])
-        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(),
+                                              headers=fur.get_headers())
         file_data = json.loads(response.body.decode())
         data = {
-            'name': 'foo',
+            'text': 'foo',
             'files': [{'file': f} for f in file_data['files']]
         }
+
         self.connection.call_verb('multifile-route', 'create', **data)
         last_data = self.connection.get_last_message()['data']
-        import ipdb;ipdb.set_trace()
+        self.assertEqual(len(last_data['files']), 2)

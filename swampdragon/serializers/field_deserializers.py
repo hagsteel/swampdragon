@@ -15,6 +15,8 @@ class FileDeserializer(BaseDeserializer):
             return
         if isinstance(val, str):
             return
+        if isinstance(val, list):
+            val = val[0]
         file_id = int(val['file_id'])
         if not file_id > 0:
             return
