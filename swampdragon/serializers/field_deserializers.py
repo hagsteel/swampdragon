@@ -15,6 +15,7 @@ class FileDeserializer(BaseDeserializer):
             return
         if isinstance(val, str):
             return
+        import ipdb;ipdb.set_trace()
         file_id = int(val['file_id'])
         if not file_id > 0:
             return
