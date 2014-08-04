@@ -1,10 +1,15 @@
 from os.path import join
 from os import makedirs
 from django.conf import settings
+from datetime import datetime
+import time
 
 
 def make_file_id(file_data):
-    return str(abs(hash(file_data)))
+    timestamp = datetime.now()
+    timestamp = time.mktime(timestamp.timetuple()) * 1e3 + timestamp.microsecond / 1e3
+    timestamp = '{}'.format(timestamp).encode()
+    return str(abs(hash(file_data + timestamp)))
 
 
 def get_file_location(file_name, file_id):
