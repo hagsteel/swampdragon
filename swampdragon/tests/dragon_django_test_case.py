@@ -11,9 +11,8 @@ class FileUploadRequestData(object):
     def __init__(self, files):
         if not isinstance(files, list):
             files = [files]
-        self.boundary = '----WebKitFormBoundarywUMYINNriVDExJ5e'
-        self.boundary = 'dragontestclient'
-        self.body = self.boundary
+        self.boundary = '--dragontestclient'
+        self.body = ''
         for f in files:
             self.add_file(f)
         self.close_body()
@@ -36,14 +35,14 @@ class FileUploadRequestData(object):
             'filename': file.name.split('/')[-1],
             'file_body': file.read().decode()
         }
-        self.body += '--{boundary}\r\n'.format(**data)
+        self.body += '--{boundary}\r\n\r\n'.format(**data)
         self.body += 'Content-Disposition: form-data; name="uploadedFile"; filename="{filename}"\r\n'.format(**data)
         self.body += 'Content-Type: {mimetype}\r\n\r\n'.format(**data)
         self.body += '{file_body}'.format(**data)
-        self.body += '\r\n'.format(**data)
+        self.body += '\r\n'
 
     def close_body(self):
-        self.body += '--{}--\r\n'.format(self.boundary)
+        self.body += '--{}--\r\n\r\n'.format(self.boundary)
 
     def get_body(self):
         return self.body

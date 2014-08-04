@@ -13,6 +13,11 @@ AsyncIOMainLoop().install()
 
 
 class SelfPubExampleTest(DragonDjangoTestCase, AsyncHTTPTestCase):
+    def setUp(self):
+        super(SelfPubExampleTest, self).setUp()
+        self.as_client = self.get_http_client()
+        self.upload_url = self.get_url('/_sdfileupload/')
+
     def get_app(self):
         return self._load_app()
 
@@ -33,16 +38,14 @@ class SelfPubExampleTest(DragonDjangoTestCase, AsyncHTTPTestCase):
     def test_get_request_fileupload(self):
         url = self.get_url('/_sdfileupload/')
         self.as_client = self.get_http_client()
-        response = yield self.as_client.fetch(url, method='GET')
+        response = yield self.as_client.fetch(self.upload_url, method='GET')
         self.assertEqual(response.body.decode(), 'Hello!')
 
     @tornado.testing.gen_test
     def test_single_file_upload(self):
         tmp_text_file = self._generate_text_file()
-        self.as_client = self.get_http_client()
-        url = self.get_url('/_sdfileupload/')
         fur = FileUploadRequestData([tmp_text_file])
-        response = yield self.as_client.fetch(url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
         data = json.loads(response.body.decode())
         self.assertEqual(data['files'][0]['file_name'], tmp_text_file.name.split('/')[-1])
 
@@ -50,9 +53,13 @@ class SelfPubExampleTest(DragonDjangoTestCase, AsyncHTTPTestCase):
     def test_multiple_file_upload(self):
         tmp_text_file = self._generate_text_file()
         tmp_img_file = self._generate_image_file()
-        self.as_client = self.get_http_client()
-        url = self.get_url('/_sdfileupload/')
         fur = FileUploadRequestData([tmp_text_file, tmp_img_file])
-        response = yield self.as_client.fetch(url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
         data = json.loads(response.body.decode())
-        import ipdb;ipdb.set_trace()
+
+    @tornado.testing.gen_test
+    def test_create_with_file(self):
+        tmp_text_file = self._generate_text_file()
+        fur = FileUploadRequestData([tmp_text_file])
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        data = json.loads(response.body.decode())
