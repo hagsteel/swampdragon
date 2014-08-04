@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="WithFileApp">
+<html lang="en" id="ng-app" ng-app="WithFileApp" xmlns:ng="http://angularjs.org">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +7,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
     <title>Swamp dragon</title>
 
     <!-- Bootstrap core CSS -->
@@ -42,9 +45,9 @@
 </div>
 
 <div class="container">
-    {% block main_content %}
+    {% block main_contentx %}
 
-    {% endblock main_content %}
+    {% endblock main_contentx %}
 </div>
 <!-- /.container -->
 
@@ -52,12 +55,10 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>-->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>-->
+<!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>-->
 <script type="text/javascript" src="{{ STATIC_URL }}libs/angular-1.2.15/angular.min.js"></script>
-{#<script type="text/javascript" src="{{ STATIC_URL }}libs/angular-1.2.6/angular-route.min.js"></script>#}
-{#<script type="text/javascript" src="{{ STATIC_URL }}libs/angular-1.2.6/angular-cookies.min.js"></script>#}
-{#<script type="text/javascript" src="{{ STATIC_URL }}libs/angular-1.2.6/angular-resource.min.js"></script>#}
 <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/vendor/sockjs-0.3.2.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/swampdragon.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/datamapper.js"></script>
