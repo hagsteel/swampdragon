@@ -55,7 +55,7 @@ class FileUploadHandler(RequestHandler):
         pass
 
 
-class BaseRouter(FileUploadHandler):
+class BaseRouter(object):
     valid_verbs = ['get_list', 'get_single', 'create', 'update', 'delete', 'subscribe', 'unsubscribe']
     exclude_verbs = []
     serializer_class = None

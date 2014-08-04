@@ -10,28 +10,35 @@ from swampdragon import discover_routes
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option(
-            '--host',
-            action='store',
-            dest='host',
-            default='127.0.0.1',
-            help='Host'),
-        make_option(
-            '--port',
-            action='store',
-            dest='port',
-            default=getattr(settings, 'SOCKJS_PORT', 9999),
-            help='What port number to run the socket server on'),
-        make_option(
-            '--no-keep-alive',
-            action='store_true',
-            dest='no_keep_alive',
-            default=False,
-            help='Set no_keep_alive on the connection if your server needs it')
-    )
+    # option_list = BaseCommand.option_list + (
+    #     make_option(
+    #         '--host',
+    #         action='store',
+    #         dest='host',
+    #         default='127.0.0.1',
+    #         help='Host'),
+    #     make_option(
+    #         '--port',
+    #         action='store',
+    #         dest='port',
+    #         default=getattr(settings, 'SOCKJS_PORT', 9999),
+    #         help='What port number to run the socket server on'),
+    #     make_option(
+    #         '--no-keep-alive',
+    #         action='store_true',
+    #         dest='no_keep_alive',
+    #         default=False,
+    #         help='Set no_keep_alive on the connection if your server needs it')
+    # )
 
-    def handle(self, **options):
+    def handle(self, *args, **kwargs):
+        HOST = '127.0.0.1'
+        PORT = 9999
+
+        if args:
+            host_port = args[0]
+            HOST = host_port.split(':')[0]
+            PORT = host_port.split(':')[1]
         routers = []
         for sockjs_class in settings.SOCKJS_CLASSES:
             module_name, cls_name = sockjs_class[0].rsplit('.', 1)
@@ -45,14 +52,12 @@ class Command(BaseCommand):
             'debug': settings.DEBUG,
         }
 
-        HOST = options['host']
-        PORT = int(options['port'])
         urls = discover_routes()
         for router in routers:
             urls += router.urls
 
         app = web.Application(urls, **app_settings)
-        app.listen(PORT, address=HOST, no_keep_alive=options['no_keep_alive'])
+        app.listen(PORT, address=HOST, no_keep_alive=False)
         print('Running sock app on {}:{}'.format(HOST, PORT))
         try:
             iol = ioloop.IOLoop.instance()
