@@ -56,7 +56,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-4" ng-controller="WithFileCtrl">
         <div class="panel panel-default">
             <div class="panel-heading">Drop file upload</div>
             <div class="panel-body">
@@ -66,8 +66,16 @@
                         <input type="text" ng-model="withfile.name" class="form-control">
                     </div>
                     <div class="form-group">
+                        <div id="dropbox" style="background-color: #ccc; height: 50px;">Drop files here</div>
                         <label>Picture</label>
-                        <input type="file" sd-file-upload ng-model="withfile.file" class="form-control">
+                        <input type="file" sd-file-upload drag-drop-target="dropbox" on-progress="updateProgress" ng-model="withfile.file" class="form-control">
+
+                        <div class="progress" id="withfile">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="{$ progress $}" aria-valuemin="0" aria-valuemax="100" style="width: {$ progress $}%;">
+                                {$ progress $}%
+                            </div>
+                        </div>
+
                     </div>
                     <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
                 </form>
@@ -76,33 +84,35 @@
     </div>
 </div>
 
-<div class="col-md-6" ng-controller="WithFileListCtrl">
-    <div class="panel panel-default">
-        <div class="panel-heading">Single file uploads</div>
-        <div class="panel-body">
-            <table class="table table-striped">
-                <tr ng-repeat="wf in datasource">
-                    <td>{$ wf.name $}</td>
-                    <td><img ng-src="{$ wf.file $}" height="40"></td>
-                </tr>
-            </table>
+<div class="row">
+    <div class="col-md-6" ng-controller="WithFileListCtrl">
+        <div class="panel panel-default">
+            <div class="panel-heading">Single file uploads</div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <tr ng-repeat="wf in datasource">
+                        <td>{$ wf.name $}</td>
+                        <td><img ng-src="{$ wf.file $}" height="40"></td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-md-6" ng-controller="MultiFileListCtrl">
-    <div class="panel panel-default">
-        <div class="panel-heading">Multi file uploads</div>
-        <div class="panel-body">
-            <table class="table table-striped">
-                <tr ng-repeat="wf in datasource">
-                    <td>{$ wf.text $}</td>
-                    <td>
-                        <img ng-repeat="file in wf.files" ng-src="{$ file.file $}" height="40">
-                    </td>
-                    <!--<td><img ng-src="{$ wf.file $}" height="60"></td>-->
-                </tr>
-            </table>
+    <div class="col-md-6" ng-controller="MultiFileListCtrl">
+        <div class="panel panel-default">
+            <div class="panel-heading">Multi file uploads</div>
+            <div class="panel-body">
+                <table class="table table-striped">
+                    <tr ng-repeat="wf in datasource">
+                        <td>{$ wf.text $}</td>
+                        <td>
+                            <img ng-repeat="file in wf.files" ng-src="{$ file.file $}" height="40">
+                        </td>
+                        <!--<td><img ng-src="{$ wf.file $}" height="60"></td>-->
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>
