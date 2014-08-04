@@ -7,8 +7,13 @@ SDFileUploader.directive('sdFileUpload', ['$parse', function ($parse) {
             this.scope = scope;
 
             elements.change(function (e) {
-                uploadFile(elements[0], attrs.route, uploadComplete);
+                uploadFile(elements[0], uploadComplete, uploadProgress);
             });
+
+            function uploadProgress(e) {
+                var progress = parseInt(100.0 * e.loaded / e.total);
+                console.log(progress);
+            }
 
             function uploadComplete(evt) {
                 var data = JSON.parse(evt.target.responseText);
@@ -19,17 +24,16 @@ SDFileUploader.directive('sdFileUpload', ['$parse', function ($parse) {
                 var model = $parse(modelName);
                 var model_data = $parse(modelName + '__data');
                 scope.$apply(function () {
+                    var fileObj = {};
                     if (multiple) {
                         var modelFileList = model.assign(scope, []);
                         for (var i in data.files) {
-                            var fileObj = {};
                             fileObj[attrName] = data.files[i];
                             modelFileList.push(fileObj);
                         }
                         model.assign(scope, modelFileList);
                         model_data.assign(scope, modelFileList);
                     } else {
-                        var fileObj = {};
                         fileObj[attrName] = data.files[0];
                         model.assign(scope, fileObj);
                         model_data.assign(scope, fileObj);

@@ -1,5 +1,5 @@
 // Originated from http://jsfiddle.net/danielzen/utp7j/
-var uploadFile = function (element, dest, uploadComplete) {
+var uploadFile = function (element, uploadComplete, uploadProgress) {
     var that = this;
     var url = window.swampDragon.url + '/_sdfileupload/';
     var fd = new FormData();
@@ -7,7 +7,9 @@ var uploadFile = function (element, dest, uploadComplete) {
         fd.append("uploadedFile", element.files[i]);
     }
     var xhr = new XMLHttpRequest();
-    xhr.upload.addEventListener("progress", uploadProgress, false);
+    if (uploadProgress) {
+        xhr.upload.addEventListener("progress", uploadProgress, false);
+    }
     xhr.addEventListener("load", uploadComplete, false);
     xhr.addEventListener("error", uploadFailed, false);
     xhr.addEventListener("abort", uploadCanceled, false);
@@ -31,13 +33,13 @@ function uploadCanceled(evt) {
     console.log("The upload has been canceled by the user or the browser dropped the connection.")
 }
 
-function uploadProgress(evt) {
-//    console.log(evt);
-//    scope.$apply(function () {
-//        if (evt.lengthComputable) {
-//            scope.progress = Math.round(evt.loaded * 100 / evt.total);
-//        } else {
-//            scope.progress = 'unable to compute';
-//        }
-//    })
-}
+//function uploadProgress(evt) {
+////    console.log(evt);
+////    scope.$apply(function () {
+////        if (evt.lengthComputable) {
+////            scope.progress = Math.round(evt.loaded * 100 / evt.total);
+////        } else {
+////            scope.progress = 'unable to compute';
+////        }
+////    })
+//}
