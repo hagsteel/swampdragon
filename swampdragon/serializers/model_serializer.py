@@ -18,7 +18,13 @@ class ValidationError(Exception):
 class ModelSerializerMeta(object):
     def __init__(self, options):
         self.publish_fields = getattr(options, 'publish_fields', ())
+        if isinstance(self.publish_fields, str):
+            self.publish_fields = (self.publish_fields, )
+
         self.update_fields = getattr(options, 'update_fields', ())
+        if isinstance(self.update_fields, str):
+            self.update_fields = (self.update_fields, )
+
         self.model = get_model(getattr(options, 'model'))
         self.id_field = getattr(options, 'id_field', 'pk')
         self.base_channel = getattr(options, 'base_channel', self.model._meta.model_name)

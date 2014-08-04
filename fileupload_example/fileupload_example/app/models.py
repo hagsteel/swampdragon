@@ -18,4 +18,3 @@ class MultiFileModel(models.Model):
 class File(models.Model):
     multi_file_model = models.ForeignKey(MultiFileModel, related_name='files')
     file = models.ImageField(upload_to='images')
-

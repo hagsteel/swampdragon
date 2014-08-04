@@ -62,4 +62,26 @@ class SelfPubExampleTest(DragonDjangoTestCase, AsyncHTTPTestCase):
         tmp_text_file = self._generate_text_file()
         fur = FileUploadRequestData([tmp_text_file])
         response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
-        data = json.loads(response.body.decode())
+        file_data = json.loads(response.body.decode())
+        data = {
+            'name': 'foo',
+            'file': file_data['files'][0]
+        }
+        self.connection.call_verb('withfile-route', 'create', **data)
+        last_data = self.connection.get_last_message()['data']
+        self.assertGreater(len(last_data['file']), 0)
+
+    @tornado.testing.gen_test
+    def test_create_with_multiple_files(self):
+        tmp_text_file = self._generate_text_file()
+        tmp_img_file = self._generate_image_file()
+        fur = FileUploadRequestData([tmp_text_file, tmp_img_file])
+        response = yield self.as_client.fetch(self.upload_url, method='POST', body=fur.get_body(), headers=fur.get_headers())
+        file_data = json.loads(response.body.decode())
+        data = {
+            'name': 'foo',
+            'files': [{'file': f} for f in file_data['files']]
+        }
+        self.connection.call_verb('multifile-route', 'create', **data)
+        last_data = self.connection.get_last_message()['data']
+        import ipdb;ipdb.set_trace()
