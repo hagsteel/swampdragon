@@ -25,7 +25,6 @@ var DataMapper = function (channelMaps) {
     dataMapper.channelMaps = channelMaps;
 
     dataMapper.mapData = function (datasource, message) {
-        console.log("lol");
         if (message.action == "created") {
             dataMapper.mapCreated(datasource, message.data);
         }
