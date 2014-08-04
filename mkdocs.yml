@@ -2,6 +2,7 @@ site_name: Swamp Dragon
 pages:
 - [index.md, Home]
 - [routers.md, Routers]
+- [serializers.md, Serializers]
 - [pagination.md, Pagination]
 - [sessions.md, Sessions]
 - [file-upload.md, File upload]
