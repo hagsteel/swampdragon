@@ -1,0 +1,6 @@
+-e git+https://github.com/mrjoes/sockjs-tornado.git#egg=sockjs-tornado
+Django >= 1.4
+Tornado
+tornado-redis
+redis
+python-dateutil
