@@ -2,6 +2,11 @@ var WithFileControllers = angular.module('WithFileControllers', ['SwampDragonSer
 
 WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', function($scope, dataService) {
     $scope.withfile = { a_bool: false };
+    $scope.progress = 0;
+
+    $scope.updateProgress = function(progress, loaded, total) {
+        $scope.progress = progress;
+    };
 
     $scope.save = function() {
         var promise = null;
@@ -25,6 +30,13 @@ WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', functio
 WithFileControllers.controller('MultiFileCtrl', ['$scope', 'dataService', function($scope, dataService) {
     $scope.multifile = {};
 
+    $scope.progress = 0;
+
+    $scope.updateProgress = function(progress, loaded, total) {
+        $scope.progress = progress;
+    };
+
+
     $scope.save = function() {
         var promise = null;
         if ('id' in this.multifile) {
@@ -36,7 +48,7 @@ WithFileControllers.controller('MultiFileCtrl', ['$scope', 'dataService', functi
 
         if (promise) {
             promise.then(function(data) {
-                
+
             }).catch(function(errors) {
                 console.log(errors);
             })
