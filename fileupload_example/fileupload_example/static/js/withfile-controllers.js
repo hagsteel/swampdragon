@@ -13,7 +13,7 @@ WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', functio
 
         if (promise) {
             promise.then(function(data) {
-                console.log(data);
+
             }).catch(function(errors) {
                 console.log(errors);
             })
@@ -36,7 +36,7 @@ WithFileControllers.controller('MultiFileCtrl', ['$scope', 'dataService', functi
 
         if (promise) {
             promise.then(function(data) {
-                console.log(data);
+                
             }).catch(function(errors) {
                 console.log(errors);
             })
