@@ -2,8 +2,8 @@ var SDFileUploader = angular.module('SDFileUploader', []);
 
 SDFileUploader.directive('sdFileUpload', ['$parse', function ($parse) {
     return {
-        link: function(scope, elements, attrs) {
-            this.multiple = attrs.multiple;
+        link: function (scope, elements, attrs) {
+            var multiple = attrs.multiple || false;
             this.scope = scope;
 
             elements.change(function (e) {
@@ -18,7 +18,7 @@ SDFileUploader.directive('sdFileUpload', ['$parse', function ($parse) {
 
                 var model = $parse(modelName);
                 var model_data = $parse(modelName + '__data');
-                scope.$apply(function() {
+                scope.$apply(function () {
                     if (multiple) {
                         var modelFileList = model.assign(scope, []);
                         for (var i in data.files) {
@@ -29,8 +29,10 @@ SDFileUploader.directive('sdFileUpload', ['$parse', function ($parse) {
                         model.assign(scope, modelFileList);
                         model_data.assign(scope, modelFileList);
                     } else {
-                        model.assign(scope, data.files[0].file_url);
-                        model_data.assign(scope, data.files[0]);
+                        var fileObj = {};
+                        fileObj[attrName] = data.files[0];
+                        model.assign(scope, fileObj);
+                        model_data.assign(scope, fileObj);
                     }
                 });
             }

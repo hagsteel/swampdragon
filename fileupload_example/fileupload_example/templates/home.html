@@ -12,7 +12,7 @@
                 </div>
                 <div class="form-group">
                     <label>Picture</label>
-                    <input type="file" sd-file-upload multiple="true" ng-model="withfile.file" class="form-control">
+                    <input type="file" sd-file-upload ng-model="withfile.file" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
             </form>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="form-group">
                     <label>Picture</label>
-                    <input type="file" sd-file-upload multiple="true" ng-model="withfile.file" class="form-control">
+                    <input type="file" sd-file-upload ng-model="withfile.file" class="form-control">
                 </div>
                 <button type="submit" class="btn btn-default" ng-click="save();">Save</button>
             </form>
@@ -65,7 +65,7 @@
             <table class="table table-striped">
                 <tr ng-repeat="wf in datasource">
                     <td>{$ wf.name $}</td>
-                    <td><img ng-src="{$ wf.file $}" height="60"></td>
+                    <td><img ng-src="{$ wf.file $}" height="40"></td>
                 </tr>
             </table>
         </div>
@@ -79,7 +79,9 @@
             <table class="table table-striped">
                 <tr ng-repeat="wf in datasource">
                     <td>{$ wf.text $}</td>
-                    <td>{$ wf.files $}</td>
+                    <td>
+                        <img ng-repeat="file in wf.files" ng-src="{$ file.file $}" height="40">
+                    </td>
                     <!--<td><img ng-src="{$ wf.file $}" height="60"></td>-->
                 </tr>
             </table>

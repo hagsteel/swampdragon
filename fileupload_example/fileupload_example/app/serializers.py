@@ -4,7 +4,7 @@ from swampdragon.serializers.model_serializer import ModelSerializer
 class WithFileSerializer(ModelSerializer):
     class Meta:
         model = 'app.WithFile'
-        publish_fields = ('name', 'file', 'created')
+        publish_fields = ('name', 'file')
         update_fields = ('name', 'file')
 
 
