@@ -1,7 +1,6 @@
 *.log
 *.pot
 *.pyc
-local_settings.py
 .idea/
 dev.sqlite
 dev.sqlite3
