@@ -1,2 +1,3 @@
 recursive-include swampdragon/static *
+recursive-include swampdragon/app_templates *
 include README.md
