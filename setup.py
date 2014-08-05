@@ -22,10 +22,9 @@ setup(
         'swampdragon.pubsub_providers',
         'swampdragon.serializers',
         'swampdragon.sessions',
-        'swampdragon.static',
     ],
     long_description=read('README.md'),
-    include_package_data=True,
+    # include_package_data=True,
     install_requires=[
         "Django >= 1.4",
         "Tornado",

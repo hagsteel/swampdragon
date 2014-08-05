@@ -1,6 +1,7 @@
 site_name: Swamp Dragon
 pages:
 - [index.md, Home]
+- [installation.md, Installation]
 - [quick-start.md, Quickstart]
 - [settings.md, Settings]
 - [routers.md, Routers]
