@@ -34,7 +34,7 @@ class RedisPubSubProvider(BaseProvider):
 
     def _get_channels_from_redis(self, base_channel):
         channels = self._client.execute_command('PUBSUB', 'channels', '{}*'.format(base_channel))
-        return [str(c, 'utf-8') for c in channels]
+        return [c.decode() for c in channels]
 
     def publish(self, channel, data):
         self._client.publish(channel, json.dumps(data))

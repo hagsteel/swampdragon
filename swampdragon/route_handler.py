@@ -7,7 +7,7 @@ from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
 from .pubsub_providers.model_publisher import publish_model
-from .serializers.model_serializer import ValidationError
+from .serializers.validation import ModelValidationError
 
 
 registered_handlers = {}
@@ -269,7 +269,7 @@ class BaseModelRouter(BaseRouter):
         self.serializer = self.serializer_class(data=kwargs, initial=initials)
         try:
             obj = self.serializer.save()
-        except ValidationError as error:
+        except ModelValidationError as error:
             self.on_error(error.get_error_dict())
             return
 
@@ -291,7 +291,7 @@ class BaseModelRouter(BaseRouter):
         past_state = self.serializer.serialize()
         try:
             self.serializer.save()
-        except ValidationError as error:
+        except ModelValidationError as error:
             errors = error.get_error_dict()
             self.on_error(errors)
             return

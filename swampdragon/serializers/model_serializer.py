@@ -6,15 +6,6 @@ from swampdragon.serializers.field_deserializers import get_deserializer
 from swampdragon.serializers.serializer_tools import get_serializer_relationship_field, get_id_mappings
 
 
-class ValidationError(Exception):
-    def __init__(self, errors={}, *args, **kwargs):
-        super(ValidationError, self).__init__(*args, **kwargs)
-        self.errors = errors
-
-    def get_error_dict(self):
-        return self.errors
-
-
 class ModelSerializerMeta(object):
     def __init__(self, options):
         self.publish_fields = getattr(options, 'publish_fields', ())
