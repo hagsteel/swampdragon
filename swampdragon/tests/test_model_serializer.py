@@ -55,7 +55,6 @@ class DeserializerTest(DragonDjangoTestCase):
             'name': 'this is baz',
             'bar': {'number': 25}
         }
-
         baz = BazSerializer(data).save()
         self.assertEqual(baz.name, 'this is baz')
         self.assertEqual(baz.bar.number, 25)
@@ -64,6 +63,7 @@ class DeserializerTest(DragonDjangoTestCase):
         data = {
             'test_field_a': 'foo',
             'test_field_b': 'bar',
+            'value': 'test',
             'foos': [{'test_field_a': 'a', 'test_field_b': 'b'}]
         }
         qux = QuxSerializer(data).save()

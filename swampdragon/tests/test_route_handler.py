@@ -70,7 +70,7 @@ class TestModelRouter(DragonDjangoTestCase):
         self.assertTrue(self.foo_router.model.objects.filter(**model_data).exists())
 
     def test_update_model(self):
-        model_data = {'test_field_a': 'value'}
+        model_data = {'test_field_a': 'value', 'test_field_b': 'second value'}
         foo = FooModel.objects.create(**model_data)
 
         update_data = {

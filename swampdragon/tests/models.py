@@ -96,12 +96,12 @@ class FooModel(TestSelfPublishModel, models.Model):
 class BarModel(TestSelfPublishModel, models.Model):
     serializer_class = BarSerializer
     number = models.IntegerField()
-    foo = models.ForeignKey(FooModel, related_name='bars', null=True)
+    foo = models.ForeignKey(FooModel, related_name='bars', null=True, blank=True)
 
 
 class BazModel(models.Model):
     name = models.CharField(max_length=100)
-    bar = models.OneToOneField(BarModel)
+    bar = models.OneToOneField(BarModel, null=True, blank=True)
 
 
 class QuxModel(models.Model):

@@ -1,9 +1,11 @@
+from django.core.exceptions import ValidationError
 from swampdragon.model_tools import get_property, get_model
 from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.object_map import get_object_map
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
 from swampdragon.serializers.serializer_tools import get_serializer_relationship_field, get_id_mappings
+from swampdragon.serializers.validation import ModelValidationError
 
 
 class ModelSerializerMeta(object):
@@ -69,6 +71,10 @@ class ModelSerializer(object):
 
     def save(self):
         self.deserialize()
+        try:
+            self.instance.clean_fields()
+        except ValidationError as e:
+            raise ModelValidationError(e.message_dict)
         self.instance.save()
 
         # Serialize related fields
