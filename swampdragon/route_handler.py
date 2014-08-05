@@ -2,12 +2,13 @@ import json
 from tornado.web import RequestHandler
 from .file_upload_handler import get_file_location, make_file_id, get_file_url
 from .paginator import Paginator, Page
-from .serializers.model_serializer import ValidationError
 from .sessions.sessions import get_session_store
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
 from .pubsub_providers.model_publisher import publish_model
+from .serializers.model_serializer import ValidationError
+
 
 registered_handlers = {}
 
@@ -111,7 +112,7 @@ class BaseRouter(object):
     def _update_client_context(self, data):
         if not data:
             return
-        if not 'client_context' in self.context:
+        if 'client_context' not in self.context:
             self.context['client_context'] = {}
         self.context['client_context'].update(data)
 
