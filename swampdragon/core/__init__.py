@@ -53,4 +53,3 @@ def start_project(project_name):
 
     with open(project_settings_file, 'wb') as settings_file:
         settings_file.writelines(settings)
-

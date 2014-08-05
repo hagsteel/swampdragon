@@ -19,4 +19,3 @@ class SerializerTest(DragonDjangoTestCase):
     def test_get_serializser_relationship_with_fk(self):
         rel = get_serializer_relationship_field(BarSerializer, FooSerializer)
         self.assertEqual(rel, 'barmodel')
-

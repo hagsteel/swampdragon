@@ -24,7 +24,6 @@ class FooRouter(BaseModelPublisherRouter):
         self.send({'foo': 'bar'})
 
 
-
 class TestModelRouter(DragonDjangoTestCase):
     def setUp(self):
         route_handler.register(FooRouter)
@@ -183,4 +182,3 @@ class TestModelRouter(DragonDjangoTestCase):
         obj_map = json.loads(self.connection.sent_data[-1])['data']
         self.assertEqual(len(obj_map), 2)
         self.assertEqual(len(self.connection.pub_sub._channels), 2)
-

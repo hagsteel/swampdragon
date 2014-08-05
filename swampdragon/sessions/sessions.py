@@ -4,6 +4,7 @@ from .redis_session_store import RedisSessionStore
 
 session_store = None
 
+
 def get_session_store():
     global session_store
 

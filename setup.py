@@ -7,22 +7,13 @@ def read(fname):
 
 setup(
     name="SwampDragon",
-    version="0.3.0",
+    version="0.3.1",
     author="Jonas Hagstedt",
     author_email="hagstedt@gmail.com",
     description=("Swamp dragon is a powerful platform making it easy to build real time web applications, combining the power of Django and Tornado"),
     license="BSD",
     keywords="swamp dragon, realtime, sockjs, django, tornado, framework",
     url="https://github.com/jonashagstedt/swampdragon",
-    # packages=[
-    #     'swampdragon',
-    #     'swampdragon.cache',
-    #     'swampdragon.connections',
-    #     'swampdragon.management',
-    #     'swampdragon.pubsub_providers',
-    #     'swampdragon.serializers',
-    #     'swampdragon.sessions',
-    # ],
     packages=find_packages(),
     long_description=read('README.md'),
     include_package_data=True,

@@ -64,7 +64,7 @@ def filter_channels_by_model(channels, obj):
 
 def has_related_values(obj, properties):
     for field, channel_val in properties:
-        if not '__' in field:
+        if '__' not in field:
             filter_name = channel_val
             property_name = field
         else:

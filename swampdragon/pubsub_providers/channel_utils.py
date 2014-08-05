@@ -65,7 +65,7 @@ def channel_match_check(channel, data):
         key, val = term.split(':')
         if '__' in key and key.split('__')[-1] in filter_options.keys():
             option = key.rsplit('__', 1)[-1]
-        if not key in data:
+        if key not in data:
             return False
         if not term_match_check(data[key], val, option):
             return False
@@ -83,7 +83,7 @@ def properties_match_channel_by_object(obj, channel_properties):
 def properties_match_channel_by_dict(dict, channel_properties):
     result = True
     for prop, val in channel_properties:
-        if not prop in dict:
+        if prop not in dict:
             return False
         if not dict[prop] == val:
             return False
@@ -107,7 +107,7 @@ def has_val(obj, prop, val):
 
 
 def has_related_value(obj, field, channel_val):
-    if not '__' in field:
+    if '__' not in field:
         filter_by_val = channel_val
         property_name = field
     else:
@@ -116,8 +116,6 @@ def has_related_value(obj, field, channel_val):
     if hasattr(attr, 'all'):
         return getattr(obj, property_name).filter(**{filter_by_val: channel_val}).exists()
     else:
-        filter_query = { 'pk': obj.pk, }
+        filter_query = {'pk': obj.pk}
         filter_query[field] = channel_val
         return obj.__class__.objects.filter(**filter_query).exists()
-
-

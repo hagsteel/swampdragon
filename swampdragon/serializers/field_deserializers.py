@@ -51,6 +51,7 @@ deserializer_map = {
     'DateField': DateDeserializer,
 }
 
+
 def get_deserializer(name):
     if name in deserializer_map:
         return deserializer_map[name]()

@@ -18,6 +18,7 @@ class DocumentRouter(BaseModelPublisherRouter):
     def get_object(self, **kwargs):
         return self.model.objects.get(**kwargs)
 
+
 class CompanyRouter(BaseModelPublisherRouter):
     model = Company
     route_name = 'test_company_router'

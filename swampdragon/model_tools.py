@@ -19,7 +19,7 @@ def get_property(obj, field):
 
 
 def string_to_list(val):
-    return val.replace('[','').replace(']','').split(',')
+    return val.replace('[', '').replace(']', '').split(',')
 
 
 def get_model(model):

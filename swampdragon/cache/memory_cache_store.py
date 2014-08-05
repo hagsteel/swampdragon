@@ -1,5 +1,6 @@
 cache = {}
 
+
 def store_data(data, key, ttl):
     cache[key] = data
 
