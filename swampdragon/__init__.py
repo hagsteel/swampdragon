@@ -1,7 +1,5 @@
-from swampdragon import route_handler
-
-
 def discover_routes():
+    from swampdragon import route_handler
     """
     Discover, borrowed from django admin.
     Returns urls for each route handler
