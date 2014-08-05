@@ -59,22 +59,5 @@ Add routers.py to your app directory (same as your models.py, and serializers.py
     
     route_handler.register(FooRouter)
 
-
-Update settings.py to include your new app:
- 
-     INSTALLED_APPS = (
-        ...
-        'myproject.myapp',
-    )
-
-
-For django to be able to find your templates you need to add at least one template dir.
-Append the following to the end of your settings.py file
-
-    
-    TEMPLATE_DIRS = [
-        os.path.join(BASE_DIR, 'templates')
-    ]
-
-
-Create a folder in the root of your project called ```templates``` and add a new file named ```home.html```.
+A demo project with templates and static files setup can be found on [
+Github](https://github.com/jonashagstedt/swampdragon)
