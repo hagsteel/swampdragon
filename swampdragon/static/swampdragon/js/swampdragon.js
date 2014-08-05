@@ -13,6 +13,7 @@
  * -----------------------------------
  */
 var SwampDragon = function(options) {
+    options = options || {};
     var swampDragon = this;
     swampDragon.isReady = false;
     window.swampDragon = swampDragon;
