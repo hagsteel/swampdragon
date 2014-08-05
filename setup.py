@@ -7,10 +7,10 @@ def read(fname):
 
 setup(
     name="SwampDragon",
-    version="0.1.0",
+    version="0.3.0",
     author="Jonas Hagstedt",
     author_email="hagstedt@gmail.com",
-    description=("Self publishing models for Django using Tornado"),
+    description=("Swamp dragon is a powerful platform making it easy to build real time web applications, combining the power of Django and Tornado"),
     license="BSD",
     keywords="socketjs pubsub",
     url = "https://github.com/jonashagstedt/swampdragon",

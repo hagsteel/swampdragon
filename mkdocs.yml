@@ -1,6 +1,7 @@
 site_name: Swamp Dragon
 pages:
 - [index.md, Home]
+- [quick-start.md, Quickstart]
 - [routers.md, Routers]
 - [serializers.md, Serializers]
 - [pagination.md, Pagination]

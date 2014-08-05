@@ -1,17 +1,12 @@
 Swamp Dragon
 ============
 
-Build realtime applications with Django.
+Build real-time web applications with Django.
 
 
-# UNDER DEVELOPMENT
+# Notes
 
-
-# Important
-**Note**: As Django models are blocking, long queries will prevent other requests from coming through.
-
-
-# Tornado 4.0
+## Tornado 4.0
 If you experience ```Error during WebSocket handshake: Unexpected response code: 403``` you might have to run 
 the latest dev version of sockjs-tornado.
 
