@@ -7,3 +7,6 @@ dev.sqlite
 dev.sqlite3
 static_root/
 media/
+build/
+dist/
+*.egg-info

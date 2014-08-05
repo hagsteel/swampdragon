@@ -12,10 +12,20 @@ setup(
     author_email="hagstedt@gmail.com",
     description=("Swamp dragon is a powerful platform making it easy to build real time web applications, combining the power of Django and Tornado"),
     license="BSD",
-    keywords="socketjs pubsub",
-    url = "https://github.com/jonashagstedt/swampdragon",
-    packages=['swampdragon', ],
+    keywords="swamp dragon, realtime, sockjs, django, tornado, framework",
+    url="https://github.com/jonashagstedt/swampdragon",
+    packages=[
+        'swampdragon',
+        'swampdragon.cache',
+        'swampdragon.connections',
+        'swampdragon.management',
+        'swampdragon.pubsub_providers',
+        'swampdragon.serializers',
+        'swampdragon.sessions',
+        'swampdragon.static',
+    ],
     long_description=read('README.md'),
+    include_package_data=True,
     install_requires=[
         "Django >= 1.4",
         "Tornado",
@@ -25,8 +35,7 @@ setup(
         "python-dateutil"
     ],
     classifiers=[
-        "Development Status :: Beta",
-        "Topic :: WebSocket framework",
+        "Development Status :: 4 - Beta",
         "License :: OSI Approved :: BSD License",
     ],
 )
