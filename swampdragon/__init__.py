@@ -19,5 +19,18 @@ def discover_routes():
     routes = route_handler.registered_handlers
     for route in routes:
         urls.append(('/' + route + '/$', routes[route]))
-    # urls.append(('/_sdfileupload/$', route_handler.FileUploadHandler))
     return urls
+
+
+def load_field_deserializers():
+    from django.conf import settings
+    from django.utils.importlib import import_module
+    imported_deserializers = []
+    for app in settings.INSTALLED_APPS:
+        try:
+            target_mod = '%s.field_deserializers' % app
+            if target_mod not in imported_deserializers:
+                import_module(target_mod)
+            imported_deserializers.append(target_mod)
+        except ImportError:
+            pass

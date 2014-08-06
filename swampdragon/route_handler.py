@@ -1,6 +1,4 @@
-import json
-from tornado.web import RequestHandler
-from .paginator import Paginator, Page
+from .paginator import Paginator
 from .sessions.sessions import get_session_store
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
@@ -14,45 +12,6 @@ registered_handlers = {}
 
 class UnexpectedVerbException(Exception):
     pass
-
-
-class FileUploadHandler(RequestHandler):
-    def _set_access_control(self):
-        origin = self.request.headers['origin']
-        orig_test = origin.split('/')[-1]
-        if ':' in orig_test:
-            orig_test = orig_test.split(':')[0]
-        if not self.request.host.split(':')[0] == orig_test:
-            return
-        self.set_header('Access-Control-Allow-Credentials', True)
-        self.set_header('Access-Control-Allow-Methods', 'POST')
-        self.set_header('Access-Control-Allow-Origin', origin)
-
-    def get(self, *args, **kwargs):
-        self.write('Hello!')
-
-    def post(self, *args, **kwargs):
-        self._set_access_control()
-        files = self.request.files['file']
-        response = {'files': []}
-        for f in files:
-            file_id = make_file_id(f['body'])
-            file_name = f['filename']
-            named_file = open(get_file_location(file_name, file_id), 'wb')
-            named_file.write(f['body'])
-            named_file.close()
-            response['files'].append({
-                'file_id': file_id,
-                'file_name': file_name,
-                'file_url': get_file_url(file_name, file_id)
-            })
-        self.write(json.dumps(response))
-
-    def options(self, *args, **kwargs):
-        self._set_access_control()
-
-    def file_upload(self, request):
-        pass
 
 
 class BaseRouter(object):

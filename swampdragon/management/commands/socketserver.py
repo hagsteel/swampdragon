@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.utils.importlib import import_module
 from tornado import web, ioloop
 from sockjs.tornado import SockJSRouter
-from swampdragon import discover_routes
+from swampdragon import discover_routes, load_field_deserializers
 
 
 class Command(BaseCommand):
@@ -55,6 +55,8 @@ class Command(BaseCommand):
         urls = discover_routes()
         for router in routers:
             urls += router.urls
+
+        load_field_deserializers()
 
         app = web.Application(urls, **app_settings)
         app.listen(PORT, address=HOST, no_keep_alive=False)

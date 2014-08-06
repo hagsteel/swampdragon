@@ -6,6 +6,7 @@ pages:
 - [settings.md, Settings]
 - [routers.md, Routers]
 - [serializers.md, Serializers]
+- [field-deserializers.md, Field deserializers]
 - [pagination.md, Pagination]
 - [sessions.md, Sessions]
 - [file-upload.md, File upload]
