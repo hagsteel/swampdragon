@@ -3,7 +3,6 @@ Swamp Dragon
 
 Build real-time web applications with Django.
 
-
 # Notes
 
 ## Tornado 4.0

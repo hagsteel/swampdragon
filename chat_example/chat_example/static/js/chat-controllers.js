@@ -20,7 +20,7 @@ ChatControllers.controller('ChatCtrl', ['$scope', 'dataService', function($scope
         $scope.errors = null;
         dataService.callRouter('chat', 'chat-route', {message: this.message, name: this.name})
             .then(function(response) { })
-            .catch(function(response) {
+            ["catch"](function(response) {
                 $scope.errors = response.errors;
             });
     }
