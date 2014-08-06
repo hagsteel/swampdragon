@@ -1,4 +1,4 @@
-var ChatControllers = angular.module('ChatControllers', ['SwampDragonServices']);
+var ChatControllers = angular.module('ChatControllers', []);
 
 ChatControllers.controller('ChatCtrl', ['$scope', 'dataService', function($scope, dataService) {
     $scope.channel = 'chat';
