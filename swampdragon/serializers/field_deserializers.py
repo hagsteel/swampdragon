@@ -1,40 +1,19 @@
-from django.core.files import File
-from django.core.files.base import ContentFile
 from dateutil.parser import parse
-from ..route_handler import get_file_location
 
 
-class BaseDeserializer(object):
+deserializer_map = {}
+
+
+def register_field_deserializer(field_name, deserializer):
+    deserializer_map[field_name] = deserializer
+
+
+class BaseFieldDeserializer(object):
     def __call__(self, *args, **kwargs):
         raise NotImplemented()
 
 
-class FileDeserializer(BaseDeserializer):
-    def __call__(self, model_instance, key, val):
-        if not val:
-            return
-        if isinstance(val, str):
-            return
-        if isinstance(val, list):
-            val = val[0]
-        file_id = int(val['file_id'])
-        if not file_id > 0:
-            return
-        path = get_file_location(val['file_name'], val['file_id'])
-        uploaded_file = File(open(path, 'rb'))
-        setattr(model_instance, key, val['file_name'])
-        getattr(model_instance, key).save(
-            val['file_name'],
-            ContentFile(uploaded_file.read()),
-            save=False
-        )
-
-
-class ImageDeserializer(FileDeserializer):
-    pass
-
-
-class DateTimeDeserializer(BaseDeserializer):
+class DateTimeDeserializer(BaseFieldDeserializer):
     def __call__(self, model_instance, key, val):
         date_val = parse(val)
         setattr(model_instance, key, date_val)
@@ -44,12 +23,8 @@ class DateDeserializer(DateTimeDeserializer):
     pass
 
 
-deserializer_map = {
-    'FileField': FileDeserializer,
-    'ImageField': ImageDeserializer,
-    'DateTimeField': DateTimeDeserializer,
-    'DateField': DateDeserializer,
-}
+register_field_deserializer('DateTimeField', DateTimeDeserializer)
+register_field_deserializer('DateField', DateDeserializer)
 
 
 def get_deserializer(name):

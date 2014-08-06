@@ -19,5 +19,5 @@ def discover_routes():
     routes = route_handler.registered_handlers
     for route in routes:
         urls.append(('/' + route + '/$', routes[route]))
-    urls.append(('/_sdfileupload/$', route_handler.FileUploadHandler))
+    # urls.append(('/_sdfileupload/$', route_handler.FileUploadHandler))
     return urls
