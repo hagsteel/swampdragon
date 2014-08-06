@@ -10,4 +10,5 @@ pages:
 - [pagination.md, Pagination]
 - [sessions.md, Sessions]
 - [file-upload.md, File upload]
+- [additional-packages.md, Additional packages]
 theme: united
