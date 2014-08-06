@@ -6,7 +6,7 @@ Use the ```ModelSerializer``` to serialize and deserialize your Django models.
 
 ## Meta fields:
 
-```model``` property can be either set to a Model or to a string (app.Model).
+```model``` property can be either set to a Model or to a string (```model='app.Model'```).
 
 ```publish_fields``` is a list of fields on the model, to be published.
 

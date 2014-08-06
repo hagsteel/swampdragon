@@ -3,6 +3,11 @@
 Install Swamp Dragon: ```pip install swampdragon```, or download the latest source from 
 [Github](https://github.com/jonashagstedt/swampdragon). 
 
+Install [redis server](http://redis.io/topics/quickstart). 
+
+Open a terminal and start redis with the following command:
+
+    redis-server
 
 To start a new project run 
 
