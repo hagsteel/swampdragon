@@ -133,3 +133,19 @@ functionality:
 
 Once a model is updated, create or deleted, the BaseModelPublisherRouter will publish the updates to all
 channels matching the instances field values.
+
+
+# Permissions
+
+The following example will check if the user is signed in.
+
+    from swampdragon.permissions import LoginRequired
+
+
+    class FooRouter(BaseModelPublisherRouter):
+        ...
+        permission_classes = (LoginRequired(),)
+        
+
+You can pass a list of verbs to ```LoginRequired(['create', 'update'])``` making it easy to do a read-only route
+for anonymous users
