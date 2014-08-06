@@ -40,7 +40,7 @@ the latest dev version of sockjs-tornado.
 ```pip install -e git+https://github.com/mrjoes/sockjs-tornado.git#egg=sockjs-tornado```
 
 
-** update ** this seems to have been resolved now
+**update** this seems to have been resolved now
 
 
 
