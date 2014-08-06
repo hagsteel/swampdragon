@@ -28,13 +28,16 @@ SDFileUploader.directive('sdFileUpload', ['$parse', function ($parse) {
 
             /*
              * Once upload is completed, update the models
-             * on the scope
+             * on the scope.
+             * If "multiple" is set to true, assume the
+             * parent property is the collection as multiple properties
+             * with the same name can not exist
              ******************************************/
             function uploadComplete(evt) {
                 console.log("done");
                 var data = JSON.parse(evt.target.responseText);
                 var modelNameList = attrs.ngModel.split('.');
-                var attrName = modelNameList.pop();
+//                var attrName = modelNameList.pop();
                 var modelName = modelNameList.join('.');
 
                 var model = $parse(modelName);
@@ -51,9 +54,9 @@ SDFileUploader.directive('sdFileUpload', ['$parse', function ($parse) {
                         model_data.assign($scope, modelFileList);
                     } else {
                         var fileObj = {};
-                        fileObj[attrName] = data.files[0];
-                        model.assign($scope, fileObj);
-                        model_data.assign($scope, fileObj);
+//                        fileObj[attrName] = data.files[0];
+                        model.assign($scope, data.files[0]);
+                        model_data.assign($scope, data.files[0]);
                     }
                 });
             }

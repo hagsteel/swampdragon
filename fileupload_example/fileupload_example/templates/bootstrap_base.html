@@ -55,16 +55,35 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="http://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}libs/angular-1.2.15/angular.min.js"></script>
+
+<script>
+    //optional need to be loaded before angular-file-upload-shim(.min).js
+    FileAPI = {
+        //only one of jsPath or jsUrl.
+//        jsPath: '/js/FileAPI.min.js/folder/',
+        jsUrl: '{{ STATIC_URL }}ng-file-upload/FileAPI.min.js', //'yourcdn.com/js/FileAPI.min.js',
+
+        //only one of staticPath or flashUrl.
+//        staticPath: '/flash/FileAPI.flash.swf/folder/',
+        flashUrl: '{{ STATIC_URL }}ng-file-upload/FileAPI.flash.swf' //'yourcdn.com/js/FileAPI.flash.swf',
+
+//        forceLoad: true, html5: false //to debug flash in HTML5 browsers
+    }
+</script>
+
+<script src="{{ STATIC_URL }}ng-file-upload/angular-file-upload-shim.min.js"></script>
+<script src="{{ STATIC_URL }}ng-file-upload/angular-file-upload.min.js"></script>
+
 <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/vendor/sockjs-0.3.2.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/swampdragon.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/datamapper.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/angular/services.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/angular/directives.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/fileupload.js"></script>
+<!--<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/angular/directives.js"></script>-->
+<!--<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/fileupload.js"></script>-->
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/app.js?v={% now 'U' %}"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/withfile-controllers.js"></script>

@@ -1,58 +1,66 @@
-var WithFileControllers = angular.module('WithFileControllers', ['SwampDragonServices']);
+var WithFileControllers = angular.module('WithFileControllers', []);
 
-WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', function($scope, dataService) {
-    $scope.withfile = { a_bool: false };
+WithFileControllers.controller('WithFileCtrl', ['$scope', 'dataService', '$upload', function($scope, dataService, $upload) {
+    $scope.withfile = {};
     $scope.progress = 0;
 
     $scope.updateProgress = function(progress, loaded, total) {
         $scope.progress = progress;
     };
 
+    $scope.onFileSelect = function($files) {
+        for (var i = 0; i < $files.length; i++) {
+            var file = $files[i];
+            $scope.upload = $upload.upload({
+                url: window.swampDragon.url + '/_sdfileupload/',
+                file: file
+            }).progress(function(evt) {
+                 $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
+            }).success(function(data, status, headers, config) {
+                $scope.withfile.file = data.files[0];
+            });
+        }
+    };
+
     $scope.save = function() {
-        var promise = null;
-        if ('id' in this.withfile) {
-            promise = dataService.update('withfile-route', this.withfile);
-        } else {
-            promise = dataService.create('withfile-route', this.withfile);
-        }
-
-        if (promise) {
-            promise.then(function(data) {
-
-            }).catch(function(errors) {
-                console.log(errors);
-            })
-        }
+        $scope.errors = null;
+        dataService.create('withfile-route', this.withfile).then(function(data) {
+            console.log(data);
+        }).catch(function(response) {
+            $scope.errors = response.errors;
+        })
     };
 }]);
 
 
-WithFileControllers.controller('MultiFileCtrl', ['$scope', 'dataService', function($scope, dataService) {
-    $scope.multifile = {};
+WithFileControllers.controller('MultiFileCtrl', ['$scope', 'dataService', '$upload', function($scope, dataService, $upload) {
+    $scope.multifile = {files: []};
 
     $scope.progress = 0;
 
-    $scope.updateProgress = function(progress, loaded, total) {
-        $scope.progress = progress;
+    $scope.onFileSelect = function($files) {
+        for (var i = 0; i < $files.length; i++) {
+            var file = $files[i];
+            $scope.upload = $upload.upload({
+                url: window.swampDragon.url + '/_sdfileupload/',
+                file: file
+            }).progress(function(evt) {
+                 $scope.progress = parseInt(100.0 * evt.loaded / evt.total);
+            }).success(function(data, status, headers, config) {
+                for (var i in data.files) {
+                    $scope.multifile.files.push({file: data.files[i]});
+                }
+            });
+        }
     };
 
 
     $scope.save = function() {
         var promise = null;
-        if ('id' in this.multifile) {
-            promise = dataService.update('multifile-route', this.multifile);
-        } else {
-            console.log(this.multifile);
-            promise = dataService.create('multifile-route', this.multifile);
-        }
-
-        if (promise) {
-            promise.then(function(data) {
-
-            }).catch(function(errors) {
-                console.log(errors);
-            })
-        }
+        dataService.create('multifile-route', this.multifile).then(function(data) {
+        }).catch(function(errors) {
+            console.log(errors);
+        })
     };
 }]);
 

@@ -34,7 +34,7 @@ class FileUploadHandler(RequestHandler):
 
     def post(self, *args, **kwargs):
         self._set_access_control()
-        files = self.request.files['uploadedFile']
+        files = self.request.files['file']
         response = {'files': []}
         for f in files:
             file_id = make_file_id(f['body'])

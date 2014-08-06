@@ -7,15 +7,17 @@
             <div class="panel-heading">Single file upload</div>
             <div class="panel-body">
                 <form>
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{'has-error': errors.name}">
                         <label>Name</label>
                         <input type="text" ng-model="withfile.name" class="form-control">
+                        <ul><li ng-repeat="error in errors.name">{$ error $}</li></ul>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" ng-class="{'has-error': errors.file}">
                         <label>Picture</label>
-                        <input type="file" sd-file-upload ng-model="withfile.file" on-progress="updateProgress" class="form-control">
+                        <input type="file" ng-file-select="onFileSelect($files)">
+                        <ul><li ng-repeat="error in errors.file">{$ error $}</li></ul>
 
-                        <div class="progress" id="withfile">
+                        <div class="progress">
                             <div class="progress-bar" role="progressbar" aria-valuenow="{$ progress $}"
                                  aria-valuemin="0" aria-valuemax="100" style="width: {$ progress $}%;">
                                 {$ progress $}%
@@ -40,9 +42,9 @@
                     </div>
                     <div class="form-group">
                         <label>Pictures</label>
-                        <input type="file" sd-file-upload multiple="true" on-progress="updateProgress" ng-model="multifile.files.file" class="form-control">
+                        <input type="file" ng-file-select="onFileSelect($files)" multiple>
 
-                        <div class="progress" id="withfile">
+                        <div class="progress">
                             <div class="progress-bar" role="progressbar" aria-valuenow="{$ progress $}"
                                  aria-valuemin="0" aria-valuemax="100" style="width: {$ progress $}%;">
                                 {$ progress $}%
@@ -66,11 +68,10 @@
                         <input type="text" ng-model="withfile.name" class="form-control">
                     </div>
                     <div class="form-group">
-                        <div id="dropbox" style="background-color: #ccc; height: 50px;">Drop files here</div>
+                        <div ng-file-drop="onFileSelect($files)"style="background-color: #ccc; height: 50px;">Drop files here</div>
                         <label>Picture</label>
-                        <input type="file" sd-file-upload drag-drop-target="dropbox" on-progress="updateProgress" ng-model="withfile.file" class="form-control">
 
-                        <div class="progress" id="withfile">
+                        <div class="progress" id="withfile-drop">
                             <div class="progress-bar" role="progressbar" aria-valuenow="{$ progress $}" aria-valuemin="0" aria-valuemax="100" style="width: {$ progress $}%;">
                                 {$ progress $}%
                             </div>

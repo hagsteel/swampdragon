@@ -53,6 +53,7 @@ class DeserializerTest(DragonDjangoTestCase):
         """
         data = {
             'name': 'this is baz',
+
             'bar': {'number': 25}
         }
         baz = BazSerializer(data).save()

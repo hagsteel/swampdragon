@@ -1,6 +1,6 @@
 var WithFileApp = angular.module('WithFileApp', [
     'SwampDragonServices',
-    'SDFileUploader',
+    'angularFileUpload',
     'WithFileControllers'
 ]);
 
