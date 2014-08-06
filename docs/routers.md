@@ -88,7 +88,7 @@ Any functionality after creating an instance of a model can be executed by overr
         # Perform any desired operation here
         self.send(self.serializer.serialize(obj))
         
-The same logic applies to ```create``` and ```created```.
+The same logic applies to ```update``` and ```updated```.
 
 
 If additional data is required for a model, this can be provided by ```get_initials```.
