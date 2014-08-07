@@ -1,6 +1,9 @@
 SwampDragon
 ===========
 
+[![Downloads](https://pypip.in/download/SwampDragon/badge.svg?style=flat&?period=month)](https://pypi.python.org/pypi/SwampDragon/)
+[![Downloads](https://pypip.in/py_versions/SwampDragon/badge.svg?style=flat&)](https://pypi.python.org/pypi/SwampDragon/)
+
 Build real-time web applications with Django.
 
 Features:
