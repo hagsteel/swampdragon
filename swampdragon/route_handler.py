@@ -167,6 +167,7 @@ def replace_original_with_data(kwargs):
 class BaseModelRouter(BaseRouter):
     model = None
     instance = None
+    include_related = []
     paginate_by = None
     _query_set = None
     _obj = None
@@ -272,41 +273,6 @@ class BaseModelRouter(BaseRouter):
         serialized_obj = self.serializer.serialize()
         self.send(serialized_obj, **kwargs)
 
-
-class BaseModelPublisherRouter(BaseModelRouter):
-    include_related = []
-
-    def publish_action(self, channels, data, action):
-        publish_data = dict({'data': data})
-        publish_data['action'] = action
-        # publish_data['channel'] = channel
-        self.publish(channels, publish_data)
-
-    def created(self, obj, **kwargs):
-        super(BaseModelPublisherRouter, self).created(obj)
-        base_channel = self.serializer_class.get_base_channel()
-        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
-        channels = filter_channels_by_model(all_model_channels, obj)
-        self.publish_action(channels, self.serializer_class(instance=obj).serialize(), PUBACTIONS.created)
-
-    def updated(self, obj, **kwargs):
-        super(BaseModelPublisherRouter, self).updated(obj, **kwargs)
-        publish_model(
-            obj,
-            self.serializer_class(),
-            self.connection.pub_sub,
-            PUBACTIONS.updated, kwargs.get('past_state')
-        )
-
-    def deleted(self, obj, obj_id, **kwargs):
-        super(BaseModelPublisherRouter, self).deleted(obj, **kwargs)
-        base_channel = self.serializer_class.get_base_channel()
-        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
-        channels = filter_channels_by_model(all_model_channels, obj)
-        data = self.serializer.serialize()
-        data[self.serializer.opts.id_field] = obj_id
-        self.publish_action(channels, data, PUBACTIONS.deleted)
-
     def subscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
         server_channels = make_channels(self.serializer_class, self.include_related, self.get_subscription_contexts(**kwargs))
@@ -327,6 +293,39 @@ class BaseModelPublisherRouter(BaseModelRouter):
             channel_setup=self.make_channel_data(client_channel, server_channels),
             **kwargs)
         self.connection.pub_sub.unsubscribe(server_channels, self.connection)
+
+
+class BaseModelPublisherRouter(BaseModelRouter):
+    def publish_action(self, channels, data, action):
+        publish_data = dict({'data': data})
+        publish_data['action'] = action
+        # publish_data['channel'] = channel
+        self.publish(channels, publish_data)
+
+    def created(self, obj, **kwargs):
+        super(BaseModelPublisherRouter, self).created(obj)
+        base_channel = self.serializer_class.get_base_channel()
+        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
+        channels = filter_channels_by_model(all_model_channels, obj)
+        self.publish_action(channels, self.serializer_class(instance=obj).serialize(), PUBACTIONS.created)
+
+    def updated(self, obj, **kwargs):
+        super(BaseModelPublisherRouter, self).updated(obj, **kwargs)
+        publish_model(
+            obj,
+            self.serializer_class(instance=obj),
+            self.connection.pub_sub,
+            PUBACTIONS.updated, kwargs.get('past_state')
+        )
+
+    def deleted(self, obj, obj_id, **kwargs):
+        super(BaseModelPublisherRouter, self).deleted(obj, **kwargs)
+        base_channel = self.serializer_class.get_base_channel()
+        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
+        channels = filter_channels_by_model(all_model_channels, obj)
+        data = self.serializer.serialize()
+        data[self.serializer.opts.id_field] = obj_id
+        self.publish_action(channels, data, PUBACTIONS.deleted)
 
 
 def register(route):
