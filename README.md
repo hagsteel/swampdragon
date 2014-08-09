@@ -28,8 +28,9 @@ Redis blazing speed.
    
 ## Quickstart
 
-See documentation and example projects in this repository
+See [documentation](http://swamp-dragon.readthedocs.org) and example projects in this repository.
 
+[Tutorial](http://jonashagstedt.github.io/swampdragon/) available here.
 
 ## Notes
 
