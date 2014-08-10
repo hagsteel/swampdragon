@@ -1,14 +1,4 @@
 site_name: Swamp Dragon
 pages:
 - [index.md, Home]
-- [installation.md, Installation]
-- [quick-start.md, Quickstart]
-- [settings.md, Settings]
-- [routers.md, Routers]
-- [serializers.md, Serializers]
-- [field-deserializers.md, Field deserializers]
-- [pagination.md, Pagination]
-- [sessions.md, Sessions]
-- [file-upload.md, File upload]
-- [additional-packages.md, Additional packages]
 theme: united
