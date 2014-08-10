@@ -29,26 +29,10 @@ Redis blazing speed.
    
 ## Quickstart
 
-See [documentation](http://swamp-dragon.readthedocs.org) and example projects in this repository.
+See [documentation](http://swampdragon.hagsteel.com/documentation/) and example projects in this repository.
 
-[Tutorial](http://jonashagstedt.github.io/swampdragon/) available here.
-
-## Notes
-
-### Tornado 4.0
-If you experience ```Error during WebSocket handshake: Unexpected response code: 403``` you might have to run 
-the latest dev version of sockjs-tornado.
-
-```pip uninstall sockjs-tornado```
-
-
-```pip install -e git+https://github.com/mrjoes/sockjs-tornado.git#egg=sockjs-tornado```
-
-
-**update** this seems to have been resolved now
-
-
+[Tutorial](http://swampdragon.hagsteel.com/tutorial/here-be-dragons-and-thats-a-good-thing/) available here.
 
 # Documentation
 
-see [ReadTheDocs](http://swamp-dragon.readthedocs.org)
+See [Documentation](http://swampdragon.hagsteel.com/documentation/) here
