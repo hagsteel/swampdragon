@@ -16,6 +16,7 @@ Features:
 *  Routers that are easy to understand
 *  Angular JS support
 *  Query style data subscriptions
+*  Easy to implement in existing Django projects
 
 
 SwampDragon makes use of Djangos wonderful ORM, Tornados excellent websocket support (with fallback. Tested in IE7), and

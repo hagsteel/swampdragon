@@ -86,23 +86,14 @@ class BaseRouter(object):
     def create(self, **kwargs):
         raise NotImplemented('create is not implemented')
 
-    def created(self, obj):
-        raise NotImplemented('created is not implemented')
-
     def update(self, **kwargs):
         raise NotImplemented('update is not implemented')
 
     def action_failed(self, **kwargs):
         self.send_error({self.context['verb']: 'failed'})
 
-    def updated(self, obj, **kwargs):
-        raise NotImplemented('updated is not implemented')
-
     def delete(self, **kwargs):
         raise NotImplemented('delete is not implemented')
-
-    def deleted(self, obj, **kwargs):
-        raise NotImplemented('deleted is not implemented')
 
     def get_initials(self, verb, **kwargs):
         return dict()
@@ -233,7 +224,7 @@ class BaseModelRouter(BaseRouter):
             return
 
         obj.save()
-        self.created(obj)
+        self.created(obj, **kwargs)
 
     def created(self, obj, **kwargs):
         if not self.serializer:
@@ -266,10 +257,10 @@ class BaseModelRouter(BaseRouter):
         if not obj:
             return self.action_failed(**kwargs)
         obj_id = obj.pk
-        self.deleted(obj, obj_id)
+        self.deleted(obj, obj_id, **kwargs)
         obj.delete()
 
-    def deleted(self, obj, **kwargs):
+    def deleted(self, obj, obj_id, **kwargs):
         serialized_obj = self.serializer.serialize()
         self.send(serialized_obj, **kwargs)
 
@@ -299,7 +290,6 @@ class BaseModelPublisherRouter(BaseModelRouter):
     def publish_action(self, channels, data, action):
         publish_data = dict({'data': data})
         publish_data['action'] = action
-        # publish_data['channel'] = channel
         self.publish(channels, publish_data)
 
     def created(self, obj, **kwargs):
@@ -319,7 +309,7 @@ class BaseModelPublisherRouter(BaseModelRouter):
         )
 
     def deleted(self, obj, obj_id, **kwargs):
-        super(BaseModelPublisherRouter, self).deleted(obj, **kwargs)
+        super(BaseModelPublisherRouter, self).deleted(obj, obj_id, **kwargs)
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
