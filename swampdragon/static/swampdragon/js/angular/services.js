@@ -60,8 +60,8 @@ SwampDragonServices.factory('dataService', ['$rootScope', '$q', function ($rootS
 
         on: function (eventName, callback) {
             swampDragon.on(eventName, function () {
-                var args = arguments
-                    callback.apply(swampDragon, args);
+                var args = arguments;
+                callback.apply(swampDragon, args);
             });
         },
 
