@@ -1,3 +1,3 @@
 # Swamp Dragon
 
-Documentation moved [here](http://swampdragon.hagsteel.com/documentation/)
+Documentation moved [here](http://swampdragon.net/documentation/)

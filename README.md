@@ -29,10 +29,10 @@ Redis blazing speed.
    
 ## Quickstart
 
-See [documentation](http://swampdragon.hagsteel.com/documentation/) and example projects in this repository.
+See [documentation](http://swampdragon.net/documentation/) and example projects in this repository.
 
-[Tutorial](http://swampdragon.hagsteel.com/tutorial/here-be-dragons-and-thats-a-good-thing/) available here.
+[Tutorial](http://swampdragon.net/tutorial/here-be-dragons-and-thats-a-good-thing/) available here.
 
 # Documentation
 
-See [Documentation](http://swampdragon.hagsteel.com/documentation/) here
+See [Documentation](http://swampdragon.net/documentation/) here
