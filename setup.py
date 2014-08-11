@@ -13,9 +13,9 @@ setup(
     description=("SwampDragon is a powerful platform making it easy to build real time web applications, combining the power of Django and Tornado"),
     license="BSD",
     keywords="SwampDragon, realtime, sockjs, django, tornado, framework",
-    url="https://github.com/jonashagstedt/swampdragon",
+    url="http://swampdragon.net",
     packages=find_packages(),
-    long_description=read('README.md'),
+    long_description=read('README.rst'),
     include_package_data=True,
     entry_points={'console_scripts': ['dragon-admin = swampdragon.core:run',]},
     install_requires=[
