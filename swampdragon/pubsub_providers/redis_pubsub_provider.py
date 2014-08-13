@@ -1,4 +1,3 @@
-import json
 import redis
 import tornadoredis.pubsub
 import tornadoredis
@@ -37,4 +36,4 @@ class RedisPubSubProvider(BaseProvider):
         return [c.decode() for c in channels]
 
     def publish(self, channel, data):
-        self._client.publish(channel, json.dumps(data))
+        self._client.publish(channel, data)
