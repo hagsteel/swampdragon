@@ -108,7 +108,7 @@ class BaseRouter(object):
         self.connection.send(format_message(data=None, context=self.context, channel_setup=channel_setup))
 
     def get_subscription_channels(self, **kwargs):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def subscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
