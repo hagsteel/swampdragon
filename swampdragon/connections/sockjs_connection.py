@@ -43,11 +43,10 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
         self.close()
 
     def send(self, message, binary=False):
-        super(SubscriberConnection, self).send(self.to_string(message), binary)
+        super(SubscriberConnection, self).send(message, binary)
 
     def broadcast(self, clients, message):
-        data = self.to_string(message)
-        super(SubscriberConnection, self).broadcast(clients, data)
+        super(SubscriberConnection, self).broadcast(clients, message)
 
 
 class DjangoSubscriberConnection(SubscriberConnection):
