@@ -92,7 +92,9 @@ var SwampDragon = function(options) {
 
         swampDragon.conn.onmessage = function(e) {
             if ('data' in e) {
-                e['data'] = JSON.parse(e['data']);
+                if ((typeof e.data != "object")) {
+                    e['data'] = JSON.parse(e['data']);
+                }
             }
 
             if ('data' in e && 'context' in e.data && 'client_callback_name' in e.data.context) {
