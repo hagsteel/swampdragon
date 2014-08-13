@@ -6,6 +6,9 @@ from .pubsub_providers.model_channel_builder import make_channels, filter_channe
 from .pubsub_providers.model_publisher import publish_model
 from .serializers.validation import ModelValidationError
 
+SUCCESS = 'success'
+ERROR = 'error'
+LOGIN_REQUIRED = 'login_required'
 
 registered_handlers = {}
 
@@ -32,10 +35,10 @@ class BaseRouter(object):
 
     @classmethod
     def get_name(cls):
-        try:
-            return getattr(cls, 'route_name')
-        except AttributeError:
+        route_name = getattr(cls, 'route_name')
+        if not route_name:
             raise Exception('\n------\n{} has no name.\nSet the route_name property\n------\n'.format(cls.__name__))
+        return route_name
 
     def handle(self, data):
         verb = data['verb']
@@ -59,6 +62,10 @@ class BaseRouter(object):
                 raise UnexpectedVerbException('\n------\nUnexpected verb: {}\n------'.format(verb))
 
     def get_client_context(self, verb, **kwargs):
+        '''
+        Additional data to be sent to the client with each `send` call
+        from the router
+        '''
         return {}
 
     def _update_client_context(self, data):
@@ -69,32 +76,22 @@ class BaseRouter(object):
         self.context['client_context'].update(data)
 
     def get_list(self, **kwargs):
-        raise NotImplemented('get_list is not implemented')
-
-    def got_list(self, **kwargs):
-        raise NotImplemented('got_list is not implemented')
+        raise NotImplementedError('get_list is not implemented')
 
     def get_single(self, **kwargs):
-        raise NotImplemented('get_single is not implemented')
+        raise NotImplementedError('get_single is not implemented')
 
     def create(self, **kwargs):
-        raise NotImplemented('create is not implemented')
+        raise NotImplementedError('create is not implemented')
 
     def update(self, **kwargs):
-        raise NotImplemented('update is not implemented')
-
-    def action_failed(self, **kwargs):
-        self.send_error({self.context['verb']: 'failed'})
+        raise NotImplementedError('update is not implemented')
 
     def delete(self, **kwargs):
-        raise NotImplemented('delete is not implemented')
-
-    def get_initials(self, verb, **kwargs):
-        return dict()
+        raise NotImplementedError('delete is not implemented')
 
     def send(self, data, channel_setup=None, **kwargs):
-        self.context['state'] = 'success'
-
+        self.context['state'] = SUCCESS
         if 'verb' in self.context:
             client_context = self.get_client_context(self.context['verb'], **kwargs)
             self._update_client_context(client_context)
@@ -103,11 +100,11 @@ class BaseRouter(object):
         self.connection.send(message)
 
     def send_error(self, data, channel_setup=None):
-        self.context['state'] = 'error'
+        self.context['state'] = ERROR
         self.connection.send(format_message(data=data, context=self.context, channel_setup=channel_setup))
 
     def send_login_required(self, channel_setup=None):
-        self.context['state'] = 'login_required'
+        self.context['state'] = LOGIN_REQUIRED
         self.connection.send(format_message(data=None, context=self.context, channel_setup=channel_setup))
 
     def get_subscription_channels(self, **kwargs):
@@ -189,13 +186,14 @@ class BaseModelRouter(BaseRouter):
         self.send_list(obj_list, **kwargs)
         return obj_list
 
+    def get_initial(self, verb, **kwargs):
+        return dict()
+
     def send_list(self, object_list, **kwargs):
         self.send([self.serializer_class(instance=o).serialize() for o in object_list], **kwargs)
 
     def get_single(self, **kwargs):
         obj = self.get_object(**kwargs)
-        if not obj:
-            return self.action_failed(**kwargs)
         self.send_single(obj, **kwargs)
         return obj
 
@@ -208,9 +206,8 @@ class BaseModelRouter(BaseRouter):
 
     def create(self, **kwargs):
         kwargs = replace_original_with_data(kwargs)
-        initials = self.get_initials('create', **kwargs)
-        # self.serializer = self.serializer_class(context=self.context, **kwargs)
-        self.serializer = self.serializer_class(data=kwargs, initial=initials)
+        initial = self.get_initial('create', **kwargs)
+        self.serializer = self.serializer_class(data=kwargs, initial=initial)
         try:
             obj = self.serializer.save()
         except ModelValidationError as error:
@@ -227,10 +224,8 @@ class BaseModelRouter(BaseRouter):
 
     def update(self, **kwargs):
         kwargs = replace_original_with_data(kwargs)
-        initial = self.get_initials('update', **kwargs)
+        initial = self.get_initial('update', **kwargs)
         obj = self.get_object(**kwargs)
-        if not obj:
-            return self.action_failed(**kwargs)
         self.serializer = self.serializer_class(instance=obj, data=kwargs, initial=initial)
         past_state = self.serializer.serialize()
         try:
@@ -248,8 +243,6 @@ class BaseModelRouter(BaseRouter):
     def delete(self, **kwargs):
         obj = self.get_object(**kwargs)
         self.serializer = self.serializer_class(instance=obj, data=kwargs)
-        if not obj:
-            return self.action_failed(**kwargs)
         obj_id = obj.pk
         self.deleted(obj, obj_id, **kwargs)
         obj.delete()
