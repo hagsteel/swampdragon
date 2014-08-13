@@ -11,7 +11,8 @@
         <ul>
             <li ng-repeat="company in datasource">
                 Company: {$ company.name $}
-                {$ company.companyowner.name $}
+
+                <span ng-bind="company.companyowner.name"></span>
                 <ul>
                     <li ng-repeat="s in company.staff">
                         Staff: {$ s.name $}

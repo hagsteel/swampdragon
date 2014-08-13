@@ -15,17 +15,7 @@ from django.conf import settings
 from django.test.utils import get_runner
 
 
-def usage():
-    return """
-    Usage: python runtests.py [UnitTestClass].[method]
-
-    You can pass the Class name of the `UnitTestClass` you want to test.
-
-    Append a method name if you only want to test a specific method of that class.
-    """
-
-
-def main():
+def run_tests():
     try:
         django.setup()
     except AttributeError:
@@ -45,8 +35,22 @@ def main():
         test_module_name = 'tests'
 
     failures = test_runner.run_tests([test_module_name + test_case])
+    return failures
 
-    sys.exit(failures)
+
+def usage():
+    return """
+    Usage: python runtests.py [UnitTestClass].[method]
+
+    You can pass the Class name of the `UnitTestClass` you want to test.
+
+    Append a method name if you only want to test a specific method of that class.
+    """
+
+
+def main():
+    run_tests()
 
 if __name__ == '__main__':
-    main()
+    failures = main()
+    sys.exit(failures)

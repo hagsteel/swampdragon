@@ -24,13 +24,7 @@ class BaseRouter(object):
     session_store = get_session_store()
 
     def __init__(self, connection, request=None, **kwargs):
-        if request is not None:
-            super(BaseRouter, self).__init__(connection, request, **kwargs)
-        if request:
-            # This is a normal web request so we won't have a connection
-            return
-        else:
-            self.connection = connection
+        self.connection = connection
         self.context = dict()
 
     def make_channel_data(self, client_channel, server_channels):
