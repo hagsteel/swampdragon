@@ -134,9 +134,6 @@ class BaseRouter(object):
             publish_data['channel'] = channel
             self.connection.pub_sub.publish(channel, publish_data)
 
-    def get_subscription_contexts(self, **kwargs):
-        return dict(kwargs)
-
 
 def replace_original_with_data(kwargs):
     keys = [key for key in kwargs.keys() if '__' in key]
@@ -188,6 +185,9 @@ class BaseModelRouter(BaseRouter):
 
     def get_initial(self, verb, **kwargs):
         return dict()
+
+    def get_subscription_contexts(self, **kwargs):
+        return dict(kwargs)
 
     def send_list(self, object_list, **kwargs):
         self.send([self.serializer_class(instance=o).serialize() for o in object_list], **kwargs)
