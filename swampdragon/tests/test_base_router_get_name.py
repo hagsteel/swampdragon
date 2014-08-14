@@ -6,7 +6,7 @@ class FooRouter(BaseRouter):
     route_name = 'foo'
 
 
-class NamelesRrouter(BaseRouter):
+class NamelessRrouter(BaseRouter):
     pass
 
 
@@ -16,4 +16,4 @@ class TestBaseRouter(DragonDjangoTestCase):
 
     def test_name_missing(self):
         with self.assertRaises(Exception):
-            NamelesRrouter.get_name()
+            NamelessRrouter.get_name()

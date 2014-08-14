@@ -8,6 +8,7 @@ class FooRouter(BaseRouter):
 
 class BarRouter(BaseRouter):
     channels = ['channel_a', 'channel_b']
+
     def get_subscription_channels(self, **kwargs):
         return self.channels
 

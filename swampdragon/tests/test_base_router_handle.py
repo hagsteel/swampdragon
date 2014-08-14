@@ -19,6 +19,7 @@ class Permission(RoutePermission):
     def permission_failed(self, handler):
         pass
 
+
 class TestBaseRouter(DragonDjangoTestCase):
     def setUp(self):
         self.router = FooRouter(self.connection)

@@ -135,14 +135,6 @@ class BaseRouter(object):
             self.connection.pub_sub.publish(channel, publish_data)
 
 
-def replace_original_with_data(kwargs):
-    keys = [key for key in kwargs.keys() if '__' in key]
-    for key in keys:
-        val = kwargs.pop(key)
-        kwargs[key.split('__')[0]] = val
-    return kwargs
-
-
 class BaseModelRouter(BaseRouter):
     model = None
     instance = None
@@ -152,8 +144,13 @@ class BaseModelRouter(BaseRouter):
     _obj = None
 
     def _get_changes(self, current_state, past_state):
+        '''
+        Compare the previous data with the current data
+        to get only the changed fields (this makes the footprint smaller)
+        '''
         changed_state = {}
-
+        if '_type' in current_state:
+            changed_state['_type'] = current_state['_type']
         for o in current_state:
             if past_state[o] != current_state[o]:
                 changed_state[o] = current_state[o]
@@ -161,22 +158,23 @@ class BaseModelRouter(BaseRouter):
             changed_state['id'] = current_state['id']
         return changed_state
 
-    def _get_query_set(self, **kwargs):
-        if self._query_set:
-            return self._query_set
-        self._query_set = self.get_query_set(**kwargs)
-        return self._query_set
-
     def _get_object(self, **kwargs):
         if self._obj:
             return self._obj
         self._obj = self.get_object(**kwargs)
         return self._obj
 
+    def _get_query_set(self, **kwargs):
+        if self._query_set:
+            return self._query_set
+        self._query_set = self.get_query_set(**kwargs)
+        return self._query_set
+
     def get_list(self, **kwargs):
-        obj_list = self.get_query_set(**kwargs)
-        if self.paginate_by and self.context['page']:
-            page = Paginator(obj_list, self.paginate_by).page(self.context['page'])
+        obj_list = self._get_query_set(**kwargs)
+        if self.paginate_by:
+            page_num = self.context.get('page', 1)
+            page = Paginator(obj_list, self.paginate_by).page(page_num)
             self._update_client_context({'page': page.serialize()})
             obj_list = page.object_list
 
@@ -193,7 +191,7 @@ class BaseModelRouter(BaseRouter):
         self.send([self.serializer_class(instance=o).serialize() for o in object_list], **kwargs)
 
     def get_single(self, **kwargs):
-        obj = self.get_object(**kwargs)
+        obj = self._get_object(**kwargs)
         self.send_single(obj, **kwargs)
         return obj
 
@@ -205,7 +203,6 @@ class BaseModelRouter(BaseRouter):
         self.send_error(errors)
 
     def create(self, **kwargs):
-        kwargs = replace_original_with_data(kwargs)
         initial = self.get_initial('create', **kwargs)
         self.serializer = self.serializer_class(data=kwargs, initial=initial)
         try:
@@ -218,14 +215,11 @@ class BaseModelRouter(BaseRouter):
         self.created(obj, **kwargs)
 
     def created(self, obj, **kwargs):
-        if not self.serializer:
-            self.serializer = self.serializer_class(obj)
         self.send(self.serializer.serialize())
 
     def update(self, **kwargs):
-        kwargs = replace_original_with_data(kwargs)
         initial = self.get_initial('update', **kwargs)
-        obj = self.get_object(**kwargs)
+        obj = self._get_object(**kwargs)
         self.serializer = self.serializer_class(instance=obj, data=kwargs, initial=initial)
         past_state = self.serializer.serialize()
         try:
@@ -241,7 +235,7 @@ class BaseModelRouter(BaseRouter):
         self.send(kwargs.get('updated_data'), **kwargs)
 
     def delete(self, **kwargs):
-        obj = self.get_object(**kwargs)
+        obj = self._get_object(**kwargs)
         self.serializer = self.serializer_class(instance=obj, data=kwargs)
         obj_id = obj.pk
         self.deleted(obj, obj_id, **kwargs)
@@ -288,12 +282,10 @@ class BaseModelPublisherRouter(BaseModelRouter):
 
     def updated(self, obj, **kwargs):
         super(BaseModelPublisherRouter, self).updated(obj, **kwargs)
-        publish_model(
-            obj,
-            self.serializer_class(instance=obj),
-            self.connection.pub_sub,
-            PUBACTIONS.updated, kwargs.get('past_state')
-        )
+        base_channel = self.serializer_class.get_base_channel()
+        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
+        channels = filter_channels_by_model(all_model_channels, obj)
+        self.publish_action(channels, kwargs.get('updated_data'), PUBACTIONS.updated)
 
     def deleted(self, obj, obj_id, **kwargs):
         super(BaseModelPublisherRouter, self).deleted(obj, obj_id, **kwargs)

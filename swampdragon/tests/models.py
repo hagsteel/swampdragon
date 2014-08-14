@@ -12,5 +12,5 @@ class TextModel(SDModel):
 
 
 class TwoFieldModel(SDModel):
-    text = models.CharField(max_length=100)
+    text = models.CharField(max_length=50)
     number = models.IntegerField()

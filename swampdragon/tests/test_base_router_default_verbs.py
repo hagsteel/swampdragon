@@ -29,4 +29,3 @@ class TestBaseRouter(DragonDjangoTestCase):
     def test_delete(self):
         with self.assertRaises(NotImplementedError):
             self.router.delete()
-
