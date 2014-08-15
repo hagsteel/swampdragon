@@ -293,12 +293,11 @@ class BaseModelPublisherRouter(BaseModelRouter):
         all_model_channels = self.connection.pub_sub.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
         data = self.serializer.serialize()
-        data[self.serializer.opts.id_field] = obj_id
         self.publish_action(channels, data, PUBACTIONS.deleted)
 
 
 def register(route):
-    if route in registered_handlers:
+    if route.get_name() in registered_handlers:
         return
     if issubclass(route, BaseModelRouter) or issubclass(route, BaseModelPublisherRouter):
         if 'get_single' in route.valid_verbs and 'get_single' not in route.exclude_verbs:
