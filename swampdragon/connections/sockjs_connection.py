@@ -4,6 +4,8 @@ from .. import route_handler
 import json
 
 
+pub_sub = RedisPubSubProvider()
+
 class ConnectionMixin(object):
     def to_json(self, data):
         if isinstance(data, dict):
@@ -25,7 +27,7 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
         super(SubscriberConnection, self).__init__(session)
 
     def on_open(self, request):
-        self.pub_sub = RedisPubSubProvider()
+        self.pub_sub = pub_sub
 
     def on_close(self):
         self.pub_sub.close()
