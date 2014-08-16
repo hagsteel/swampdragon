@@ -41,4 +41,7 @@ class RedisPubSubProvider(BaseProvider):
             data = json.dumps(data)
         broadcasters = list(self._subscriber.subscribers[channel].keys())
         if broadcasters:
-            broadcasters[0].broadcast(broadcasters, data)
+            for bc in broadcasters:
+                if not bc.session.is_closed:
+                    bc.broadcast(broadcasters, data)
+                    break
