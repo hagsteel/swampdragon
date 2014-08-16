@@ -30,7 +30,7 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
         self.pub_sub = pub_sub
 
     def on_close(self):
-        self.pub_sub.close()
+        self.pub_sub.close(self)
 
     def on_message(self, data):
         try:
