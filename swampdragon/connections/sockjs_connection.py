@@ -23,6 +23,8 @@ class ConnectionMixin(object):
 
 
 class SubscriberConnection(ConnectionMixin, SockJSConnection):
+    channels = []
+
     def __init__(self, session):
         super(SubscriberConnection, self).__init__(session)
 
