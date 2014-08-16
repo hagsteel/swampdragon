@@ -4,13 +4,16 @@ from .pubsub_providers.redis_pubsub_provider import RedisPubSubProvider
 from .pubsub_providers.base_provider import PUBACTIONS
 from .model_tools import get_property
 from .pubsub_providers.model_publisher import publish_model
+from .pubsub_providers.pubsub_factory import get_pubsub_provider
+
+
+pubsub = get_pubsub_provider()
 
 
 class SelfPublishModel(object):
     _ignore_changes_for = None
     _should_publish = True
     serializer_class = None
-    publisher_class = RedisPubSubProvider
 
     def __enter__(self):
         self._should_publish = False
@@ -74,7 +77,7 @@ class SelfPublishModel(object):
     def _publish(self, action, changes=None):
         if not self.serializer_class:
             return
-        publish_model(self, self._serializer, self.publisher_class(), action, changes)
+        publish_model(self, self._serializer, pubsub, action, changes)
 
     def save(self, *args, **kwargs):
         if not self.pk:

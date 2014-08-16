@@ -1,5 +1,5 @@
 from ..route_handler import BaseRouter, ERROR, SUCCESS, LOGIN_REQUIRED
-from .dragon_django_test_case import DragonDjangoTestCase
+from .dragon_test_case import DragonTestCase
 
 
 class FooRouter(BaseRouter):
@@ -13,7 +13,7 @@ class BarRouter(BaseRouter):
         return self.channels
 
 
-class TestBaseRouter(DragonDjangoTestCase):
+class TestBaseRouter(DragonTestCase):
     def setUp(self):
         self.foo_router = FooRouter(self.connection)
         self.bar_router = BarRouter(self.connection)

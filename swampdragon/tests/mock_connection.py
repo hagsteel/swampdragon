@@ -1,11 +1,15 @@
 import json
 import uuid
-from .mock_provider import MockPubSubProvider
 from .. import route_handler
+from ..pubsub_providers.pubsub_factory import get_pubsub_provider
+
+
+pubsub = get_pubsub_provider()
 
 
 class TestConnection(object):
     uid = None
+    channels = []
 
     def __init__(self, user=None):
         self.uid = str(uuid.uuid4())
@@ -13,7 +17,7 @@ class TestConnection(object):
 
         self.sent_data = []
         self.published_data = []
-        self.pub_sub = MockPubSubProvider()
+        self.pub_sub = pubsub
 
     def send(self, message):
         self.sent_data.append(json.dumps(message))

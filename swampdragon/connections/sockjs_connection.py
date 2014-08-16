@@ -1,32 +1,30 @@
 from sockjs.tornado import SockJSConnection
-from ..pubsub_providers.redis_pubsub_provider import RedisPubSubProvider
+from ..pubsub_providers.pubsub_factory import get_pubsub_provider
 from .. import route_handler
 import json
 
 
-pub_sub = RedisPubSubProvider()
+pub_sub = get_pubsub_provider()
+
 
 class ConnectionMixin(object):
     def to_json(self, data):
+        """
+        If the message is a dict, return it.
+        If it's a string try to decode it into json,
+        otherwise assume it's not a dictionary but a simple text message
+        """
         if isinstance(data, dict):
             return data
         try:
-            data = json.loads(data.replace("'", '"'))
-            return data
+            return json.loads(data)
         except:
-            return json.dumps({'message': data})
-
-    def to_string(self, data):
-        if isinstance(data, dict):
-            return json.dumps(data).replace("'", '"')
-        return data
+            return {'message': data}
 
 
 class SubscriberConnection(ConnectionMixin, SockJSConnection):
     channels = []
-
-    def __init__(self, session):
-        super(SubscriberConnection, self).__init__(session)
+    pub_sub = None
 
     def on_open(self, request):
         self.pub_sub = pub_sub
@@ -46,13 +44,6 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
     def abort_connection(self):
         self.close()
 
-    def send(self, message, binary=False):
-        super(SubscriberConnection, self).send(message, binary)
-
-    def broadcast(self, clients, message):
-        super(SubscriberConnection, self).broadcast(clients, message)
-
 
 class DjangoSubscriberConnection(SubscriberConnection):
-    def __init__(self, session):
-        super(DjangoSubscriberConnection, self).__init__(session)
+    pass

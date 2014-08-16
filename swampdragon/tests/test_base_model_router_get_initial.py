@@ -1,6 +1,6 @@
 from ..route_handler import BaseModelRouter
 from ..serializers.model_serializer import ModelSerializer
-from .dragon_django_test_case import DragonDjangoTestCase
+from .dragon_test_case import DragonTestCase
 from .models import TwoFieldModel
 
 
@@ -22,7 +22,7 @@ class FooRouter(BaseModelRouter):
         return initial
 
 
-class TestBaseModelRouter(DragonDjangoTestCase):
+class TestBaseModelRouter(DragonTestCase):
     def setUp(self):
         self.router = FooRouter(self.connection)
 

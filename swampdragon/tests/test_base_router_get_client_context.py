@@ -1,5 +1,5 @@
 from ..route_handler import BaseRouter
-from .dragon_django_test_case import DragonDjangoTestCase
+from .dragon_test_case import DragonTestCase
 
 
 class FooRouter(BaseRouter):
@@ -15,7 +15,7 @@ class FooRouter(BaseRouter):
         self.send({'foo': 'bar'})
 
 
-class TestBaseRouter(DragonDjangoTestCase):
+class TestBaseRouter(DragonTestCase):
     def setUp(self):
         self.router = FooRouter(self.connection)
 

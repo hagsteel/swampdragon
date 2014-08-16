@@ -1,5 +1,5 @@
 from ..route_handler import BaseRouter, UnexpectedVerbException
-from .dragon_django_test_case import DragonDjangoTestCase
+from .dragon_test_case import DragonTestCase
 from swampdragon.permissions import RoutePermission
 
 
@@ -20,7 +20,7 @@ class Permission(RoutePermission):
         pass
 
 
-class TestBaseRouter(DragonDjangoTestCase):
+class TestBaseRouter(DragonTestCase):
     def setUp(self):
         self.router = FooRouter(self.connection)
 

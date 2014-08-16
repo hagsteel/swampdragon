@@ -3,8 +3,8 @@ from mimetypes import MimeTypes
 from swampdragon.tests.dragon_test_case import DragonTestCase
 
 
-class DragonDjangoTestCase(DragonTestCase, TestCase):
-    pass
+# class DragonDjangoTestCase(DragonTestCase, TestCase):
+#     pass
 
 
 class FileUploadRequestData(object):

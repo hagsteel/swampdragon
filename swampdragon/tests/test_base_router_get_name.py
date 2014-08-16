@@ -1,5 +1,5 @@
 from ..route_handler import BaseRouter
-from .dragon_django_test_case import DragonDjangoTestCase
+from .dragon_test_case import DragonTestCase
 
 
 class FooRouter(BaseRouter):
@@ -10,7 +10,7 @@ class NamelessRrouter(BaseRouter):
     pass
 
 
-class TestBaseRouter(DragonDjangoTestCase):
+class TestBaseRouter(DragonTestCase):
     def test_get_name(self):
         self.assertEqual(FooRouter.get_name(), FooRouter.route_name)
 

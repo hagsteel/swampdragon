@@ -28,12 +28,12 @@ def run_tests():
     elif len(sys.argv) == 1:
         test_case = ''
     else:
-        print(usage())
         sys.exit(1)
     test_module_name = 'swampdragon.tests'
     if django.VERSION[0] == 1 and django.VERSION[1] < 6:
         test_module_name = 'tests'
 
+    sys.argv.append('test')
     failures = test_runner.run_tests([test_module_name + test_case])
     return failures
 

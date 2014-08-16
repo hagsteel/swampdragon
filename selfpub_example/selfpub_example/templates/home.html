@@ -2,26 +2,39 @@
 
 {% block main_content %}
     <div class="col-md-12" ng-controller="CompanyCtrl">
-
         <ol>
             <li>Create a superuser <pre>python manage.py createsuperuser</pre></li>
             <li>Make sure the socketserver is running <pre>python manage.py socketserver</pre></li>
             <li>You can now log in to Django admin and add companies and they should appear below</li>
         </ol>
-        <ul>
-            <li ng-repeat="company in datasource">
-                Company: {$ company.name $}
 
-                <span ng-bind="company.companyowner.name"></span>
-                <ul>
-                    <li ng-repeat="s in company.staff">
-                        Staff: {$ s.name $}
-                        <ul>
-                            <li ng-repeat="d in s.documents">Document: {$ d.title $}</li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <div class="col-md-6">
+            <ul>
+                <li ng-repeat="company in datasource">
+                    Company: {$ company.name $}
+
+                    <span ng-bind="company.companyowner.name"></span>
+                    <ul>
+                        <li ng-repeat="s in company.staff">
+                            Staff: {$ s.name $}
+                            <ul>
+                                <li ng-repeat="d in s.documents">Document: {$ d.title $}</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Company name" ng-model="company.name">
+            </div>
+
+            <button class="btn btn-primary" ng-click="createCompany()">
+                Save company
+            </button>
+        </div>
     </div>
 {% endblock main_content %}

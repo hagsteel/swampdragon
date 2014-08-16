@@ -20,4 +20,12 @@ CompanyControllers.controller('CompanyCtrl', ['$scope', 'dataService', function(
             });
         }
     });
+
+    $scope.createCompany = function() {
+        dataService.create('company-route', this.company).then(function(response) {
+            console.log(response);
+        }).catch(function(errors) {
+            console.log(errors);
+        });
+    }
 }]);
