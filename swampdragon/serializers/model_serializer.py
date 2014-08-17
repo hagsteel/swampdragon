@@ -112,8 +112,6 @@ class ModelSerializer(object):
                 getattr(self.instance, key).add(related_instance)
         else:
             related_instance = serializer(val).deserialize()
-            if save_instance:
-                related_instance.save()
             setattr(self.instance, key, related_instance)
 
 

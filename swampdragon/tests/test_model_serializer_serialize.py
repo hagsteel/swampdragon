@@ -7,6 +7,7 @@ class TextModelSerializer(ModelSerializer):
     class Meta:
         model = TextModel
         publish_fields = ('text', )
+        base_channel = 'custom_base_channel'
 
 
 class TestModelSerializer(DragonTestCase):
@@ -16,3 +17,14 @@ class TestModelSerializer(DragonTestCase):
         data = serializer.serialize()
         self.assertEqual(text_model.pk, data['id'])
         self.assertEqual(text_model.text, data['text'])
+
+    def test_serializer_without_instance(self):
+        """
+        Serializing without instance should return None
+        """
+        expected = None
+        actual = TextModelSerializer().serialize()
+        self.assertEqual(expected, actual)
+
+    def test_serialize_custom_base_channel(self):
+        self.assertEqual(TextModelSerializer.get_base_channel(), 'custom_base_channel|')

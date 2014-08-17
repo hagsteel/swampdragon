@@ -4,27 +4,27 @@ from .dragon_test_case import DragonTestCase
 from .models import SDModel
 
 
-class Foo(SDModel):
+class FooM2M(SDModel):
     name = models.CharField(max_length=20)
 
 
-class Bar(SDModel):
-    foos = models.ManyToManyField(Foo)
+class BarM2M(SDModel):
+    foos = models.ManyToManyField(FooM2M)
     number = models.IntegerField()
 
 
-class FooSerializer(ModelSerializer):
-    bar_set = 'BarSerializer'
+class FooM2MSerializer(ModelSerializer):
+    barm2m_set = 'BarM2MSerializer'
     class Meta:
-        model = Foo
-        update_fields = ('name', 'bar_set')
+        model = FooM2M
+        update_fields = ('name', 'barm2m_set')
 
 
-class BarSerializer(ModelSerializer):
-    foos = FooSerializer
+class BarM2MSerializer(ModelSerializer):
+    foos = FooM2MSerializer
 
     class Meta:
-        model = Bar
+        model = BarM2M
         update_fields = ('number', 'foos')
 
 
@@ -36,7 +36,7 @@ class TestModelSerializer(DragonTestCase):
                 {'name': 'foo'}
             ]
         }
-        serializer = BarSerializer(data)
+        serializer = BarM2MSerializer(data)
         bar = serializer.save()
         self.assertEqual(bar.number, data['number'])
         self.assertEqual(bar.foos.first().name, data['foos'][0]['name'])
@@ -44,11 +44,11 @@ class TestModelSerializer(DragonTestCase):
     def test_deserialize_reverse_m2m(self):
         data = {
             'name': 'foo',
-            'bar_set': [
+            'barm2m_set': [
                 {'number': 3}
             ]
         }
-        serializer = FooSerializer(data)
+        serializer = FooM2MSerializer(data)
         foo = serializer.save()
         self.assertEqual(foo.name, data['name'])
-        self.assertEqual(foo.bar_set.first().number, data['bar_set'][0]['number'])
+        self.assertEqual(foo.barm2m_set.first().number, data['barm2m_set'][0]['number'])

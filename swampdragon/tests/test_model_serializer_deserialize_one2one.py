@@ -4,12 +4,12 @@ from .dragon_test_case import DragonTestCase
 from .models import TextModel, SDModel
 
 
-class Foo(SDModel):
+class FooOne2One(SDModel):
     name = models.CharField(max_length=20)
 
 
-class Bar(SDModel):
-    foo = models.OneToOneField(Foo)
+class BarOne2One(SDModel):
+    foo = models.OneToOneField(FooOne2One)
     number = models.IntegerField()
 
 
@@ -17,7 +17,7 @@ class FooSerializer(ModelSerializer):
     bar = 'BarSerializer'
 
     class Meta:
-        model = Foo
+        model = FooOne2One
         update_fields = ('name', 'bar')
 
 
@@ -25,7 +25,7 @@ class BarSerializer(ModelSerializer):
     foo = FooSerializer
 
     class Meta:
-        model = Bar
+        model = BarOne2One
         update_fields = ('number', 'foo')
 
 

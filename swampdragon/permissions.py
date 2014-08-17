@@ -13,10 +13,10 @@ def login_required(func):
 
 class RoutePermission(object):
     def test_permission(self, handler, verb, **kwargs):
-        raise NotImplemented("You need to implement test_permission")
+        raise NotImplementedError("You need to implement test_permission")
 
     def permission_failed(self, handler):
-        raise NotImplemented("You need to implement permission_failed")
+        raise NotImplementedError("You need to implement permission_failed")
 
 
 class LoginRequired(RoutePermission):

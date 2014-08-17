@@ -54,3 +54,13 @@ class TestModelSerializer(DragonTestCase):
         child = serializer.save()
         self.assertEqual(child.number, data['number'])
         self.assertEqual(child.parent.name, data['parent']['name'])
+
+    def test_get_object_map(self):
+        """
+        The object map should return information on how to map parents to children
+        and vice versa
+        """
+        object_map = ParentSerializer.get_object_map()
+        self.assertLessEqual(len(object_map), 2)
+        for om in object_map:
+            self.assertIn('via', om)

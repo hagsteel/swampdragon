@@ -14,3 +14,12 @@ class TextModel(SDModel):
 class TwoFieldModel(SDModel):
     text = models.CharField(max_length=50)
     number = models.IntegerField()
+
+
+class ParentModel(SDModel):
+    name = models.CharField(max_length=100)
+
+
+class ChildModel(SDModel):
+    parent = models.ForeignKey(ParentModel)
+    number = models.IntegerField()
