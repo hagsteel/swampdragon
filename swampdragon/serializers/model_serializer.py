@@ -28,7 +28,7 @@ class ModelSerializer(object):
         if data and not isinstance(data, dict):
             raise Exception('data needs to be a dictionary')
         self.opts = ModelSerializerMeta(self.Meta)
-        self._instance = instance
+        self.instance = instance
         self.data = data
         self.initial = initial or {}
         self.base_fields = self._get_base_fields()
@@ -38,12 +38,6 @@ class ModelSerializer(object):
     class Meta(object):
         pass
 
-    @property
-    def instance(self):
-        # if not self._instance:
-        #     self._instance = self.opts.model()
-        return self._instance
-
     def _get_base_fields(self):
         return [f.name for f in self.opts.model._meta.fields]
 
@@ -51,18 +45,20 @@ class ModelSerializer(object):
         return [f for f in self.opts.update_fields if f not in self.base_fields and f not in self.m2m_fields]
 
     def _get_m2m_fields(self):
+        reverse_m2m = [field.get_accessor_name() for field in self.opts.model._meta.get_all_related_many_to_many_objects()]
         m2m_fields = [f.name for f in self.opts.model._meta.local_many_to_many]
-        return [f for f in self.opts.update_fields if f in m2m_fields]
+        fields = list(reverse_m2m + m2m_fields)
+        return [f for f in self.opts.update_fields if f in fields]
 
     def deserialize(self):
         # Set initial data
-        if not self._instance:
-            self._instance = self.opts.model()
+        if not self.instance:
+            self.instance = self.opts.model()
 
         for key, val in self.initial.items():
             setattr(self.instance, key, val)
 
-        # Serialize base fields
+        # Deserialize base fields
         for key, val in self.data.items():
             if key not in self.opts.update_fields or key not in self.base_fields:
                 continue
@@ -114,6 +110,12 @@ class ModelSerializer(object):
                 if save_instance:
                     related_instance.save()
                 getattr(self.instance, key).add(related_instance)
+        else:
+            related_instance = serializer(val).deserialize()
+            if save_instance:
+                related_instance.save()
+            setattr(self.instance, key, related_instance)
+
 
     def _get_related_serializer(self, key):
         serializer = getattr(self, key, None)

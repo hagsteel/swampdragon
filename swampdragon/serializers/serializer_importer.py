@@ -18,8 +18,13 @@ def get_serializer(ser, f):
 
     root = f.__module__.split('.')[0]
     package_name = ser.rsplit('.', 1)[0]
-    serializer_class_name = ser.rsplit('.', 1)[1]
-    src = '.'.join([root, package_name, 'serializers'])
+    if '.' in ser:
+        serializer_class_name = ser.rsplit('.', 1)[1]
+        src = '.'.join([root, package_name, 'serializers'])
+    else:
+        serializer_class_name = ser
+        src = f.__module__
+
     try:
         mod = get_module(src)
         if not mod:
