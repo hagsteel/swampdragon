@@ -28,7 +28,7 @@ class ModelSerializer(object):
         if data and not isinstance(data, dict):
             raise Exception('data needs to be a dictionary')
         self.opts = ModelSerializerMeta(self.Meta)
-        self.instance = instance
+        self._instance = instance
         self.data = data
         self.initial = initial or {}
         self.base_fields = self._get_base_fields()
@@ -38,6 +38,12 @@ class ModelSerializer(object):
     class Meta(object):
         pass
 
+    @property
+    def instance(self):
+        # if not self._instance:
+        #     self._instance = self.opts.model()
+        return self._instance
+
     def _get_base_fields(self):
         return [f.name for f in self.opts.model._meta.fields]
 
@@ -45,20 +51,20 @@ class ModelSerializer(object):
         return [f for f in self.opts.update_fields if f not in self.base_fields and f not in self.m2m_fields]
 
     def _get_m2m_fields(self):
-        reverse_m2m = [field.get_accessor_name() for field in self.opts.model._meta.get_all_related_many_to_many_objects()]
+        related_m2m = [f.get_accessor_name() for f in self.opts.model._meta.get_all_related_many_to_many_objects()]
         m2m_fields = [f.name for f in self.opts.model._meta.local_many_to_many]
-        fields = list(reverse_m2m + m2m_fields)
-        return [f for f in self.opts.update_fields if f in fields]
+        m2m = m2m_fields + related_m2m
+        return [f for f in self.opts.update_fields if f in m2m]
 
     def deserialize(self):
         # Set initial data
-        if not self.instance:
-            self.instance = self.opts.model()
+        if not self._instance:
+            self._instance = self.opts.model()
 
         for key, val in self.initial.items():
             setattr(self.instance, key, val)
 
-        # Deserialize base fields
+        # Serialize base fields
         for key, val in self.data.items():
             if key not in self.opts.update_fields or key not in self.base_fields:
                 continue
@@ -114,18 +120,22 @@ class ModelSerializer(object):
             related_instance = serializer(val).deserialize()
             setattr(self.instance, key, related_instance)
 
-
     def _get_related_serializer(self, key):
         serializer = getattr(self, key, None)
         if isinstance(serializer, str):
             return get_serializer(serializer, self.__class__)
         return serializer
 
+    def get_object_map_data(self):
+        return {
+            'id': getattr(self.instance, self.opts.id_field),
+            '_type': self.opts.model._meta.model_name
+        }
+
     def serialize(self, ignore_serializers=None):
         if not self.instance:
             return None
-        data = {'id': getattr(self.instance, self.opts.id_field)}
-        data['_type'] = self.opts.model._meta.model_name
+        data = self.get_object_map_data()
 
         # Set all the ids for related models
         # so the datamapper can find the connection

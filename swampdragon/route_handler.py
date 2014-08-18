@@ -1,9 +1,9 @@
+from .pubsub_providers.publisher_factory import get_publisher
 from .paginator import Paginator
 from .sessions.sessions import get_session_store
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
-from .pubsub_providers.model_publisher import publish_model
 from .serializers.validation import ModelValidationError
 
 SUCCESS = 'success'
@@ -11,6 +11,8 @@ ERROR = 'error'
 LOGIN_REQUIRED = 'login_required'
 
 registered_handlers = {}
+
+publisher = get_publisher()
 
 
 class UnexpectedVerbException(Exception):
@@ -20,7 +22,6 @@ class UnexpectedVerbException(Exception):
 class BaseRouter(object):
     valid_verbs = ['get_list', 'get_single', 'create', 'update', 'delete', 'subscribe', 'unsubscribe']
     exclude_verbs = []
-    serializer_class = None
     serializer = None
     route_name = None
     permission_classes = []
@@ -132,11 +133,12 @@ class BaseRouter(object):
     def publish(self, channels, publish_data):
         for channel in channels:
             publish_data['channel'] = channel
-            self.connection.pub_sub.publish(channel, publish_data)
+            publisher.publish(channel, publish_data)
 
 
 class BaseModelRouter(BaseRouter):
     model = None
+    serializer_class = None
     instance = None
     include_related = []
     paginate_by = None
@@ -276,24 +278,32 @@ class BaseModelPublisherRouter(BaseModelRouter):
     def created(self, obj, **kwargs):
         super(BaseModelPublisherRouter, self).created(obj)
         base_channel = self.serializer_class.get_base_channel()
-        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
+        all_model_channels = publisher.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
         self.publish_action(channels, self.serializer_class(instance=obj).serialize(), PUBACTIONS.created)
 
     def updated(self, obj, **kwargs):
         super(BaseModelPublisherRouter, self).updated(obj, **kwargs)
         base_channel = self.serializer_class.get_base_channel()
-        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
+        all_model_channels = publisher.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
         self.publish_action(channels, kwargs.get('updated_data'), PUBACTIONS.updated)
 
     def deleted(self, obj, obj_id, **kwargs):
         super(BaseModelPublisherRouter, self).deleted(obj, obj_id, **kwargs)
         base_channel = self.serializer_class.get_base_channel()
-        all_model_channels = self.connection.pub_sub.get_channels(base_channel)
+        all_model_channels = publisher.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
         data = self.serializer.serialize()
         self.publish_action(channels, data, PUBACTIONS.deleted)
+
+
+class ModelRouter(BaseModelRouter):
+    pass
+
+
+class ModelPubRouter(BaseModelPublisherRouter):
+    pass
 
 
 def register(route):

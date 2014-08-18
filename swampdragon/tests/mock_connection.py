@@ -54,6 +54,10 @@ class TestConnection(object):
     def last_message(self):
         return self.get_last_message()
 
+    @property
+    def last_pub(self):
+        return self.get_last_published()
+
     def get_last_published(self):
         if not self.published_data:
             return None

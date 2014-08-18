@@ -2,8 +2,13 @@ from .redis_pubsub_provider import RedisPubSubProvider
 from .mock_pubsub_provider import MockPubSubProvider
 import sys
 
+_subscriber = None
 
 def get_pubsub_provider():
-    if 'test' in sys.argv:
-        return MockPubSubProvider()
-    return RedisPubSubProvider()
+    global _subscriber
+    if not _subscriber:
+        if 'test' in sys.argv:
+            _subscriber = MockPubSubProvider()
+        else:
+            _subscriber = RedisPubSubProvider()
+    return _subscriber

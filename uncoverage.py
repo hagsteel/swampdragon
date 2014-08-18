@@ -36,7 +36,11 @@ if __name__ == '__main__':
     os.environ['DJANGO_SETTINGS_MODULE'] = 'swampdragon.runtests.settings'
 
 
-    cov = coverage(source=['swampdragon'], omit=['./swampdragon/tests/*'])
+    cov = coverage(source=['swampdragon'], omit=[
+        './swampdragon/tests/*',
+        'swampdragon/__init__.py',
+        'swampdragon/core/__init__.py',
+    ])
     cov.start()
 
     runtests.run_tests()

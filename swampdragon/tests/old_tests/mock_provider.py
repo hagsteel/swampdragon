@@ -1,4 +1,4 @@
-from ..pubsub_providers.base_provider import BaseProvider
+from swampdragon.pubsub_providers.base_provider import BaseProvider
 
 _channels = []
 _subscribers = {}

@@ -11,7 +11,10 @@ def get_property(obj, field):
             if attr is None:
                 return None
         return attr
-    return getattr(obj, field, None)
+    try:
+        return getattr(obj, field, None)
+    except:
+        return None
 
 
 def string_to_list(val):
@@ -19,6 +22,7 @@ def string_to_list(val):
 
 
 def get_model(model):
+
     if isinstance(model, str):
         return get_django_model(*model.split('.', 1))
     return model

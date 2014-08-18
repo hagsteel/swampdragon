@@ -1,10 +1,10 @@
 from swampdragon import route_handler
-from swampdragon.route_handler import BaseModelPublisherRouter
+from swampdragon.route_handler import ModelRouter
 from .serializers import CompanySerializer, StaffSerializer, DocumentSerializer, CompanyOwnerSerializer
 from .models import Company
 
 
-class CompanyRouter(BaseModelPublisherRouter):
+class CompanyRouter(ModelRouter):
     serializer_class = CompanySerializer
     model = Company
     route_name = 'company-route'

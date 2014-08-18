@@ -44,9 +44,9 @@ class TestSubscriberConnection(DragonTestCase):
         """
         self.connection.on_open(None)
         self.connection.pub_sub.subscribe(['test-channel'], self.connection)
-        self.assertIn(self.connection, self.connection.pub_sub._subscribers['test-channel'])
+        self.assertIn(self.connection, self.connection.pub_sub.publisher.subscribers['test-channel'])
         self.connection.on_close()
-        self.assertNotIn('test-channel', self.connection.pub_sub._subscribers)
+        self.assertNotIn('test-channel', self.connection.pub_sub.publisher.subscribers)
 
     def test_on_message(self):
         route_handler.register(TestRouter)

@@ -13,3 +13,6 @@ class BaseProvider(object):
         filter_string = '|'.join(['{}:{}'.format(k, make_safe(channel_filter[k])) for k in sorted_filter_keys])
         complete_channel = '{}|{}'.format(base_channel, filter_string)
         return complete_channel
+
+    def get_channel(self, base_channel, **channel_filter):
+        return self._construct_channel(base_channel, **channel_filter)

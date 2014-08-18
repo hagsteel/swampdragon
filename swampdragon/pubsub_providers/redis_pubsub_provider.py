@@ -14,9 +14,6 @@ class RedisPubSubProvider(BaseProvider):
         self._client = redis_client
         self._subscriber = subscriber
 
-    def get_channels(self, base_channel):
-        return self._get_channels_from_redis(base_channel)
-
     def close(self, broadcaster):
         for channel in broadcaster.channels:
             self._subscriber.unsubscribe(channel, broadcaster)
@@ -31,10 +28,6 @@ class RedisPubSubProvider(BaseProvider):
     def unsubscribe(self, channels, broadcaster):
         for channel in channels:
             self._subscriber.unsubscribe(channel, broadcaster)
-
-    def _get_channels_from_redis(self, base_channel):
-        channels = self._client.execute_command('PUBSUB', 'channels', '{}*'.format(base_channel))
-        return [c.decode() for c in channels]
 
     def publish(self, channel, data):
         if isinstance(data, dict):

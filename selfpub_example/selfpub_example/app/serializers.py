@@ -9,6 +9,7 @@ class CompanyOwnerSerializer(ModelSerializer):
 
 class CompanySerializer(ModelSerializer):
     companyowner = CompanyOwnerSerializer
+
     staff = 'app.StaffSerializer'
 
     class Meta:

@@ -1,8 +1,12 @@
 from ..pubsub_providers.base_provider import PUBACTIONS
 from ..pubsub_providers.model_channel_builder import filter_channels_by_model, filter_channels_by_dict
+from ..pubsub_providers.publisher_factory import get_publisher
 
 
-def publish_model(model_instance, serializer, publisher, action, changes=None):
+publisher = get_publisher()
+
+
+def publish_model(model_instance, serializer, action, changes=None):
     if action is PUBACTIONS.updated and not changes:
         return
 
@@ -13,14 +17,14 @@ def publish_model(model_instance, serializer, publisher, action, changes=None):
     all_model_channels = publisher.get_channels(base_channel)
     channels = filter_channels_by_model(all_model_channels, model_instance)
 
-    serialized_data = serializer.serialize()
     if channels:
         if changes:
-            publish_data = dict({'data': {'id': model_instance.pk}})
-            publish_data.update(changes)
+            publish_data = {'data': serializer.get_object_map_data()}
+            publish_data['data'].update(changes)
         else:
-            publish_data = dict({'data': serialized_data})
-            publish_data['action'] = action
+            publish_data = dict({'data': serializer.serialize()})
+        publish_data['action'] = action
+
         for c in channels:
             publish_data['channel'] = c
             publisher.publish(c, publish_data)

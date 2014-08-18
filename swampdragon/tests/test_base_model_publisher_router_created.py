@@ -29,6 +29,6 @@ class TestBaseModelPublisherRouter(DragonTestCase):
         self.router.subscribe(**{'channel': 'client-channel'})
         data = {'text': 'text', 'number': 3}
         self.router.create(**data)
-        actual = self.connection.get_last_published()
+        actual = self.connection.last_pub
         expected = {'action': 'created', 'channel': 'twofieldmodel|', 'data': {'_type': 'twofieldmodel', 'id': 1}}
         self.assertDictEqual(actual, expected)
