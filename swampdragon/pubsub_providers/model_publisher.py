@@ -1,6 +1,7 @@
 from ..pubsub_providers.base_provider import PUBACTIONS
 from ..pubsub_providers.model_channel_builder import filter_channels_by_model, filter_channels_by_dict
 from ..pubsub_providers.publisher_factory import get_publisher
+from ..serializers.serializer_tools import get_id_mappings
 
 
 publisher = get_publisher()
@@ -21,6 +22,7 @@ def publish_model(model_instance, serializer, action, changes=None):
         if changes:
             publish_data = {'data': serializer.get_object_map_data()}
             publish_data['data'].update(changes)
+            publish_data['data'].update(get_id_mappings(serializer))
         else:
             publish_data = dict({'data': serializer.serialize()})
         publish_data['action'] = action

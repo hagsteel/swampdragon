@@ -7,7 +7,7 @@ class Company(SelfPublishModel, models.Model):
     name = models.CharField(max_length=100)
     serializer_class = CompanySerializer
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -16,7 +16,7 @@ class CompanyOwner(SelfPublishModel, models.Model):
     company = models.OneToOneField(Company)
     serializer_class = CompanyOwnerSerializer
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -25,7 +25,7 @@ class Staff(SelfPublishModel, models.Model):
     company = models.ForeignKey(Company, related_name='staff')
     serializer_class = StaffSerializer
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -35,5 +35,5 @@ class Document(SelfPublishModel, models.Model):
     staff = models.ManyToManyField(Staff, related_name='documents', null=True, blank=True)
     serializer_class = DocumentSerializer
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
