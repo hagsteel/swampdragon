@@ -1,6 +1,6 @@
 from ..serializers.model_serializer import ModelSerializer
 from .dragon_test_case import DragonTestCase
-from .models import TextModel
+from .models import TextModel, ChildModel, ParentModel
 
 
 class TextModelSerializer(ModelSerializer):

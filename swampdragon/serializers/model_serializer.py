@@ -1,4 +1,6 @@
 from django.core.exceptions import ValidationError
+from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor, ForeignRelatedObjectsDescriptor, \
+    ReverseManyRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor
 from swampdragon.model_tools import get_property, get_model
 from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.object_map import get_object_map
@@ -135,6 +137,7 @@ class ModelSerializer(object):
     def serialize(self, ignore_serializers=None):
         if not self.instance:
             return None
+
         data = self.get_object_map_data()
 
         # Set all the ids for related models
@@ -172,6 +175,19 @@ class ModelSerializer(object):
             return [obj_serializer(instance=o).serialize(ignore_serializers=[self.__class__]) for o in val.all()]
         elif obj_serializer:
             return obj_serializer(instance=val).serialize(ignore_serializers=[self.__class__])
+        elif hasattr(self.opts.model, attr_name):
+            # Check if the field is a relation of any kind
+            field_type = getattr(self.opts.model, attr_name)
+            # Reverse FK
+            if isinstance(field_type, ReverseSingleRelatedObjectDescriptor):
+                val = get_property(self.instance, attr_name).pk
+            # FK
+            elif isinstance(field_type, ForeignRelatedObjectsDescriptor):
+                val = get_property(self.instance, attr_name).all().values_list('pk', flat=True)
+            elif isinstance(field_type, ReverseManyRelatedObjectsDescriptor):
+                val = get_property(self.instance, attr_name).all().values_list('pk', flat=True)
+            elif isinstance(field_type, ManyRelatedObjectsDescriptor):
+                val = get_property(self.instance, attr_name).all().values_list('pk', flat=True)
 
         # Serialize the field
         return serialize_field(val)
