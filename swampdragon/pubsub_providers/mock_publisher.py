@@ -13,7 +13,9 @@ class MockPublisher(object):
         if not subs:
             return
         for subscriber in subs:
-            subscriber.published_data.append(json.dumps(message))
+            if isinstance(message, str):
+                message = json.dumps(message)
+            subscriber.published_data.append(message)
 
     def _get_channels_from_subscriptions(self, base_channel):
         channels = [key for key in self.subscribers.keys() if key.startswith(base_channel)]

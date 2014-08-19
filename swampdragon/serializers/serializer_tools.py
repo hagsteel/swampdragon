@@ -1,6 +1,7 @@
 from collections import namedtuple
 from django.db.models.fields.related import ForeignKey, ReverseSingleRelatedObjectDescriptor, \
-    ManyRelatedObjectsDescriptor
+    ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor, ForeignRelatedObjectsDescriptor, \
+    SingleRelatedObjectDescriptor
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyField
 
@@ -65,50 +66,28 @@ def get_id_mappings(serializer):
     for field_name in serializer.opts.publish_fields:
         if not hasattr(serializer, field_name):
             continue
-        serializable_field = getattr(serializer, field_name)
+
+        serializable_field = serializer._get_related_serializer(field_name)
         if not hasattr(serializable_field, 'serialize'):
             continue
 
         field_type = getattr(serializer.opts.model, field_name)
         is_fk = isinstance(field_type, ReverseSingleRelatedObjectDescriptor)
-        is_reverse_m2m = isinstance(field_type, ManyRelatedObjectsDescriptor)
+        is_o2o = isinstance(field_type, SingleRelatedObjectDescriptor)
+        is_reverse_fk = isinstance(field_type, ForeignRelatedObjectsDescriptor)
+        is_m2m = isinstance(field_type, ManyRelatedObjectsDescriptor)
+        is_reverse_m2m = isinstance(field_type, ReverseManyRelatedObjectsDescriptor)
         val = getattr(serializer.instance, field_name)
 
-        if is_fk:
-            if val:
-                data['{}_id'.format(field_name)] = [val.pk]
-                continue
+        if not val:
+            continue
 
-        if is_reverse_m2m:
-            if val:
-                data['{}_id'.format(field_name)] = val.all().values_list('pk', flat=True)
-                continue
+        if is_fk or is_o2o:
+            data['{}'.format(field_name)] = val.pk
+            continue
 
-        field_type = FieldType(*serializer.opts.model._meta.get_field_by_name(field_name))
-        field = field_type.field
-
-
-
-
-
-
-        # if field_type.is_reverse_fk:
-        #     # Check if this is a one 2 one field first
-        #     try:
-        #         val = getattr(serializer.instance, field_name)
-        #     except field.model.DoesNotExist:
-        #         continue
-        #
-        #     if hasattr(val, 'all'):
-        #         qs = val.all()
-        #         data['{}_id'.format(field.var_name)] = [v[0] for v in qs.values_list('pk')]
-        #
-        # if field_type.is_m2m:
-        #     qs = getattr(serializer.instance, field_name).all()
-        #     data['{}_id'.format(field.var_name)] = [v[0] for v in qs.values_list('pk')]
-        #
-        # if field_type.is_reverse_m2m:
-        #     qs = getattr(serializer.instance, field_name).all()
-        #     data['{}_id'.format(field.attname)] = [v[0] for v in qs.values_list('pk')]
+        if is_reverse_fk or is_m2m or is_reverse_m2m:
+            data['{}'.format(field_name)] = val.all().values_list('pk', flat=True)
+            continue
 
     return data

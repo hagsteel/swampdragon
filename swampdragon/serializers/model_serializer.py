@@ -154,7 +154,7 @@ class ModelSerializer(object):
         # Set the id value for related models, for the data mapper
         if ignore_serializers:
             for ser in ignore_serializers:
-                via = '{}_id'.format(get_serializer_relationship_field(ser, self))
+                via = '{}'.format(get_serializer_relationship_field(ser, self))
                 if hasattr(self.instance, via):
                     data[via] = getattr(self.instance, via)
 

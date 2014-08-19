@@ -1,6 +1,6 @@
 from ..serializers.model_serializer import ModelSerializer
 from .dragon_test_case import DragonTestCase
-from .models import TextModel, TwoFieldModel
+from .models import TextModel, TwoFieldModel, ChildModel, ParentModel
 
 
 class TextModelSerializer(ModelSerializer):
@@ -13,6 +13,11 @@ class TextModelSerializer(ModelSerializer):
 class AllFieldSerializer(ModelSerializer):
     class Meta:
         model = TwoFieldModel
+
+
+class ChildModelSerializer(ModelSerializer):
+    class Meta:
+        model = ChildModel
 
 
 class TestModelSerializer(DragonTestCase):
@@ -40,3 +45,13 @@ class TestModelSerializer(DragonTestCase):
         data = ser.serialize()
         self.assertEqual(tfm.text, data['text'])
         self.assertEqual(tfm.number, data['number'])
+
+    def test_serialize_include_related_as_ids(self):
+        """
+        Include related fields as ids, with no publish_fields set
+        """
+        parent = ParentModel.objects.create(name='parent', pk=99)
+        child = ChildModel.objects.create(number=8, parent=parent)
+        ser = ChildModelSerializer(instance=child)
+        data = ser.serialize()
+        self.assertEqual(data['parent'], parent.pk)
