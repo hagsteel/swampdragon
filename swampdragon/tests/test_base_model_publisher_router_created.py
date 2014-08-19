@@ -6,6 +6,7 @@ from swampdragon.tests.models import TwoFieldModel
 
 class Serializer(ModelSerializer):
     class Meta:
+        publish_fields = ('id',)
         update_fields = ('text', 'number')
         model = TwoFieldModel
 

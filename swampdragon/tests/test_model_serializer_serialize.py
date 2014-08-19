@@ -1,6 +1,6 @@
 from ..serializers.model_serializer import ModelSerializer
 from .dragon_test_case import DragonTestCase
-from .models import TextModel, ChildModel, ParentModel
+from .models import TextModel, TwoFieldModel
 
 
 class TextModelSerializer(ModelSerializer):
@@ -8,6 +8,11 @@ class TextModelSerializer(ModelSerializer):
         model = TextModel
         publish_fields = ('text', )
         base_channel = 'custom_base_channel'
+
+
+class AllFieldSerializer(ModelSerializer):
+    class Meta:
+        model = TwoFieldModel
 
 
 class TestModelSerializer(DragonTestCase):
@@ -28,3 +33,10 @@ class TestModelSerializer(DragonTestCase):
 
     def test_serialize_custom_base_channel(self):
         self.assertEqual(TextModelSerializer.get_base_channel(), 'custom_base_channel|')
+
+    def test_serializer_auto_set_publish_fields(self):
+        tfm = TwoFieldModel.objects.create(text='foo', number=123)
+        ser = AllFieldSerializer(instance=tfm)
+        data = ser.serialize()
+        self.assertEqual(tfm.text, data['text'])
+        self.assertEqual(tfm.number, data['number'])

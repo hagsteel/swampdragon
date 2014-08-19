@@ -1,4 +1,16 @@
+from django.db import models
 from .dragon_test_case import DragonTestCase
+from swampdragon.tests.models import SDModel
+
+
+class ReverseM2M(SDModel):
+    number = models.IntegerField()
+
+
+class M2M(SDModel):
+    name = models.CharField(max_length=10)
+    many = models.ManyToManyField(ReverseM2M)
+
 
 
 class TestSerializerTools(DragonTestCase):

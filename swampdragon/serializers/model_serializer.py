@@ -12,7 +12,12 @@ from swampdragon.serializers.validation import ModelValidationError
 
 class ModelSerializerMeta(object):
     def __init__(self, options):
-        self.publish_fields = getattr(options, 'publish_fields', ())
+        self.model = get_model(getattr(options, 'model'))
+        self.publish_fields = getattr(options, 'publish_fields', None)
+
+        if not self.publish_fields:
+            self.publish_fields = self.get_fields(self.model)
+
         if isinstance(self.publish_fields, str):
             self.publish_fields = (self.publish_fields, )
 
@@ -20,9 +25,11 @@ class ModelSerializerMeta(object):
         if isinstance(self.update_fields, str):
             self.update_fields = (self.update_fields, )
 
-        self.model = get_model(getattr(options, 'model'))
         self.id_field = getattr(options, 'id_field', 'pk')
         self.base_channel = getattr(options, 'base_channel', self.model._meta.model_name)
+
+    def get_fields(self, model):
+        return model._meta.get_all_field_names()
 
 
 class ModelSerializer(object):
