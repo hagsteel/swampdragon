@@ -190,11 +190,6 @@ class ModelSerializer(object):
         if ignore_serializers and obj_serializer in ignore_serializers:
             return None
 
-        # # If there is a specific function
-        # if hasattr(self, 'serialize_{}'.format(attr_name)):
-        #     serialize_function = getattr(self, 'serialize_{}'.format(attr_name))
-        #     return serialize_function(self.instance, serializer=obj_serializer)
-
         val = get_property(self.instance, attr_name)
 
         # If we have one or more related models

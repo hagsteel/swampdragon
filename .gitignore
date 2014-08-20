@@ -7,3 +7,4 @@ static_root/
 media/
 build/
 dist/
+.coverage
