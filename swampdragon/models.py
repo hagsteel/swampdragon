@@ -85,8 +85,8 @@ class SelfPublishModel(object):
 #         instance.changes = instance.get_changes()
 #         instance._publish(instance.action, instance.changes)
 #
-#
-# @receiver(pre_delete)
-# def _self_publish_model_delete(sender, instance, **kwargs):
-#     if isinstance(instance, SelfPublishModel):
-#         instance._publish(PUBACTIONS.deleted)
+
+@receiver(pre_delete)
+def _self_publish_model_delete(sender, instance, **kwargs):
+    if isinstance(instance, SelfPublishModel):
+        instance._publish(PUBACTIONS.deleted)

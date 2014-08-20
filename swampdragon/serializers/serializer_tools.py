@@ -91,7 +91,7 @@ def get_id_mappings(serializer):
             continue
 
         if is_reverse_fk or is_m2m or is_reverse_m2m:
-            data['{}'.format(field_name)] = val.all().values_list('pk', flat=True)
+            data['{}'.format(field_name)] = list(val.all().values_list('pk', flat=True))
             continue
 
     return data

@@ -4,7 +4,7 @@ import sys
 
 _subscriber = None
 
-def get_pubsub_provider():
+def get_subscription_provider():
     global _subscriber
     if not _subscriber:
         if 'test' in sys.argv:

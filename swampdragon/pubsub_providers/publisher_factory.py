@@ -3,6 +3,7 @@ from swampdragon.pubsub_providers import redis_publisher, mock_publisher
 
 _publisher = None
 
+
 def get_publisher():
     global _publisher
     if not _publisher:

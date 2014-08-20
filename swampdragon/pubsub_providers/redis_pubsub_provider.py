@@ -5,14 +5,14 @@ import tornadoredis
 from .base_provider import BaseProvider
 
 
-redis_client = redis.StrictRedis()
-subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client())
+# redis_client = redis.StrictRedis()
+# subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client())
 
 
 class RedisPubSubProvider(BaseProvider):
     def __init__(self):
-        self._client = redis_client
-        self._subscriber = subscriber
+        self._client = redis.StrictRedis()
+        self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client())
 
     def close(self, broadcaster):
         for channel in broadcaster.channels:
@@ -22,8 +22,10 @@ class RedisPubSubProvider(BaseProvider):
         return self._construct_channel(base_channel, **channel_filter)
 
     def subscribe(self, channels, broadcaster):
-        broadcaster.channels += channels
         self._subscriber.subscribe(channels, broadcaster)
+        for channel in channels:
+            if channel not in broadcaster.channels:
+                broadcaster.channels.append(channel)
 
     def unsubscribe(self, channels, broadcaster):
         for channel in channels:

@@ -1,10 +1,10 @@
 import json
 import uuid
 from .. import route_handler
-from ..pubsub_providers.pubsub_factory import get_pubsub_provider
+from ..pubsub_providers.pubsub_factory import get_subscription_provider
 
 
-pubsub = get_pubsub_provider()
+pubsub = get_subscription_provider()
 
 
 class TestConnection(object):

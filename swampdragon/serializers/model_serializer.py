@@ -187,7 +187,6 @@ class ModelSerializer(object):
 
     def _serialize_value(self, attr_name, ignore_serializers=None):
         obj_serializer = self._get_related_serializer(attr_name)
-
         # To prevent infinite recursion, allow serializers to be ignored
         if ignore_serializers and obj_serializer in ignore_serializers:
             return None

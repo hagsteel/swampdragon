@@ -1,10 +1,7 @@
 from sockjs.tornado import SockJSConnection
-from ..pubsub_providers.pubsub_factory import get_pubsub_provider
+from ..pubsub_providers.pubsub_factory import get_subscription_provider
 from .. import route_handler
 import json
-
-
-pub_sub = get_pubsub_provider()
 
 
 class ConnectionMixin(object):
@@ -26,8 +23,9 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
     channels = []
     pub_sub = None
 
-    def on_open(self, request):
-        self.pub_sub = pub_sub
+    def __init__(self, session):
+        super(SubscriberConnection, self).__init__(session)
+        self.pub_sub = get_subscription_provider()
 
     def on_close(self):
         self.pub_sub.close(self)
