@@ -27,4 +27,3 @@ class StaffSerializer(ModelSerializer):
 class DocumentSerializer(ModelSerializer):
     class Meta:
         model = 'app.Document'
-        publish_fields = ('title', 'content', 'staff')

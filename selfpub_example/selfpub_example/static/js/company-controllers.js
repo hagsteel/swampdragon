@@ -14,9 +14,9 @@ CompanyControllers.controller('CompanyCtrl', ['$scope', 'dataService', function(
     });
 
     $scope.$on('handleChannelMessage', function(e, channels, message) {
+        console.log(message);
         if (indexOf.call(channels, $scope.channel) > -1) {
             $scope.$apply(function() {
-                console.log(message);
                 this.dataMapper.mapData($scope.datasource, message);
             });
         }

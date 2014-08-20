@@ -206,11 +206,11 @@ class ModelSerializer(object):
                 val = get_property(self.instance, attr_name).pk
             # FK
             elif isinstance(field_type, ForeignRelatedObjectsDescriptor):
-                val = get_property(self.instance, attr_name).all().values_list('pk', flat=True)
+                val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
             elif isinstance(field_type, ReverseManyRelatedObjectsDescriptor):
-                val = get_property(self.instance, attr_name).all().values_list('pk', flat=True)
+                val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
             elif isinstance(field_type, ManyRelatedObjectsDescriptor):
-                val = get_property(self.instance, attr_name).all().values_list('pk', flat=True)
+                val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
 
         # Serialize the field
         return serialize_field(val)

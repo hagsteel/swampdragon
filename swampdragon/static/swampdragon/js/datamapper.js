@@ -81,8 +81,14 @@ var DataMapper = function (channelMaps) {
                 }
             }
         }
-        dataMapper._removeOldParents(datasource, data, channelMap);
-        dataMapper._attachToParents(datasource, data, channelMap);
+        var removedChildren = dataMapper._removeOldParents(datasource, data, channelMap);
+        if (removedChildren.length == 0) {
+            dataMapper._attachToParents(datasource, data, channelMap);
+        }
+        for (var c in removedChildren) {
+            dataMapper._attachToParents(datasource, removedChildren[c], channelMap);
+        }
+
         if (instances.length == 0 && channelMap == null) {
             if (datasource instanceof Array) {
                 datasource.push(data);
@@ -214,6 +220,7 @@ var DataMapper = function (channelMaps) {
     };
 
     dataMapper._removeOldParents = function (datasource, data, channelMap, result) {
+        var poppedChildren = [];
         var parents = dataMapper._findCurrentParents(datasource, data, channelMap);
         for (var p in parents) {
             var parent = parents[p];
@@ -223,7 +230,7 @@ var DataMapper = function (channelMaps) {
                     for (var c in children) {
                         var child = children[c];
                         if (dataMapper._compareIds(child.id, data.id)) {
-                            children.splice(c, 1);
+                            poppedChildren.push(children.splice(c, 1)[0]);
                         }
                     }
                 } else {
@@ -231,13 +238,14 @@ var DataMapper = function (channelMaps) {
                 }
             }
         }
+        return poppedChildren;
     };
 
     dataMapper._attachToParents = function (datasource, data, channelMap) {
         if (channelMap == null)
             return;
         var parentIds = data[channelMap.via];
-        var parents = []
+        var parents = [];
         if (parentIds instanceof Array) {
             for (var pid in parentIds) {
                 var parentId = parentIds[pid];

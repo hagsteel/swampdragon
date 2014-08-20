@@ -52,10 +52,7 @@ class TestModelSerializer(DragonTestCase):
         address_book.address.add(address)
 
         ser = ExtendedAddressSerializer(instance=address)
-        with self.assertNumQueries(1):
-            # Just ensure that the values_list
-            # doesnt take more than one query
-            data = ser.serialize()
+        data = ser.serialize()
         self.assertEqual(data['addressbook_set'][0]['owner'], address_book.owner)
 
 

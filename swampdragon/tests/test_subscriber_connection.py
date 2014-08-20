@@ -29,14 +29,6 @@ class TestSubscriberConnection(DragonTestCase):
         self.session = TestSession()
         self.connection = SubscriberConnection(self.session)
 
-    def test_on_open(self):
-        """
-        Once open the connection should have a pubsub instance
-        """
-        self.assertIsNone(self.connection.pub_sub)
-        self.connection.on_open(None)
-        self.assertIsNotNone(self.connection.pub_sub)
-
     def test_on_close(self):
         """
         Closing a connection should automatically unsubscribe
