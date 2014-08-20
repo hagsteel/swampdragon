@@ -29,7 +29,8 @@ class ModelSerializerMeta(object):
         self.base_channel = getattr(options, 'base_channel', self.model._meta.model_name)
 
     def get_fields(self, model):
-        return model._meta.get_all_field_names()
+        fields = model._meta.get_all_field_names()
+        return fields
 
 
 class ModelSerializer(object):
@@ -49,8 +50,6 @@ class ModelSerializer(object):
 
     @property
     def instance(self):
-        # if not self._instance:
-        #     self._instance = self.opts.model()
         return self._instance
 
     def _get_base_fields(self):
@@ -135,6 +134,17 @@ class ModelSerializer(object):
             return get_serializer(serializer, self.__class__)
         return serializer
 
+    def _get_custom_field_serializers(self):
+        """
+        Get all custom serializer functions.
+        If this function has a serializer attached to it, include that
+        """
+        functions = [(
+            getattr(self, f),
+            f.replace('serialize_', '')
+        ) for f in dir(self) if f.startswith('serialize_')]
+        return functions
+
     def get_object_map_data(self):
         return {
             'id': getattr(self.instance, self.opts.id_field),
@@ -161,6 +171,16 @@ class ModelSerializer(object):
         # Serialize the fields
         for field in self.opts.publish_fields:
             data[field] = self._serialize_value(field, ignore_serializers)
+
+        custom_serializer_functions = self._get_custom_field_serializers()
+        for custom_function, name in custom_serializer_functions:
+            serializer = getattr(self, name, None)
+            if serializer:
+                serializer = get_serializer(serializer, self)
+                data[name] = custom_function(self.instance, serializer)
+            else:
+                data[name] = custom_function(self.instance)
+
         return data
 
     def _serialize_value(self, attr_name, ignore_serializers=None):
@@ -170,10 +190,10 @@ class ModelSerializer(object):
         if ignore_serializers and obj_serializer in ignore_serializers:
             return None
 
-        # If there is a specific function
-        if hasattr(self, 'serialize_{}'.format(attr_name)):
-            serialize_function = getattr(self, 'serialize_{}'.format(attr_name))
-            return serialize_function(self.instance, serializer=obj_serializer)
+        # # If there is a specific function
+        # if hasattr(self, 'serialize_{}'.format(attr_name)):
+        #     serialize_function = getattr(self, 'serialize_{}'.format(attr_name))
+        #     return serialize_function(self.instance, serializer=obj_serializer)
 
         val = get_property(self.instance, attr_name)
 
