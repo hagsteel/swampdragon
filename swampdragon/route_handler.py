@@ -3,7 +3,7 @@ from .paginator import Paginator
 from .sessions.sessions import get_session_store
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
-from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model
+from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model, filter_channels_by_dict
 from .serializers.validation import ModelValidationError
 
 SUCCESS = 'success'
@@ -145,20 +145,16 @@ class BaseModelRouter(BaseRouter):
     _query_set = None
     _obj = None
 
-    def _get_changes(self, current_state, past_state):
+    def _get_changed_fields(self, current_state, past_state):
         '''
         Compare the previous data with the current data
-        to get only the changed fields (this makes the footprint smaller)
+        to get only the changed fields
         '''
-        changed_state = {}
-        if '_type' in current_state:
-            changed_state['_type'] = current_state['_type']
+        changed_fields = []
         for o in current_state:
             if past_state[o] != current_state[o]:
-                changed_state[o] = current_state[o]
-        if self.serializer.opts.id_field not in changed_state:
-            changed_state['id'] = current_state['id']
-        return changed_state
+                changed_fields.append(o)
+        return changed_fields
 
     def _get_object(self, **kwargs):
         if self._obj:
@@ -230,11 +226,13 @@ class BaseModelRouter(BaseRouter):
             errors = error.get_error_dict()
             self.on_error(errors)
             return
-        updated_data = self._get_changes(self.serializer.serialize(), past_state)
-        self.updated(self.serializer.instance, updated_data=updated_data, past_state=past_state)
+        updated_fields = self._get_changed_fields(self.serializer.serialize(), past_state)
+
+        self.updated(self.serializer.instance, updated_fields=updated_fields, past_state=past_state)
 
     def updated(self, obj, **kwargs):
-        self.send(kwargs.get('updated_data'), **kwargs)
+        updated_fields = kwargs.get('updated_fields')
+        self.send(self.serializer.serialize(fields=updated_fields), **kwargs)
 
     def delete(self, **kwargs):
         obj = self._get_object(**kwargs)
@@ -287,7 +285,13 @@ class BaseModelPublisherRouter(BaseModelRouter):
         base_channel = self.serializer_class.get_base_channel()
         all_model_channels = publisher.get_channels(base_channel)
         channels = filter_channels_by_model(all_model_channels, obj)
-        self.publish_action(channels, kwargs.get('updated_data'), PUBACTIONS.updated)
+        updated_fields = kwargs.get('updated_fields')
+        self.publish_action(channels, self.serializer.serialize(fields=updated_fields), PUBACTIONS.updated)
+        past_state = kwargs.get('past_state')
+        if past_state:
+            previous_channels = filter_channels_by_dict(all_model_channels, past_state)
+            delete_from_channels = set(previous_channels) - set(channels)
+            self.publish_action(delete_from_channels, past_state, PUBACTIONS.deleted)
 
     def deleted(self, obj, obj_id, **kwargs):
         super(BaseModelPublisherRouter, self).deleted(obj, obj_id, **kwargs)

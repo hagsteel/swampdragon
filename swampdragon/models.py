@@ -28,8 +28,6 @@ class SelfPublishModel(object):
             if val is None:
                 self._pre_save_state[field] = None
                 continue
-            # if hasattr(val, 'all'):
-            #     val = val.all()
             self._pre_save_state[field] = val
 
     def _get_relevant_fields(self):
@@ -48,37 +46,29 @@ class SelfPublishModel(object):
 
         return relevant_fields
 
-    def get_changes(self):
-        changes = dict()
+    def get_changed_fields(self):
+        changed_fields = []
         for k, v in self._pre_save_state.items():
             val = get_property(self, k)
-            # if hasattr(val, 'all'):
-            #     val = val.all()
-            #     if v is None:
-            #         v = []
-            #     diff = list(set(val).symmetric_difference(set(v)))
-            #     if len(diff) > 0:
-            #         changes[k] = diff
-            # elif val != v:
             if val != v:
-                changes[k] = val
-        return changes
+                changed_fields.append(k)
+        return changed_fields
 
     def serialize(self):
         return self._serializer.serialize()
 
-    def _publish(self, action, changes=None):
-        publish_model(self, self._serializer, action, changes)
+    def _publish(self, action, changed_fields=None):
+        publish_model(self, self._serializer, action, changed_fields)
 
     def save(self, *args, **kwargs):
         if not self.pk:
             self.action = PUBACTIONS.created
-            self.changes = None
+            self.changed_fields = None
         else:
             self.action = PUBACTIONS.updated
-            self.changes = self.get_changes()
+            self.changed_fields = self.get_changed_fields()
         super(SelfPublishModel, self).save(*args, **kwargs)
-        self._publish(self.action, self.changes)
+        self._publish(self.action, self.changed_fields)
 
 
 # @receiver(m2m_changed)

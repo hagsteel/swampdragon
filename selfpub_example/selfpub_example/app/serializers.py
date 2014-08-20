@@ -4,12 +4,10 @@ from swampdragon.serializers.model_serializer import ModelSerializer
 class CompanyOwnerSerializer(ModelSerializer):
     class Meta:
         model = 'app.CompanyOwner'
-        publish_fields = ('name', 'company_id')
 
 
 class CompanySerializer(ModelSerializer):
     companyowner = CompanyOwnerSerializer
-
     staff = 'app.StaffSerializer'
 
     class Meta:
@@ -23,12 +21,10 @@ class StaffSerializer(ModelSerializer):
 
     class Meta:
         model = 'app.Staff'
-        publish_fields = ('name', 'documents',)
+        publish_fields = ('name', 'documents', 'company')
 
 
 class DocumentSerializer(ModelSerializer):
-    staff = StaffSerializer
-
     class Meta:
         model = 'app.Document'
         publish_fields = ('title', 'content', 'staff')

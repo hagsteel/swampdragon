@@ -20,6 +20,11 @@ class ChildModelSerializer(ModelSerializer):
         model = ChildModel
 
 
+class TwoFieldModelSerializer(ModelSerializer):
+    class Meta:
+        model = TwoFieldModel
+
+
 class TestModelSerializer(DragonTestCase):
     def test_serialize_model(self):
         text_model = TextModel.objects.create(text='hello world')
@@ -55,3 +60,15 @@ class TestModelSerializer(DragonTestCase):
         ser = ChildModelSerializer(instance=child)
         data = ser.serialize()
         self.assertEqual(data['parent'], parent.pk)
+
+    def test_serialize_individual_field(self):
+        """
+        Assigning a list of fields should not use the default fields.
+        """
+        tfm = TwoFieldModel.objects.create(text='hello', number='123')
+        ser = TwoFieldModelSerializer(instance=tfm)
+        data = ser.serialize()
+        self.assertIn('text', ser.serialize())
+        self.assertIn('number', ser.serialize())
+        self.assertNotIn('text', ser.serialize(['number']))
+        self.assertIn('number', ser.serialize(['number']))

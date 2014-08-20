@@ -35,22 +35,18 @@ class TestSelfPubModel(DragonTestCase):
 
     def test_get_changes(self):
         foo = FooSelfPub.objects.create(name='test')
-        self.assertDictEqual(foo.get_changes(), {})
+        self.assertListEqual(foo.get_changed_fields(), [])
         foo.number = 12
-        self.assertDictEqual(foo.get_changes(), {'number': 12})
-        foo.number = 55
-        self.assertDictEqual(foo.get_changes(), {'number': 55})
+        self.assertListEqual(foo.get_changed_fields(), ['number'])
         foo.name = 'updated'
-        self.assertDictEqual(foo.get_changes(), {'name': 'updated', 'number': 55})
-        foo.name = 'foo'
-        foo.number = 1
-        self.assertDictEqual(foo.get_changes(), {'name': 'foo', 'number': 1})
+        self.assertIn('number', foo.get_changed_fields())
+        self.assertIn('name', foo.get_changed_fields())
 
         bar = BarSelfPub.objects.create(date=datetime.now(), foo=foo)
-        self.assertDictEqual(bar.get_changes(), {})
+        self.assertListEqual(bar.get_changed_fields(), [])
         update_date = datetime.now()
         bar.date = update_date
-        self.assertDictEqual(bar.get_changes(), {'date': update_date})
+        self.assertListEqual(bar.get_changed_fields(), ['date'])
 
     def test_raise_validation_error(self):
         foo = FooSelfPub.objects.create(name='test')

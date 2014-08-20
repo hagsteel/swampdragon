@@ -151,7 +151,9 @@ class ModelSerializer(object):
             '_type': self.opts.model._meta.model_name
         }
 
-    def serialize(self, ignore_serializers=None):
+    def serialize(self, fields=None, ignore_serializers=None):
+        if not fields:
+            fields = self.opts.publish_fields
         if not self.instance:
             return None
 
@@ -162,14 +164,14 @@ class ModelSerializer(object):
         data.update(get_id_mappings(self))
 
         # Set the id value for related models, for the data mapper
-        if ignore_serializers:
-            for ser in ignore_serializers:
-                via = '{}'.format(get_serializer_relationship_field(ser, self))
-                if hasattr(self.instance, via):
-                    data[via] = getattr(self.instance, via)
+        # if ignore_serializers:
+        #     for ser in ignore_serializers:
+        #         via = '{}'.format(get_serializer_relationship_field(ser, self))
+        #         if hasattr(self.instance, via):
+        #             data[via] = getattr(self.instance, via)
 
         # Serialize the fields
-        for field in self.opts.publish_fields:
+        for field in fields:
             data[field] = self._serialize_value(field, ignore_serializers)
 
         custom_serializer_functions = self._get_custom_field_serializers()

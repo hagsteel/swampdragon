@@ -85,7 +85,8 @@ def properties_match_channel_by_dict(dict, channel_properties):
     for prop, val in channel_properties:
         if prop not in dict:
             return False
-        if not dict[prop] == val:
+        val_type = type(val)
+        if not val_type(dict[prop]) == val:
             return False
     return result
 

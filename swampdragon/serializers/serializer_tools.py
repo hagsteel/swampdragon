@@ -77,7 +77,11 @@ def get_id_mappings(serializer):
         is_reverse_fk = isinstance(field_type, ForeignRelatedObjectsDescriptor)
         is_m2m = isinstance(field_type, ManyRelatedObjectsDescriptor)
         is_reverse_m2m = isinstance(field_type, ReverseManyRelatedObjectsDescriptor)
-        val = getattr(serializer.instance, field_name)
+
+        try:
+            val = getattr(serializer.instance, field_name)
+        except:
+            continue
 
         if not val:
             continue

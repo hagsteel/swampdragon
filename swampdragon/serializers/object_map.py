@@ -36,11 +36,11 @@ def get_object_map(serializer, ignore_serializer_pairs=None):
         field = getattr(serializer_instance.opts.model, field_name)
         if hasattr(field, 'related'):
             model = field.related.model
-            attname = '{}_id'.format(field.related.field.name)
+            attname = field.related.field.name
             is_collection = True
         else:
             model = field.field.related.parent_model
-            attname = '{}_id'.format(field.field.related.var_name)
+            attname = field.field.related.var_name
             is_collection = False
         graph.append(
             _construct_graph(
