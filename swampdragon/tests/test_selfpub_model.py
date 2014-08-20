@@ -1,5 +1,6 @@
 from datetime import datetime
 from ..route_handler import ModelRouter
+from ..pubsub_providers.base_provider import PUBACTIONS
 from .dragon_test_case import DragonTestCase
 from .models import FooSelfPub, BarSelfPub
 from .serializers import FooSelfPubSerializer, BarSelfPubSerializer
@@ -66,3 +67,20 @@ class TestSelfPubModel(DragonTestCase):
         foo.name = 'updated'
         foo.save()
         self.assertEqual(self.connection.last_pub['action'], 'updated')
+
+    def test_remove_on_update(self):
+        router = FooModelRouter(self.connection)
+        router.subscribe(**{'channel': 'testchan', 'name__contains': 'findme'})
+        foo = FooSelfPub.objects.create(name='test')
+        self.assertIsNone(self.connection.last_pub)
+        foo.name = 'findme'
+        foo.save()
+        self.assertEqual(self.connection.last_pub['action'], PUBACTIONS.updated)
+
+        foo.name = 'hideme'
+        foo.save()
+        self.assertEqual(self.connection.last_pub['action'], PUBACTIONS.deleted)
+
+        foo.name = 'findmeagain'
+        foo.save()
+        self.assertEqual(self.connection.last_pub['action'], PUBACTIONS.updated)

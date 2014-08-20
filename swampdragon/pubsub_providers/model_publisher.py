@@ -16,6 +16,7 @@ def publish_model(model_instance, serializer, action, changed_fields=None):
     base_channel = serializer.get_base_channel()
     all_model_channels = publisher.get_channels(base_channel)
     channels = filter_channels_by_model(all_model_channels, model_instance)
+    remove_from_channels = set(all_model_channels) - set(channels)
 
     if channels:
         publish_data = dict({'data': serializer.serialize(fields=changed_fields)})
@@ -24,14 +25,9 @@ def publish_model(model_instance, serializer, action, changed_fields=None):
         for c in channels:
             publish_data['channel'] = c
             publisher.publish(c, publish_data)
-    #
-    # if changed_fields:
-    #     previous_relevant_channels = filter_channels_by_dict(all_model_channels, changes)
-    #     remove_from_channels = list(set(previous_relevant_channels) - set(channels))
-    #     if not remove_from_channels:
-    #         return
-    #     publish_data = dict({'data': {'id': model_instance.pk}})
-    #     publish_data['action'] = PUBACTIONS.deleted
-    #     for c in remove_from_channels:
-    #         publish_data['channel'] = c
-    #         publisher.publish(c, publish_data)
+
+    if changed_fields:
+        publish_data = {'data': {'id': model_instance.pk}}
+        publish_data['action'] = PUBACTIONS.deleted
+        for channel in remove_from_channels:
+            publisher.publish(channel, publish_data)
