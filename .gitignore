@@ -9,3 +9,4 @@ build/
 dist/
 .coverage
 SwampDragon.egg*
+pubpypi.sh
