@@ -44,6 +44,7 @@ class ModelSerializer(object):
         self.base_fields = self._get_base_fields()
         self.m2m_fields = self._get_m2m_fields()
         self.related_fields = self._get_related_fields()
+        self.errors = {}
 
     class Meta(object):
         pass
@@ -70,17 +71,28 @@ class ModelSerializer(object):
             self._instance = self.opts.model()
 
         for key, val in self.initial.items():
-            setattr(self.instance, key, val)
+                setattr(self.instance, key, val)
 
-        # Serialize base fields
+        # Deserialize base fields
         for key, val in self.data.items():
             if key not in self.opts.update_fields or key not in self.base_fields:
                 continue
-            self._deserialize_field(key, val)
+            try:
+                self.validate_field(key, val, self.data)
+                self._deserialize_field(key, val)
+            except ModelValidationError as err:
+                self.errors.update(err.get_error_dict())
+
+
+        if self.errors:
+            raise ModelValidationError(errors=self.errors)
+
         return self.instance
 
     def save(self):
         self.deserialize()
+        if self.errors:
+            raise ModelValidationError(self.errors)
         try:
             self.instance.clean_fields()
         except ValidationError as e:
@@ -127,6 +139,14 @@ class ModelSerializer(object):
         else:
             related_instance = serializer(val).deserialize()
             setattr(self.instance, key, related_instance)
+
+    def validate_field(self, field, value, data):
+        validation_name = 'validate_{}'.format(field)
+        if hasattr(self, validation_name):
+            validator = getattr(self, validation_name)
+            validator(value)
+        return None
+
 
     def _get_related_serializer(self, key):
         serializer = getattr(self, key, None)
