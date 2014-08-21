@@ -1,7 +1,7 @@
-from ..pubsub_providers.redis_pubsub_provider import RedisPubSubProvider
+from ..pubsub_providers.publisher_factory import get_publisher
 
 
 def publish_data(channel, data):
-    publisher = RedisPubSubProvider()
+    publisher = get_publisher()
     pub_data = {'data': data, 'channel': channel}
     publisher.publish(channel, pub_data)
