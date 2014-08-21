@@ -8,3 +8,4 @@ media/
 build/
 dist/
 .coverage
+SwampDragon.egg*

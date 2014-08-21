@@ -36,6 +36,21 @@ def run():
         start_project(args[2])
 
 
+def add_server_py(project_name):
+    root = dirname(dirname(abspath(__file__)))
+    template_dir = path.join(root, 'app_templates')
+    serverpy_template = path.join(template_dir, 'server.py')
+    with open(serverpy_template, 'rb') as serverpy_file:
+        serverpy_text = ''.join(serverpy_file.readlines())
+        serverpy_text = serverpy_text.replace('<project>', project_name)
+
+    current_dir = os.getcwd()
+    serverpy_dest = path.join(path.join(path.join(current_dir, project_name)), 'server.py')
+
+    with open(serverpy_dest, 'wb') as project_serverpy_file:
+        project_serverpy_file.writelines(serverpy_text)
+
+
 def start_project(project_name):
     call_command('startproject', project_name)
     root = dirname(dirname(abspath(__file__)))
@@ -54,3 +69,5 @@ def start_project(project_name):
 
     with open(project_settings_file, 'wb') as settings_file:
         settings_file.writelines(settings)
+
+    add_server_py(project_name)
