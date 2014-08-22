@@ -27,6 +27,7 @@ class DocumentSerializer(ModelSerializer):
 
 class PersonSerializer(ModelSerializer):
     documents = DocumentSerializer
+
     class Meta:
         model = Person
 
@@ -47,26 +48,23 @@ class TestSelfPubModel(DragonTestCase):
     def setUp(self):
         route_handler.register(PersonRouter)
 
-    # def test_serialize_doc(self):
-    #     doc = Document.objects.create(content='test', pk=99)
-    #     person = Person.objects.create(name='a person')
-    #     person.documents.add(doc)
-    #     # import ipdb;ipdb.set_trace()
-    #     serp = doc.serialize()
-    #     import ipdb;ipdb.set_trace()
-
-
     def test_publish_m2m_on_add(self):
         self.connection.subscribe(PersonRouter.route_name, 'cli', {})
-        Person.objects.create(name='some person')
-        person = Person.objects.create(name='another person')
-        person = Person.objects.get(pk=person.pk)
+        for i in range(10):
+            Person.objects.create(name='person {}'.format(i))
         doc = Document.objects.create(content='test', pk=99)
         self.connection.published_data = []
-        # person.documents.add(doc)
-        # import ipdb;ipdb.set_trace()
-        # lp = self.connection.last_pub
-        # self.assertListEqual(lp['data']['documents'], [doc.pk])
+        doc.person_set = Person.objects.all()
+        self.assertEqual(len(self.connection.published_data), 2)
+
+    def test_publish_reverse_m2m_on_add(self):
+        self.connection.subscribe(PersonRouter.route_name, 'cli', {})
+        person_a = Person.objects.create(name='some person')
+        person_b = Person.objects.create(name='another person')
+        doc = Document.objects.create(content='test', pk=99)
+        self.connection.published_data = []
+        person_b.documents.add(doc)
+        self.assertEqual(len(self.connection.published_data), 1)
 
     def test_publish_m2m_on_remove(self):
         self.connection.subscribe(PersonRouter.route_name, 'cli', {})
@@ -76,3 +74,4 @@ class TestSelfPubModel(DragonTestCase):
         self.connection.published_data = []
         person.documents.remove(doc)
         lp = self.connection.last_pub
+        self.assertEqual(lp['data']['documents'], [])
