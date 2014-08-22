@@ -5,7 +5,7 @@ from sockjs.tornado import SockJSRouter
 from tornado import web
 from .. import discover_routes
 from .. import route_handler
-from ..pubsub_providers.pubsub_factory import get_subscription_provider
+from ..pubsub_providers.subscriber_factory import get_subscription_provider
 from .mock_connection import TestConnection
 
 

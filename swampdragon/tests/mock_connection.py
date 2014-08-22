@@ -1,7 +1,7 @@
 import json
 import uuid
 from .. import route_handler
-from ..pubsub_providers.pubsub_factory import get_subscription_provider
+from ..pubsub_providers.subscriber_factory import get_subscription_provider
 
 
 pubsub = get_subscription_provider()
