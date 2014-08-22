@@ -3,12 +3,15 @@ from django.dispatch.dispatcher import receiver
 from .pubsub_providers.base_provider import PUBACTIONS
 from .model_tools import get_property
 from .pubsub_providers.model_publisher import publish_model
+from .serializers.serializer_importer import get_serializer
 
 
 class SelfPublishModel(object):
     serializer_class = None
 
     def __init__(self, *args, **kwargs):
+        if isinstance(self.serializer_class, str):
+            self.serializer_class = get_serializer(self.serializer_class, self)
         self._pre_save_state = dict()
         super(SelfPublishModel, self).__init__(*args, **kwargs)
         self._serializer = self.serializer_class(instance=self)
