@@ -1,3 +1,7 @@
+from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor, SingleRelatedObjectDescriptor, \
+    ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor
+
+
 def _construct_graph(parent_type, child_type, via, is_collection, property_name):
     return {
         'parent_type': parent_type,
@@ -33,15 +37,46 @@ def get_object_map(serializer, ignore_serializer_pairs=None):
         if _serializer_is_ignored(serializer, related_serializer, ignore_serializer_pairs):
             continue
 
-        field = getattr(serializer_instance.opts.model, field_name)
-        if hasattr(field, 'related'):
-            model = field.related.model
-            attname = field.related.field.name
-            is_collection = True
-        else:
-            model = field.field.related.parent_model
-            attname = field.field.related.var_name
+        field_type = getattr(serializer_instance.opts.model, field_name)
+        is_fk = isinstance(field_type, ReverseSingleRelatedObjectDescriptor)
+        is_o2o = isinstance(field_type, SingleRelatedObjectDescriptor)
+        is_reverse_fk = isinstance(field_type, ForeignRelatedObjectsDescriptor)
+        is_m2m = isinstance(field_type, ManyRelatedObjectsDescriptor)
+        is_reverse_m2m = isinstance(field_type, ReverseManyRelatedObjectsDescriptor)
+
+        if is_fk:
+            model = field_type.field.related.parent_model
             is_collection = False
+            attname = field_type.field.related.var_name
+
+        if is_o2o:
+            model = field_type.related.model
+            is_collection = False
+            attname = field_type.related.field.name
+
+        if is_reverse_fk:
+            model = field_type.related.model
+            is_collection = True
+            attname = field_type.related.field.name
+
+        if is_m2m:
+            model = field_type.related.model
+            is_collection = True
+            attname = field_type.related.field.name
+
+        if is_reverse_m2m:
+            model = field_type.field.related.parent_model
+            is_collection = True
+            attname = field_type.field.related.var_name
+
+        # if hasattr(field, 'related'):
+        #     model = field.related.model
+        #     attname = field.related.field.name
+        #     is_collection = True
+        # else:
+        #     model = field.field.related.parent_model
+        #     attname = field.field.related.var_name
+        #     is_collection = False
         graph.append(
             _construct_graph(
                 serializer_instance.opts.model._meta.model_name,
