@@ -29,7 +29,13 @@ class ModelSerializerMeta(object):
         self.base_channel = getattr(options, 'base_channel', self.model._meta.model_name)
 
     def get_fields(self, model):
-        fields = model._meta.get_all_field_names()
+        fields = []
+        for f in model._meta.get_all_field_names():
+            field = model._meta.get_field_by_name(f)[0]
+            if hasattr(field, 'get_accessor_name'):
+                fields.append(field.get_accessor_name())
+            else:
+                fields.append(field.name)
         return fields
 
 

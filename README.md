@@ -31,7 +31,7 @@ Redis blazing speed.
 
 See [documentation](http://swampdragon.net/documentation/) and example projects in this repository.
 
-[Tutorial](http://swampdragon.net/tutorial/here-be-dragons-and-thats-a-good-thing/) available here.
+[Tutorial](http://swampdragon.net/tutorial/part-1-here-be-dragons-and-thats-a-good-thing/) available here.
 
 # Documentation
 

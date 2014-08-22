@@ -1,7 +1,7 @@
 from django.db.models.signals import pre_delete, m2m_changed
 from django.dispatch.dispatcher import receiver
 from .pubsub_providers.base_provider import PUBACTIONS
-from .model_tools import get_property
+from .model_tools import get_property, get_field_from_m2m_model_by_model
 from .pubsub_providers.model_publisher import publish_model
 from .serializers.serializer_importer import get_serializer
 
@@ -74,20 +74,27 @@ class SelfPublishModel(object):
         self._publish(self.action, self.changed_fields)
 
 
-# @receiver(m2m_changed)
-# def _self_publish_model_m2m_change(sender, instance, action, **kwargs):
-#     if not isinstance(instance, SelfPublishModel):
-#         return
-#     if not hasattr(instance, 'action'):
-#         return
-#
-#     if action is 'post_clear':
-#         instance.changes = instance.get_changes()
-#         instance._publish(instance.action, instance.changes)
-#     if action is 'post_add':
-#         instance.changes = instance.get_changes()
-#         instance._publish(instance.action, instance.changes)
-#
+@receiver(m2m_changed)
+def _self_publish_model_m2m_change(sender, instance, action, model, pk_set, **kwargs):
+    if not isinstance(instance, SelfPublishModel):
+        return
+
+    instance.action = PUBACTIONS.updated
+    if action is 'post_clear':
+        print('post clear')
+        instance.changed_fields = instance.get_changed_fields()
+        instance._publish(instance.action, instance.changed_fields)
+
+    if action is 'post_add':
+        related_instances = model.objects.filter(pk__in=pk_set)
+        for ri in related_instances:
+            ri._publish(PUBACTIONS.updated, ri._serializer.opts.publish_fields)
+
+    if action is 'post_remove':
+        field_name = get_field_from_m2m_model_by_model(instance, model)
+        instance.changed_fields = [field_name]
+        instance._publish(instance.action, instance.changed_fields)
+
 
 @receiver(pre_delete)
 def _self_publish_model_delete(sender, instance, **kwargs):
