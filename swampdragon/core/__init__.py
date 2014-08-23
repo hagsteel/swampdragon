@@ -41,8 +41,11 @@ def add_server_py(project_name):
     template_dir = path.join(root, 'app_templates')
     serverpy_template = path.join(template_dir, 'server.py')
     with open(serverpy_template, 'rb') as serverpy_file:
-        serverpy_text = ''.join(serverpy_file.readlines())
-        serverpy_text = serverpy_text.replace('<project>', project_name)
+        serverpy_lines = serverpy_file.readlines()
+        serverpy_text = []
+        for line in serverpy_lines:
+            line = line.replace(b'<project>', project_name.encode('utf-8'))
+            serverpy_text.append(line)
 
     current_dir = os.getcwd()
     serverpy_dest = path.join(path.join(path.join(current_dir, project_name)), 'server.py')

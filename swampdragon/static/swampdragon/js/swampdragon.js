@@ -16,7 +16,6 @@ var SwampDragon = function(options) {
     options = options || {};
     var swampDragon = this;
     swampDragon.isReady = false;
-//    window.swampDragon = swampDragon;
     swampDragon.conn = null;
     swampDragon.host = null;
     swampDragon.channels = {};
@@ -204,9 +203,6 @@ var SwampDragon = function(options) {
             var fn = swampDragon.events[name][ev];
             fn.apply(this, args);
         }
-//        swampDragon.events[name].forEach(function(fn) {
-//            fn.apply(this, args);
-//        });
     };
 
     return swampDragon;
