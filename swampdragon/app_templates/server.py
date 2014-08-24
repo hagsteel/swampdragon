@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     app = web.Application(urls, **app_settings)
     app.listen(PORT, address=HOST, no_keep_alive=False)
-    print('Running sock app on {}:{}'.format(HOST, PORT))
+    print('Running SwampDragon on {}:{}'.format(HOST, PORT))
     try:
         iol = ioloop.IOLoop.instance()
         iol.start()
