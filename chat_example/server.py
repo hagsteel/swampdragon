@@ -3,9 +3,11 @@ from django.utils.importlib import import_module
 from tornado import web, ioloop
 from sockjs.tornado import SockJSRouter
 from swampdragon import discover_routes, load_field_deserializers
-
+from swampdragon.settings_provider import SettingsHandler
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "<project>.settings")
+
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "chat_example.settings")
 
 if __name__ == '__main__':
     args = None
@@ -32,15 +34,15 @@ if __name__ == '__main__':
     urls = discover_routes()
     for router in routers:
         urls += router.urls
+    urls.append(('/settings.js$', SettingsHandler))
 
     load_field_deserializers()
 
     app = web.Application(urls, **app_settings)
     app.listen(PORT, address=HOST, no_keep_alive=False)
-    print('Running sock app on {}:{}'.format(HOST, PORT))
+    print('Running SwampDragon on {}:{}'.format(HOST, PORT))
     try:
         iol = ioloop.IOLoop.instance()
-        # ioloop.IOLoop.set_blocking_log_threshold(iol, 1)
         iol.start()
     except KeyboardInterrupt:
         # so you don't think you erred when ^C'ing out

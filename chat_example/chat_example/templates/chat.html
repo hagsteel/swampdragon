@@ -2,7 +2,7 @@
 
 {% block main_content %}
     <div class="col-md-6" ng-controller="ChatCtrl">
-        <form method="post" class="form-inline">
+        <form method="post" class="form-inline" ng-submit="sendMessage();">
             <div class="form-group">
                 <input type="text" class="form-control" ng-model="name" placeholder="name" autofocus="true">
             </div>
@@ -11,7 +11,7 @@
             </div>
 
             <div class="form-group">
-                <button type="button" class="btn btn-primary" ng-click="sendMessage();">chat</button>
+                <button type="submit" class="btn btn-primary">chat</button>
             </div>
 
             <div>

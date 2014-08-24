@@ -1,25 +1,29 @@
 var ChatControllers = angular.module('ChatControllers', []);
 
-ChatControllers.controller('ChatCtrl', ['$scope', 'dataService', function($scope, dataService) {
+ChatControllers.controller('ChatCtrl', ['$scope', '$dragon', function($scope, $dragon) {
     $scope.channel = 'chat';
     $scope.messages = [];
 
     /// Subscribe to the chat router
-    $scope.$on('dragonReady', function() {
-        dataService.subscribe('chat-route', $scope.channel, {});
+    $dragon.data.onReady(function() {
+        $dragon.data.subscribe('chat-route', $scope.channel).then(function(response) {
+        });
     });
 
-    $scope.$on('handleChannelMessage', function(e, channels, message) {
+    $dragon.data.onChannelMessage(function(channels, message) {
         if (indexOf.call(channels, $scope.channel) > -1) {
-            $scope.messages.unshift(message);
-            $scope.$apply();
+            $scope.$apply(function() {
+                $scope.messages.unshift(message);
+            });
         }
     });
 
     $scope.sendMessage = function() {
         $scope.errors = null;
-        dataService.callRouter('chat', 'chat-route', {message: this.message, name: this.name})
-            .then(function(response) { })
+        $dragon.data.callRouter('chat', 'chat-route', {message: this.message, name: this.name})
+            .then(function(response) {
+                console.log('done');
+            })
             ["catch"](function(response) {
                 $scope.errors = response.errors;
             });

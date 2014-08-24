@@ -1,5 +1,5 @@
 /*
- * SwampDraon 0.1 connection wrapper around SocketJS
+ * SwampDraon 0.2 connection wrapper around SocketJS
  * By Jonas Hagstedt, 2014
  * -----------------------------------
  * Usage:
@@ -16,6 +16,7 @@ var SwampDragon = function(options) {
     options = options || {};
     var swampDragon = this;
     swampDragon.isReady = false;
+    window.swampDragons = window.swampDragons || {};
     swampDragon.conn = null;
     swampDragon.host = null;
     swampDragon.channels = {};
@@ -73,6 +74,7 @@ var SwampDragon = function(options) {
     }
 
     swampDragon.connect = function(url, channel) {
+        window.swampDragons[channel] = swampDragon;
         swampDragon.url = url;
         swampDragon.disconnect();
         if (swampDragon.host == null) {

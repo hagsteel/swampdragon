@@ -36,3 +36,58 @@ See [documentation](http://swampdragon.net/documentation/) and example projects 
 # Documentation
 
 See [Documentation](http://swampdragon.net/documentation/) here
+
+
+# Changelog
+
+## 0.3.5
+
+```python manage.py socketserver``` has been removed, use ```python server.py``` both for development and deployment. 
+
+Multiple connections are now possible:
+
+    SOCKJS_CLASSES = (
+        ('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data'),
+        ('myproject.connections.CustomConnection', '/myendpoint'),
+    )
+
+A lot of changes has been made to the JavaScript libraries to work with multiple connections and be more 'endpoint specific'.
+
+
+### JavaScript changes
+
+The old ```dataService``` will be removed.
+ 
+
+#### AngularJS
+With multiple endpoint support, the AngularJS service changes. 
+
+```dataService``` is renamed to ```$dragon``` 
+
+and all calls requires the endpoint. So ```dataService.getList``` becomes ```$dragon.data.getList``` 
+(where **data** is the name of the endpoint).
+
+Previously $rootScope was used to broadcast when the connection was ready, however with multiple connections
+possible this now changes to ```$dragon.[endpoint].onReady```
+
+    $dragon.data.onReady(function() {
+        ...
+    });
+
+
+The same goes for ```onChannelMessage```.
+
+    // Previously
+    $scope.$on('handleChannelMessage', function(e, channels, message) { ... });
+    
+    // Now
+    $dragon.data.onChannelMessage(function(channels, message) { ... });
+
+
+#### JavaScript settings 
+
+Settings needs to be included in the template
+ 
+    <script type="text/javascript" src="http://localhost:9999/settings.js"></script>
+    
+(remember to change localhost to your server url / domain name)
