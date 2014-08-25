@@ -15,7 +15,7 @@ if __name__ == '__main__':
     HOST = '127.0.0.1'
     PORT = 9999
 
-    if args:
+    if len(args) > 1:
         host_port = args[1]
         HOST = host_port.split(':')[0]
         PORT = host_port.split(':')[1]
