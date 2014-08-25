@@ -4,8 +4,8 @@ from swampdragon.default_settings import SwampDragonSettings
 
 class SettingsHandler(RequestHandler):
 
-    def head(self, *args, **kwargs):
-        self.set_header("Content-Type", "text/javascript; charset=UTF-8")
+    def set_default_headers(self):
+        self.set_header("Content-Type", "text/javascript")
 
     def get(self, *args, **kwargs):
         data = '''window.swampdragon_settings = {settings};
