@@ -5,17 +5,18 @@ from sockjs.tornado import SockJSRouter
 from swampdragon import discover_routes, load_field_deserializers
 from swampdragon.settings_provider import SettingsHandler
 import os
+import sys
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "<project>.settings")
 
 if __name__ == '__main__':
-    args = None
+    args = sys.argv
     HOST = '127.0.0.1'
     PORT = 9999
 
     if args:
-        host_port = args[0]
+        host_port = args[1]
         HOST = host_port.split(':')[0]
         PORT = host_port.split(':')[1]
     routers = []
