@@ -113,7 +113,7 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
                 return this.callRouter('get_single', route, data)
             },
 
-            create: function (route, data) {
+            "create": function (route, data) {
                 return this.callRouter('create', route, data)
             },
 
