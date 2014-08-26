@@ -77,7 +77,7 @@ class ModelSerializer(object):
             self._instance = self.opts.model()
 
         for key, val in self.initial.items():
-                setattr(self.instance, key, val)
+            setattr(self.instance, key, val)
 
         # Deserialize base fields
         for key, val in self.data.items():
@@ -88,7 +88,6 @@ class ModelSerializer(object):
                 self._deserialize_field(key, val)
             except ModelValidationError as err:
                 self.errors.update(err.get_error_dict())
-
 
         if self.errors:
             raise ModelValidationError(errors=self.errors)
@@ -152,7 +151,6 @@ class ModelSerializer(object):
             validator = getattr(self, validation_name)
             validator(value)
         return None
-
 
     def _get_related_serializer(self, key):
         serializer = getattr(self, key, None)
