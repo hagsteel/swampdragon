@@ -1,17 +1,11 @@
-import redis
 import json
 import tornadoredis.pubsub
 import tornadoredis
 from .base_provider import BaseProvider
 
 
-# redis_client = redis.StrictRedis()
-# subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client())
-
-
-class RedisPubSubProvider(BaseProvider):
+class RedisSubProvider(BaseProvider):
     def __init__(self):
-        self._client = redis.StrictRedis()
         self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client())
 
     def close(self, broadcaster):
