@@ -1,4 +1,4 @@
--e git+https://github.com/mrjoes/sockjs-tornado.git#egg=sockjs-tornado
+sockjs-tornado
 Django >= 1.4
 Tornado
 tornado-redis
