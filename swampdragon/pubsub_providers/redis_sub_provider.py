@@ -11,7 +11,7 @@ class RedisSubProvider(BaseProvider):
     def close(self, broadcaster):
         for channel in self._subscriber.subscribers:
             if broadcaster in self._subscriber.subscribers[channel]:
-                self._subscriber.subscribers[channel].pop(broadcaster)
+                self._subscriber.unsubscribe(channel, broadcaster)
 
     def get_channel(self, base_channel, **channel_filter):
         return self._construct_channel(base_channel, **channel_filter)
