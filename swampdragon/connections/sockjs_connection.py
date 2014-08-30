@@ -20,7 +20,6 @@ class ConnectionMixin(object):
 
 
 class SubscriberConnection(ConnectionMixin, SockJSConnection):
-    channels = []
     pub_sub = None
 
     def __init__(self, session):

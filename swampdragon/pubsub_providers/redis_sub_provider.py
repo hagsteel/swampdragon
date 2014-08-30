@@ -9,21 +9,20 @@ class RedisSubProvider(BaseProvider):
         self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client())
 
     def close(self, broadcaster):
-        for channel in broadcaster.channels:
-            self._subscriber.unsubscribe(channel, broadcaster)
+        for channel in self._subscriber.subscribers:
+            if broadcaster in self._subscriber.subscribers[channel]:
+                self._subscriber.subscribers[channel].pop(broadcaster)
 
     def get_channel(self, base_channel, **channel_filter):
         return self._construct_channel(base_channel, **channel_filter)
 
     def subscribe(self, channels, broadcaster):
         self._subscriber.subscribe(channels, broadcaster)
-        for channel in channels:
-            if channel not in broadcaster.channels:
-                broadcaster.channels.append(channel)
 
     def unsubscribe(self, channels, broadcaster):
         for channel in channels:
-            self._subscriber.unsubscribe(channel, broadcaster)
+            if broadcaster in self._subscriber.subscribers[channel]:
+                self._subscriber.subscribers[channel].pop(broadcaster)
 
     def publish(self, channel, data):
         if isinstance(data, dict):
