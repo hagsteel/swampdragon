@@ -40,18 +40,7 @@ See [Documentation](http://swampdragon.net/documentation/) here
 
 # Changelog
 
-## 0.3.5
-
-```python manage.py socketserver``` has been removed, use ```python server.py``` both for development and deployment. 
-
-Multiple connections are now possible:
-
-    SOCKJS_CLASSES = (
-        ('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data'),
-        ('myproject.connections.CustomConnection', '/myendpoint'),
-    )
-
-A lot of changes has been made to the JavaScript libraries to work with multiple connections and be more 'endpoint specific'.
+See change logs at [swampdragon.net](http://swampdragon.net/changelog/) here
 
 
 ### JavaScript changes
