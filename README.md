@@ -1,5 +1,5 @@
-SwampDragon
-===========
+# SwampDragon
+
 
 [![Downloads](https://pypip.in/download/SwampDragon/badge.svg?style=flat&?period=month)](https://pypi.python.org/pypi/SwampDragon/)
 [![Downloads](https://pypip.in/py_versions/SwampDragon/badge.svg?style=flat&)](https://pypi.python.org/pypi/SwampDragon/)
@@ -49,7 +49,7 @@ The old ```dataService``` will be removed.
  
 
 #### AngularJS
-With multiple endpoint support, the AngularJS service changes. 
+AngularJS service changes. 
 
 ```dataService``` is renamed to ```$dragon``` 
 

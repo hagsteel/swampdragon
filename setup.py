@@ -12,7 +12,7 @@ setup(
     author_email="hagstedt@gmail.com",
     description=("SwampDragon is a powerful platform making it easy to build real time web applications, combining the power of Django and Tornado"),
     license="BSD",
-    keywords="SwampDragon, realtime, sockjs, django, tornado, framework",
+    keywords="SwampDragon, websockets, realtime, sockjs, django, tornado, framework",
     url="http://swampdragon.net",
     packages=find_packages(),
     long_description=read('README.md'),
