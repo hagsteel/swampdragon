@@ -9,6 +9,11 @@ class TestModelTools(DragonTestCase):
         val = model_tools.get_property(text_model, 'text')
         self.assertEqual(val, text_model.text)
 
+    def test_get_invalid_property(self):
+        text_model = TextModel.objects.create(text='test')
+        val = model_tools.get_property(text_model, 'invalidprop')
+        self.assertIsNone(val)
+
     def test_get_related_property(self):
         parent = ParentModel.objects.create(name='a parent')
         child = ChildModel.objects.create(number=12, parent=parent)

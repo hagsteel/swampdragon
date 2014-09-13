@@ -15,11 +15,11 @@ class MockSubProvider(BaseProvider):
             c.publish(data)
 
     def subscribe(self, channels, connection):
-        connection.channels += channels
-        for c in channels:
-            if not c in publisher.subscribers.keys():
-                publisher.subscribers[c] = []
-            publisher.subscribers[c].append(connection)
+        publisher.subscribe(channels, connection)
+        # for c in channels:
+        #     if not c in publisher.subscribers.keys():
+        #         publisher.subscribers[c] = []
+        #     publisher.subscribers[c].append(connection)
 
     def unsubscribe(self, channels, connection):
         for c in channels:
@@ -33,4 +33,4 @@ class MockSubProvider(BaseProvider):
         connection.channels = []
 
     def close(self, connection):
-        self.unsubscribe(connection.channels, connection)
+        self.publisher.remove_subscriber(connection)

@@ -1,8 +1,9 @@
 from .redis_sub_provider import RedisSubProvider
-from .mock_pubsub_provider import MockSubProvider
+from .mock_sub_provider import MockSubProvider
 import sys
 
 _subscriber = None
+
 
 def get_subscription_provider():
     global _subscriber

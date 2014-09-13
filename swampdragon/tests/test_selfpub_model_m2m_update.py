@@ -4,6 +4,7 @@ from ..serializers.model_serializer import ModelSerializer
 from .dragon_test_case import DragonTestCase
 from .models import SDModel
 from swampdragon import route_handler
+from swampdragon.pubsub_providers.base_provider import PUBACTIONS
 from swampdragon.route_handler import ModelRouter
 
 
@@ -75,3 +76,11 @@ class TestSelfPubModel(DragonTestCase):
         person.documents.remove(doc)
         lp = self.connection.last_pub
         self.assertEqual(lp['data']['documents'], [])
+
+    def test_m2m_delete_signal(self):
+        self.connection.subscribe(PersonRouter.route_name, 'cli', {})
+        person = Person.objects.create(name='a person')
+        doc = Document.objects.create(content='test', pk=100)
+        person.documents.add(doc)
+        doc.delete()
+        self.assertEqual(self.connection.last_pub['action'], PUBACTIONS.deleted)
