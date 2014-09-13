@@ -17,13 +17,22 @@ def run_server():
         HOST = host_port.split(':')[0]
         PORT = host_port.split(':')[1]
     routers = []
-    for sockjs_class in settings.SOCKJS_CLASSES:
-        module_name, cls_name = sockjs_class[0].rsplit('.', 1)
-        module = import_module(module_name)
-        cls = getattr(module, cls_name)
-        channel = sockjs_class[1]
-        routers.append(SockJSRouter(cls, channel))
-        print('Channel {}'.format(channel))
+
+    if hasattr(settings, 'SOCKJS_CLASSES'):
+        raise Exception('''
+--------------
+The SOCKJS_CLASSES setting has been removed in favour of SWAMP_DRAGON_CONNECTION
+
+Upate your settings and add SWAMP_DRAGON_CONNECTION.
+--------------
+        ''')
+
+    module_name, cls_name = settings.SWAMP_DRAGON_CONNECTION[0].rsplit('.', 1)
+    module = import_module(module_name)
+    cls = getattr(module, cls_name)
+    channel = settings.SWAMP_DRAGON_CONNECTION[1]
+    routers.append(SockJSRouter(cls, channel))
+    print('Channel {}'.format(channel))
 
     app_settings = {
         'debug': settings.DEBUG,

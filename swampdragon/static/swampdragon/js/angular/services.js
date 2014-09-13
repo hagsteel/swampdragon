@@ -2,164 +2,159 @@ var SwampDragonServices = angular.module('SwampDragonServices', []);
 
 
 SwampDragonServices.factory('$dragon', ['$q', function ($q) {
-    var dragons = {};
-    for (var ep in window.swampdragon_settings.endpoints) {
-        var endpoint = window.swampdragon_settings.endpoints[ep];
-        var dragon =  {
-            _callbackId: 0,
-            _readyCallbacks: [],
-            _channelMessageCallbacks: [],
-            _loginRequiredCallbacks: [],
-            _heartbeatCallbacks: [],
+    var endpoint = window.swampdragon_settings.endpoint;
 
-            onReady: function(fn) {
-                this._readyCallbacks.push(fn);
-            },
+    var dragon =  {
+        _callbackId: 0,
+        _readyCallbacks: [],
+        _channelMessageCallbacks: [],
+        _loginRequiredCallbacks: [],
+        _heartbeatCallbacks: [],
 
-            onLoginRequired: function(fn) {
-                this._loginRequiredCallbacks.push(fn);
-            },
+        onReady: function(fn) {
+            this._readyCallbacks.push(fn);
+        },
 
-            onChannelMessage: function(fn) {
-                this._channelMessageCallbacks.push(fn);
-            },
+        onLoginRequired: function(fn) {
+            this._loginRequiredCallbacks.push(fn);
+        },
 
-            onHeartbeat: function(fn) {
-                this._heartbeatCallbacks.push(fn);
-            },
+        onChannelMessage: function(fn) {
+            this._channelMessageCallbacks.push(fn);
+        },
 
-            _getCallbackName: function () {
-                var callbackName = 'cb_' + this._callbackId;
-                this._callbackId++;
-                if (this._callbackId > 9999)
-                    this._callbackId = 0;
-                return callbackName;
-            },
+        onHeartbeat: function(fn) {
+            this._heartbeatCallbacks.push(fn);
+        },
 
-            _handleSuccess: function(context, data, deferred) {
-                var response = {data: data};
-                if ('client_context' in context) {
-                    response['context'] = context['client_context'];
-                }
-                deferred.resolve(response);
-            },
+        _getCallbackName: function () {
+            var callbackName = 'cb_' + this._callbackId;
+            this._callbackId++;
+            if (this._callbackId > 9999)
+                this._callbackId = 0;
+            return callbackName;
+        },
 
-            _handleError: function(context, data, deferred) {
-                var response = {errors: data};
-                deferred.reject(response);
-            },
+        _handleSuccess: function(context, data, deferred) {
+            var response = {data: data};
+            if ('client_context' in context) {
+                response['context'] = context['client_context'];
+            }
+            deferred.resolve(response);
+        },
 
-            _handleCallback: function (context, data, deferred) {
+        _handleError: function(context, data, deferred) {
+            var response = {errors: data};
+            deferred.reject(response);
+        },
+
+        _handleCallback: function (context, data, deferred) {
+            if (context.state == 'success') {
+                _this.handleSuccess(data, response);
+            }
+            else if (context.state == 'error') {
+                _this.handleError(data, deferred);
+            }
+            else if (context.state == 'login_required') {
+                _this.handleError(data, deferred);
+                $rootScope.$broadcast('loginRequired');
+            } else {
+                _this.handleError(data, deferred);
+            }
+        },
+
+        isReady: function() {
+            return swampDragon.isReady;
+        },
+
+        on: function (eventName, callback) {
+            swampDragon.on(eventName, function () {
+                var args = arguments;
+                callback.apply(swampDragon, args);
+            });
+        },
+
+        callRouter: function (verb, route, args, channel) {
+            var _this = this;
+            var deferred = $q.defer();
+            var callbackName = this._getCallbackName();
+            this.swampDragon.on(callbackName, function (context, data) {
                 if (context.state == 'success') {
-                    _this.handleSuccess(data, response);
+                    _this._handleSuccess(context, data, deferred);
                 }
                 else if (context.state == 'error') {
-                    _this.handleError(data, deferred);
+                    _this._handleError(context, data, deferred);
                 }
                 else if (context.state == 'login_required') {
-                    _this.handleError(data, deferred);
-                    $rootScope.$broadcast('loginRequired');
+                    _this._handleError(context, data, deferred);
+                    for (var i in _this._loginRequiredCallbacks) {
+                        _this._loginRequiredCallbacks[i]();
+                    }
                 } else {
-                    _this.handleError(data, deferred);
+                    _this._handleError(context, data, deferred);
                 }
-            },
+            });
+            this.swampDragon.callRouter(verb, route, args, callbackName, channel);
+            return deferred.promise;
+        },
 
-            isReady: function() {
-                return swampDragon.isReady;
-            },
+        getList: function (route, data) {
+            return this.callRouter('get_list', route, data)
+        },
 
-            on: function (eventName, callback) {
-                swampDragon.on(eventName, function () {
-                    var args = arguments;
-                    callback.apply(swampDragon, args);
-                });
-            },
+        getPagedList: function (route, data, page) {
+            page = page || 1;
+            data['_page'] = page;
+            return this.callRouter('get_list', route, data)
+        },
 
-            callRouter: function (verb, route, args, channel) {
-                var _this = this;
-                var deferred = $q.defer();
-                var callbackName = this._getCallbackName();
-                this.swampDragon.on(callbackName, function (context, data) {
-                    if (context.state == 'success') {
-                        _this._handleSuccess(context, data, deferred);
-                    }
-                    else if (context.state == 'error') {
-                        _this._handleError(context, data, deferred);
-                    }
-                    else if (context.state == 'login_required') {
-                        _this._handleError(context, data, deferred);
-                        for (var i in _this._loginRequiredCallbacks) {
-                            _this._loginRequiredCallbacks[i]();
-                        }
-                    } else {
-                        _this._handleError(context, data, deferred);
-                    }
-                });
-                this.swampDragon.callRouter(verb, route, args, callbackName, channel);
-                return deferred.promise;
-            },
+        getSingle: function (route, data) {
+            return this.callRouter('get_single', route, data)
+        },
 
-            getList: function (route, data) {
-                return this.callRouter('get_list', route, data)
-            },
+        "create": function (route, data) {
+            return this.callRouter('create', route, data)
+        },
 
-            getPagedList: function (route, data, page) {
-                page = page || 1;
-                data['_page'] = page;
-                return this.callRouter('get_list', route, data)
-            },
+        update: function (route, data) {
+            return this.callRouter('update', route, data)
+        },
 
-            getSingle: function (route, data) {
-                return this.callRouter('get_single', route, data)
-            },
+        "delete": function (route, data) {
+            return this.callRouter('delete', route, data)
+        },
 
-            "create": function (route, data) {
-                return this.callRouter('create', route, data)
-            },
+        subscribe: function (route, channel, args) {
+            return this.callRouter('subscribe', route, args, channel);
+        },
 
-            update: function (route, data) {
-                return this.callRouter('update', route, data)
-            },
+        unsubscribe: function (route, channel, args) {
+            return this.callRouter('unsubscribe', route, args, channel);
+        },
 
-            "delete": function (route, data) {
-                return this.callRouter('delete', route, data)
-            },
+        sendJSON: function(data) {
+            return this.swampDragon.sendJSON(data);
+        }
+    };
 
-            subscribe: function (route, channel, args) {
-                return this.callRouter('subscribe', route, args, channel);
-            },
-
-            unsubscribe: function (route, channel, args) {
-                return this.callRouter('unsubscribe', route, args, channel);
-            },
-
-            sendJSON: function(data) {
-                return this.swampDragon.sendJSON(data);
+    dragon['swampDragon'] = new SwampDragon({
+        onchannelmessage: function (channels, data) {
+            for (var i in dragon._channelMessageCallbacks) {
+                dragon._channelMessageCallbacks[i](channels, data);
             }
-        };
-
-        dragon['swampDragon'] = new SwampDragon({
-            onchannelmessage: function (channels, data) {
-                for (var i in dragon._channelMessageCallbacks) {
-                    dragon._channelMessageCallbacks[i](channels, data);
-                }
-            },
-            onopen: function () {
-                for (var i in dragon._readyCallbacks) {
-                    dragon._readyCallbacks[i]();
-                }
-            },
-            onheartbeat: function () {
-                for (var i in dragon._heartbeatCallbacks) {
-                    dragon._heartbeatCallbacks[i]();
-                }
+        },
+        onopen: function () {
+            for (var i in dragon._readyCallbacks) {
+                dragon._readyCallbacks[i]();
             }
-        });
-        dragon.swampDragon.connect(window.swamp_dargon_host, endpoint);
-        dragons[endpoint] = dragon;
-
-    }
-    return dragons;
-
+        },
+        onheartbeat: function () {
+            for (var i in dragon._heartbeatCallbacks) {
+                dragon._heartbeatCallbacks[i]();
+            }
+        }
+    });
+    dragon.swampDragon.connect(window.swamp_dargon_host, endpoint);
+    return dragon;
 }]);
 
