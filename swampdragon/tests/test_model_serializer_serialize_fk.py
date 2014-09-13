@@ -50,7 +50,6 @@ class TestModelSerializer(DragonTestCase):
         result = ChildSerializer(instance=child).serialize(ignore_serializers=[ParentSerializer])
         self.assertIsNone(result['parent'])
 
-
     def test_serialize_fk_without_serializer(self):
         """
         If a related model is included but no serializer specified, then include the

@@ -1,7 +1,7 @@
 from django.db.models.signals import pre_delete, m2m_changed
 from django.dispatch.dispatcher import receiver
 from .pubsub_providers.base_provider import PUBACTIONS
-from .model_tools import get_property, get_field_from_m2m_model_by_model
+from .model_tools import get_property
 from .pubsub_providers.model_publisher import publish_model
 from .serializers.serializer_importer import get_serializer
 

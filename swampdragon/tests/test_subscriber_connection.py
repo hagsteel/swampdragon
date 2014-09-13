@@ -6,7 +6,7 @@ from .. import route_handler
 
 class TestSession(object):
     def __init__(self, is_open=True):
-        self.is_closed = is_open == False
+        self.is_closed = is_open is False
         self.messages = []
 
     def send_message(self, message, binary=False):

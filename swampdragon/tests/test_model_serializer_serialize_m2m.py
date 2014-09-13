@@ -45,7 +45,6 @@ class TestModelSerializer(DragonTestCase):
         data = ser.serialize()
         self.assertEqual(data['address'][0]['name'], address.name)
 
-
     def test_serialize_reverse_m2m(self):
         address = Address.objects.create(name='benedicte')
         address_book = AddressBook.objects.create(owner='veronica')
@@ -54,7 +53,6 @@ class TestModelSerializer(DragonTestCase):
         ser = ExtendedAddressSerializer(instance=address)
         data = ser.serialize()
         self.assertEqual(data['addressbook_set'][0]['owner'], address_book.owner)
-
 
     def test_serialize_m2m_without_serializer(self):
         """

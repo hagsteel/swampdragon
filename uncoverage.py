@@ -3,7 +3,6 @@ import os
 import io
 from coverage import coverage
 import sys
-from subprocess import call
 from swampdragon.runtests import runtests
 
 
@@ -20,6 +19,7 @@ class Capturing(list):
         self._stdout = sys.stdout
         sys.stdout = self._stringio = io.StringIO()
         return self
+
     def __exit__(self, *args):
         self.extend(self._stringio.getvalue().splitlines())
         sys.stdout = self._stdout
@@ -35,11 +35,15 @@ if __name__ == '__main__':
     sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
     os.environ['DJANGO_SETTINGS_MODULE'] = 'swampdragon.runtests.settings'
 
-
     cov = coverage(source=['swampdragon'], omit=[
         './swampdragon/tests/*',
         'swampdragon/__init__.py',
         'swampdragon/core/__init__.py',
+        'swampdragon/runtests/runtests.py',
+        'swampdragon/runtests/settings.py',
+        'swampdragon/swampdragon_server.py',
+        'swampdragon/pubsub_providers/mock_publisher.py',
+        'swampdragon/pubsub_providers/mock_sub_provider.py',
     ])
     cov.start()
 

@@ -57,4 +57,3 @@ class TestBaseModelPublisherRouter(DragonTestCase):
         data = {'text': 'text', 'number': 200, 'id': self.obj.pk}
         self.router.update(**data)
         self.assertEqual(self.connection.last_pub['action'], PUBACTIONS.deleted)
-

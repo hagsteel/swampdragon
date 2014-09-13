@@ -15,6 +15,7 @@ class BarM2M(SDModel):
 
 class FooM2MSerializer(ModelSerializer):
     barm2m_set = 'BarM2MSerializer'
+
     class Meta:
         model = FooM2M
         update_fields = ('name', 'barm2m_set')
