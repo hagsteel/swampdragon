@@ -10,7 +10,7 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
             _readyCallbacks: [],
             _channelMessageCallbacks: [],
             _loginRequiredCallbacks: [],
-            _hearbetaCallbacks: [],
+            _heartbeatCallbacks: [],
 
             onReady: function(fn) {
                 this._readyCallbacks.push(fn);
@@ -25,7 +25,7 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
             },
 
             onHeartbeat: function(fn) {
-                this._hearbetaCallbacks.push(fn);
+                this._heartbeatCallbacks.push(fn);
             },
 
             _getCallbackName: function () {
@@ -150,8 +150,8 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
                 }
             },
             onheartbeat: function () {
-                for (var i in dragon._hearbetaCallbacks) {
-                    dragon._hearbetaCallbacks[i]();
+                for (var i in dragon._heartbeatCallbacks) {
+                    dragon._heartbeatCallbacks[i]();
                 }
             }
         });
