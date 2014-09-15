@@ -108,6 +108,4 @@ TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, 'templates')
 ]
 
-SOCKJS_CLASSES = (
-    ('selfpub_example.sockserver.DataConnection', '/data'),
-)
+SWAMP_DRAGON_CONNECTION = ('selfpub_example.sockserver.DataConnection', '/data')

@@ -1,5 +1,3 @@
 
 # SwampDragon settings
-SOCKJS_CLASSES = (
-    ('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data'),
-)
+SWAMP_DRAGON_CONNECTION = ('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data')

@@ -27,13 +27,12 @@ class DragonTestCase(TestCase):
 
     def _load_app(self):
         routers = []
-        for sockjs_class in settings.SOCKJS_CLASSES:
-            module_name, cls_name = sockjs_class[0].rsplit('.', 1)
-            module = import_module(module_name)
-            cls = getattr(module, cls_name)
-            channel = sockjs_class[1]
-            routers.append(SockJSRouter(cls, channel))
-            print('Channel {}'.format(channel))
+        module_name, cls_name = settings.SWAMP_DRAGON_CONNECTION[0].rsplit('.', 1)
+        module = import_module(module_name)
+        cls = getattr(module, cls_name)
+        channel = settings.SWAMP_DRAGON_CONNECTION[1]
+        routers.append(SockJSRouter(cls, channel))
+        print('Channel {}'.format(channel))
 
         app_settings = {
             'debug': settings.DEBUG,
