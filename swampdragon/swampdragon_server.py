@@ -1,3 +1,4 @@
+import django
 from django.conf import settings
 from django.utils.importlib import import_module
 import sys
@@ -8,6 +9,9 @@ from swampdragon.settings_provider import SettingsHandler
 
 
 def run_server():
+    if hasattr(django, 'setup'):
+        django.setup()
+
     args = sys.argv
     HOST = '127.0.0.1'
     PORT = 9999
