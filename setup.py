@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name="SwampDragon",
-    version="0.3.5.2",
+    version="0.3.6",
     author="Jonas Hagstedt",
     author_email="hagstedt@gmail.com",
     description=("SwampDragon is a powerful platform making it easy to build real time web applications, combining the power of Django and Tornado"),
