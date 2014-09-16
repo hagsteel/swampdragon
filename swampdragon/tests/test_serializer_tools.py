@@ -1,7 +1,7 @@
-from django.db import models
 from .dragon_test_case import DragonTestCase
 from ..serializers.model_serializer import ModelSerializer
 from ..serializers import serializer_tools
+from django.db import models
 from swampdragon.tests.models import SDModel
 
 

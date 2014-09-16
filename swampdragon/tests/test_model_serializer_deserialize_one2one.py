@@ -1,7 +1,7 @@
-from django.db import models
 from ..serializers.model_serializer import ModelSerializer
 from .dragon_test_case import DragonTestCase
 from .models import TextModel, SDModel
+from django.db import models
 
 
 class FooOne2One(SDModel):

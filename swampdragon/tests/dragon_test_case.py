@@ -1,12 +1,12 @@
+from .. import discover_routes
+from .. import route_handler
+from ..pubsub_providers.subscriber_factory import get_subscription_provider
+from .mock_connection import TestConnection
 from django.test import TestCase
 from django.conf import settings
 from django.utils.importlib import import_module
 from sockjs.tornado import SockJSRouter
 from tornado import web
-from .. import discover_routes
-from .. import route_handler
-from ..pubsub_providers.subscriber_factory import get_subscription_provider
-from .mock_connection import TestConnection
 
 
 pub_sub = get_subscription_provider()

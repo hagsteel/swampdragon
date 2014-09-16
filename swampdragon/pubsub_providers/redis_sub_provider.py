@@ -1,7 +1,7 @@
+from .base_provider import BaseProvider
 import json
 import tornadoredis.pubsub
 import tornadoredis
-from .base_provider import BaseProvider
 
 
 class RedisSubProvider(BaseProvider):

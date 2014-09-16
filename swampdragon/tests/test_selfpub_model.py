@@ -1,9 +1,9 @@
-from datetime import datetime
 from ..route_handler import ModelRouter
 from ..pubsub_providers.base_provider import PUBACTIONS
 from .dragon_test_case import DragonTestCase
 from .models import FooSelfPub, BarSelfPub
 from .serializers import FooSelfPubSerializer, BarSelfPubSerializer
+from datetime import datetime
 
 
 class FooModelRouter(ModelRouter):

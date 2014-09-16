@@ -1,7 +1,7 @@
-from django.db import models
 from ..serializers.model_serializer import ModelSerializer
 from .dragon_test_case import DragonTestCase
-from .models import ParentModel, ChildModel, SDModel
+from .models import SDModel
+from django.db import models
 
 
 class Address(SDModel):

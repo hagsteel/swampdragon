@@ -1,6 +1,7 @@
 from ..pubsub_providers.base_provider import BaseProvider
 from swampdragon.pubsub_providers.publisher_factory import get_publisher
 
+
 _channels = []
 publisher = get_publisher()
 

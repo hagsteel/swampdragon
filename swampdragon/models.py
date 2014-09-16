@@ -1,9 +1,9 @@
-from django.db.models.signals import pre_delete, m2m_changed
-from django.dispatch.dispatcher import receiver
 from .pubsub_providers.base_provider import PUBACTIONS
 from .model_tools import get_property
 from .pubsub_providers.model_publisher import publish_model
 from .serializers.serializer_importer import get_serializer
+from django.db.models.signals import pre_delete, m2m_changed
+from django.dispatch.dispatcher import receiver
 
 
 class SelfPublishModel(object):

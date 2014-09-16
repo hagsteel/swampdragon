@@ -1,6 +1,6 @@
-from sockjs.tornado import SockJSConnection
 from ..pubsub_providers.subscriber_factory import get_subscription_provider
 from .. import route_handler
+from sockjs.tornado import SockJSConnection
 import json
 
 

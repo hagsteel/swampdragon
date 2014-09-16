@@ -1,5 +1,5 @@
-from django.conf import settings
 from .session_store import BaseSessionStore
+from django.conf import settings
 import redis
 
 

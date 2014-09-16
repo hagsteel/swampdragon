@@ -1,5 +1,5 @@
-from django.db import models
 from ..models import SelfPublishModel
+from django.db import models
 from swampdragon.tests.serializers import FooSelfPubSerializer, BarSelfPubSerializer
 
 

@@ -1,8 +1,8 @@
+from ..serializers.serializer_importer import get_serializer
+from ..models import get_property
 from datetime import date
 from decimal import Decimal
 from django.db.models.fields.files import ImageFieldFile, FileField
-from ..serializers.serializer_importer import get_serializer
-from ..models import get_property
 
 
 class BaseSerializer(object):
