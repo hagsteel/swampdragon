@@ -15,7 +15,7 @@ setup(
     keywords="SwampDragon, websockets, realtime, sockjs, django, tornado, framework",
     url="http://swampdragon.net",
     packages=find_packages(),
-    long_description=read('README.md'),
+    long_description=read('README.txt'),
     include_package_data=True,
     entry_points={'console_scripts': ['dragon-admin = swampdragon.core:run',]},
     install_requires=[
