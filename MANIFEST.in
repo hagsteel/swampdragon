@@ -1,4 +1,5 @@
 recursive-include swampdragon/static *
 recursive-include swampdragon/app_templates *
 include README.md
+include README.txt
 include setup.cfg
