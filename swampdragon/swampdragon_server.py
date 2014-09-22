@@ -27,7 +27,7 @@ def run_server():
 --------------
 The SOCKJS_CLASSES setting has been removed in favour of SWAMP_DRAGON_CONNECTION
 
-Upate your settings and add SWAMP_DRAGON_CONNECTION.
+Update your settings and add SWAMP_DRAGON_CONNECTION.
 --------------
         ''')
 
