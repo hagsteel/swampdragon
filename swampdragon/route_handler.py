@@ -1,6 +1,5 @@
 from .pubsub_providers.publisher_factory import get_publisher
 from .paginator import Paginator
-from .sessions.sessions import get_session_store
 from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model, filter_channels_by_dict
@@ -25,7 +24,6 @@ class BaseRouter(object):
     serializer = None
     route_name = None
     permission_classes = []
-    session_store = get_session_store()
 
     def __init__(self, connection, request=None, **kwargs):
         self.connection = connection
