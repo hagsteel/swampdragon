@@ -2,6 +2,8 @@ from ..connections.sockjs_connection import SubscriberConnection
 from ..route_handler import BaseRouter
 from .dragon_test_case import DragonTestCase
 from .mock_connection import TestConnection
+from ..sessions.session_store import BaseSessionStore
+from ..sessions import sessions
 from .test_subscriber_connection import TestSession
 import json
 
@@ -16,6 +18,16 @@ class FooRouter(BaseRouter):
     def read_session(self):
         val = self.connection.session_store.get('key')
         self.send(val)
+
+
+class TestSessionStore(BaseSessionStore):
+    data = {}
+
+    def set(self, key, val):
+        self.data[key] = val
+
+    def get(self, key):
+        return self.data[key]
 
 
 class TestSessions(DragonTestCase):
@@ -56,3 +68,11 @@ class TestSessions(DragonTestCase):
         foo_router = FooRouter(connection_b)
         foo_router.read_session()
         self.assertNotEqual(connection_b.get_last_message()['data'], 'a value')
+
+
+class TestCustomSessionStore(DragonTestCase):
+    def test_custom_session_store(self):
+        sessions.session_store = TestSessionStore
+        session_store = sessions.get_session_store()(1)
+        session_store.set('key', 'val')
+        self.assertEqual(session_store.get('key'), 'val')

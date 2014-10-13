@@ -8,13 +8,19 @@ session_store = None
 
 def get_session_store():
     global session_store
-
     if session_store:
         return session_store
-    try:
-        module_name, cls_name = settings.DRAGON_SESSION_STORE.rsplit('.', 1)
-        module = import_module(module_name)
-        cls = getattr(module, cls_name)
-        session_store = cls
-    except:
-        return RedisSessionStore
+
+    if not hasattr(settings, 'SWAMP_DRAGON_SESSION_STORE'):
+        session_store = RedisSessionStore
+        return session_store
+    else:
+        try:
+            module_name, cls_name = settings.DRAGON_SESSION_STORE.rsplit('.', 1)
+            module = import_module(module_name)
+            cls = getattr(module, cls_name)
+            session_store = cls
+        except:
+            session_store = RedisSessionStore
+        finally:
+            return session_store
