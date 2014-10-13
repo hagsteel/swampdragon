@@ -98,10 +98,16 @@ var SwampDragon = function(options) {
                 }
             }
 
+            /*******************
+             * Callback
+             *******************/
             if ('data' in e && 'context' in e.data && 'client_callback_name' in e.data.context) {
                 swampDragon.emit(e.data.context.client_callback_name, [e.data.context, e.data.data]);
             }
 
+            /*******************
+             * Channel setup
+             *******************/
             if ('channel_data' in e.data) {
                 var channel_setup = e.data.channel_data;
                 for (i in channel_setup.remote_channels) {
@@ -119,6 +125,9 @@ var SwampDragon = function(options) {
                 }
             }
 
+            /*******************
+             * Channel message
+             *******************/
             if ('channel' in e.data) {
                 var channel = swampDragon.channels[e.data.channel];
                 delete(e.data['channel']);
@@ -126,8 +135,14 @@ var SwampDragon = function(options) {
                 return;
             }
 
+            /*******************
+             * Heartbeat
+             *******************/
             if ('data' in e && 'heartbeat' in e['data']) {
-                swampDragon.settings.onheartbeat();
+                if (e.data.heartbeat == 1) {
+                    swampDragon.send(JSON.stringify(e.data));
+                    swampDragon.settings.onheartbeat();
+                }
             }
             settings.onmessage(e);
         };
