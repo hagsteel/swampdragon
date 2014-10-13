@@ -1,12 +1,17 @@
-from .base_provider import BaseProvider
 import json
 import tornadoredis.pubsub
 import tornadoredis
+from .base_provider import BaseProvider
+from .redis_settings import get_redis_host, get_redis_port, get_redis_db
 
 
 class RedisSubProvider(BaseProvider):
     def __init__(self):
-        self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client())
+        self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client(
+            host=get_redis_host(),
+            port=get_redis_port(),
+            selected_db=get_redis_db()
+        ))
 
     def close(self, broadcaster):
         for channel in self._subscriber.subscribers:

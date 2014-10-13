@@ -7,7 +7,7 @@ import json
 class RedisSessionStore(BaseSessionStore):
     def __init__(self, session_id):
         super(RedisSessionStore, self).__init__(session_id)
-        self.client = redis_publisher.redis_cli
+        self.client = redis_publisher.get_redis_cli()
 
     def get_complete_key(self, key):
         return 's:{}|k:{}'.format(self.session_id, key)
