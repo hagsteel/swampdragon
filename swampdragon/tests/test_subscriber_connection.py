@@ -2,10 +2,12 @@ from ..connections.sockjs_connection import SubscriberConnection
 from ..route_handler import BaseRouter, UnexpectedVerbException
 from .dragon_test_case import DragonTestCase
 from .. import route_handler
+import uuid
 
 
 class TestSession(object):
     def __init__(self, is_open=True):
+        self.session_id = uuid.uuid4().hex
         self.is_closed = is_open is False
         self.messages = []
 

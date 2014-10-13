@@ -1,21 +1,17 @@
-import uuid
-
-
 class BaseSessionStore(object):
-    def save(self, key, val):
-        raise NotImplemented()
+    def __init__(self, session_id):
+        self.session_id = session_id
+        self.keys = []
 
-    def save_get_key(self, val):
-        key = self.generate_key()
-        self.save(key, val)
-        return key
+    def set(self, key, val):
+        raise NotImplemented()
 
     def get(self, key):
         raise NotImplemented()
 
-    def generate_key(self):
-        key = uuid.uuid4()
-        return key.hex
-
     def refresh_key_timeout(self, key):
         raise NotImplemented()
+
+    def refresh_all_keys(self):
+        for key in self.keys:
+            self.refresh_key_timeout(key)

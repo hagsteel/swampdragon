@@ -1,7 +1,12 @@
+from sockjs.tornado import SockJSConnection
+from tornado.ioloop import PeriodicCallback
 from ..pubsub_providers.subscriber_factory import get_subscription_provider
 from .. import route_handler
-from sockjs.tornado import SockJSConnection
+from ..sessions.sessions import get_session_store
 import json
+
+
+session_store = get_session_store()
 
 
 class ConnectionMixin(object):
@@ -24,9 +29,20 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
 
     def __init__(self, session):
         super(SubscriberConnection, self).__init__(session)
+        self.session_store = session_store(self.session.session_id)
         self.pub_sub = get_subscription_provider()
 
+    def on_open(self, request):
+        super(SubscriberConnection, self).on_open(request)
+        session_key_timeout_seconds = 1000 * 60 * 20  # 20 minutes
+        self.periodic_callback = PeriodicCallback(self.on_heartbeat, session_key_timeout_seconds)
+        self.periodic_callback.start()
+
+    def on_heartbeat(self):
+        self.session_store.refresh_all_keys()
+
     def on_close(self):
+        self.periodic_callback.stop()
         self.pub_sub.close(self)
 
     def on_message(self, data):

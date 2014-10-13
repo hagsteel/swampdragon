@@ -15,7 +15,6 @@ def get_session_store():
         module_name, cls_name = settings.DRAGON_SESSION_STORE.rsplit('.', 1)
         module = import_module(module_name)
         cls = getattr(module, cls_name)
-        store = cls()
-        session_store = store
+        session_store = cls
     except:
-        return RedisSessionStore()
+        return RedisSessionStore

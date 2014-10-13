@@ -1,10 +1,12 @@
 from .. import route_handler
 from ..pubsub_providers.subscriber_factory import get_subscription_provider
+from ..sessions.sessions import get_session_store
 import json
 import uuid
 
 
 pubsub = get_subscription_provider()
+session_store = get_session_store()
 
 
 class TestConnection(object):
@@ -12,12 +14,13 @@ class TestConnection(object):
     channels = []
 
     def __init__(self, user=None):
-        self.uid = str(uuid.uuid4())
+        self.uid = str(uuid.uuid4().hex)
         self.user = user
 
         self.sent_data = []
         self.published_data = []
         self.pub_sub = pubsub
+        self.session_store = session_store(self.uid)
 
     def send(self, message):
         self.sent_data.append(json.dumps(message))
