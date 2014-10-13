@@ -1,6 +1,6 @@
 class BaseSessionStore(object):
-    def __init__(self, session_id):
-        self.session_id = session_id
+    def __init__(self, connection):
+        self.connection = connection
         self.keys = []
 
     def set(self, key, val):

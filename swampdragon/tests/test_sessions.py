@@ -73,6 +73,6 @@ class TestSessions(DragonTestCase):
 class TestCustomSessionStore(DragonTestCase):
     def test_custom_session_store(self):
         sessions.session_store = TestSessionStore
-        session_store = sessions.get_session_store()(1)
+        session_store = sessions.get_session_store()(self.connection)
         session_store.set('key', 'val')
         self.assertEqual(session_store.get('key'), 'val')

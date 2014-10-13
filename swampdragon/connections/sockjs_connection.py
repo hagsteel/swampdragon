@@ -46,7 +46,7 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
 
     def __init__(self, session):
         super(SubscriberConnection, self).__init__(session)
-        self.session_store = session_store(self.session.session_id)
+        self.session_store = session_store(self)
         self.pub_sub = get_subscription_provider()
 
     def on_open(self, request):

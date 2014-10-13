@@ -9,18 +9,24 @@ pubsub = get_subscription_provider()
 session_store = get_session_store()
 
 
+class TestSession(object):
+    def __init__(self):
+        self.session_id = str(uuid.uuid4().hex)
+
+
 class TestConnection(object):
     uid = None
     channels = []
 
     def __init__(self, user=None):
         self.uid = str(uuid.uuid4().hex)
+        self.session = TestSession()
         self.user = user
 
         self.sent_data = []
         self.published_data = []
         self.pub_sub = pubsub
-        self.session_store = session_store(self.uid)
+        self.session_store = session_store(self)
 
     def send(self, message):
         self.sent_data.append(json.dumps(message))

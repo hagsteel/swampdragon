@@ -5,12 +5,12 @@ import json
 
 
 class RedisSessionStore(BaseSessionStore):
-    def __init__(self, session_id):
-        super(RedisSessionStore, self).__init__(session_id)
+    def __init__(self, connection):
+        super(RedisSessionStore, self).__init__(connection)
         self.client = redis_publisher.get_redis_cli()
 
     def get_complete_key(self, key):
-        return 's:{}|k:{}'.format(self.session_id, key)
+        return 's:{}|k:{}'.format(self.connection.session.session_id, key)
 
     def set(self, key, val):
         if isinstance(val, dict):
