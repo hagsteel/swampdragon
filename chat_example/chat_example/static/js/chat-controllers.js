@@ -5,12 +5,12 @@ ChatControllers.controller('ChatCtrl', ['$scope', '$dragon', function($scope, $d
     $scope.messages = [];
 
     /// Subscribe to the chat router
-    $dragon.data.onReady(function() {
-        $dragon.data.subscribe('chat-route', $scope.channel).then(function(response) {
+    $dragon.onReady(function() {
+        $dragon.subscribe('chat-route', $scope.channel).then(function(response) {
         });
     });
 
-    $dragon.data.onChannelMessage(function(channels, message) {
+    $dragon.onChannelMessage(function(channels, message) {
         if (indexOf.call(channels, $scope.channel) > -1) {
             $scope.$apply(function() {
                 $scope.messages.unshift(message);
@@ -20,9 +20,9 @@ ChatControllers.controller('ChatCtrl', ['$scope', '$dragon', function($scope, $d
 
     $scope.sendMessage = function() {
         $scope.errors = null;
-        $dragon.data.callRouter('chat', 'chat-route', {message: this.message, name: this.name})
+        $dragon.callRouter('chat', 'chat-route', {message: this.message, name: this.name})
             .then(function(response) {
-                console.log('done');
+                $scope.message = '';
             })
             ["catch"](function(response) {
                 $scope.errors = response.errors;

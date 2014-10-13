@@ -20,6 +20,7 @@ class ChatRouter(BaseRouter):
         if errors:
             self.send_error(errors)
         else:
+            self.send({'status': 'ok'})
             self.publish(self.get_subscription_channels(), kwargs)
 
 
