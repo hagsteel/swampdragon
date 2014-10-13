@@ -1,3 +1,4 @@
+from django.conf import settings
 from sockjs.tornado import SockJSConnection
 from tornado.ioloop import PeriodicCallback
 from ..pubsub_providers.subscriber_factory import get_subscription_provider
@@ -7,6 +8,22 @@ import json
 
 
 session_store = get_session_store()
+heartbeat_frequency = None
+heartbeat_enabled = None
+
+
+def get_heartbeat_frequency():
+    global heartbeat_frequency
+    if not heartbeat_frequency:
+        heartbeat_frequency = getattr(settings, 'SWAMP_DRAGON_HEARTBEAT_FREQUENCY', 1000 * 60 * 20)  # Default to 20 minutes
+    return heartbeat_frequency
+
+
+def is_heartbeat_enabled():
+    global heartbeat_enabled
+    if not heartbeat_enabled:
+        heartbeat_enabled = getattr(settings, 'SWAMP_DRAGON_HEARTBEAT_ENABLED', False)
+    return heartbeat_enabled
 
 
 class ConnectionMixin(object):
@@ -34,20 +51,27 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
 
     def on_open(self, request):
         super(SubscriberConnection, self).on_open(request)
-        session_key_timeout_seconds = 1000 * 60 * 20  # 20 minutes
-        self.periodic_callback = PeriodicCallback(self.on_heartbeat, session_key_timeout_seconds)
-        self.periodic_callback.start()
+        if is_heartbeat_enabled():
+            self.periodic_callback = PeriodicCallback(self.send_heartbeat, get_heartbeat_frequency())
+            self.periodic_callback.start()
+
+    def send_heartbeat(self):
+        self.send({'heartbeat': '1'})
 
     def on_heartbeat(self):
         self.session_store.refresh_all_keys()
 
     def on_close(self):
-        self.periodic_callback.stop()
+        if hasattr(self, 'periodic_callback'):
+            self.periodic_callback.stop()
         self.pub_sub.close(self)
 
     def on_message(self, data):
         try:
             data = self.to_json(data)
+            if data == {'heartbeat': '1'}:
+                self.on_heartbeat()
+                return
             handler = route_handler.get_route_handler(data['route'])
             handler(self).handle(data)
         except Exception as e:
