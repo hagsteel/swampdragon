@@ -16,7 +16,7 @@ def get_session_store():
         return session_store
     else:
         try:
-            module_name, cls_name = settings.DRAGON_SESSION_STORE.rsplit('.', 1)
+            module_name, cls_name = settings.SWAMP_DRAGON_SESSION_STORE.rsplit('.', 1)
             module = import_module(module_name)
             cls = getattr(module, cls_name)
             session_store = cls
