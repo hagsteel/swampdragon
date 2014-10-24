@@ -8,7 +8,7 @@ class SettingsHandler(RequestHandler):
 
     def get(self, *args, **kwargs):
         data = '''window.swampdragon_settings = {settings};
-window.swamp_dargon_host = "{protocol}://{host}";
+window.swampdragon_host = "{protocol}://{host}";
 '''.format(**{
             'settings': SwampDragonSettings().to_dict(),
             'host': self.request.headers['Host'],

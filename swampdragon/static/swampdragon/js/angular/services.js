@@ -154,7 +154,7 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
             }
         }
     });
-    dragon.swampDragon.connect(window.swamp_dargon_host, endpoint);
+    dragon.swampDragon.connect(window.swampdragon_host, endpoint);
     return dragon;
 }]);
 
