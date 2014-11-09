@@ -41,7 +41,7 @@ class BaseRouter(object):
 
     def handle(self, data):
         verb = data['verb']
-        kwargs = data.get('args', {})
+        kwargs = data.get('args') or {}
         client_callback_name = data.get('callbackname')
         self.context['client_callback_name'] = client_callback_name
         self.context['verb'] = verb
