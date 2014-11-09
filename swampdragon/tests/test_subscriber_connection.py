@@ -14,7 +14,7 @@ class TestSession(object):
     def send_message(self, message, binary=False):
         self.messages.append(message)
 
-    def close(self):
+    def close(self, code=3000, message='Connection closed'):
         self.is_closed = True
 
 

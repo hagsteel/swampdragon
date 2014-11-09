@@ -26,9 +26,16 @@ var SwampDragon = function(options) {
     swampDragon.defaultOnMessage = function(e) { };
     swampDragon.defaultOnHeartbeat = function(e) { };
     swampDragon.defaultOnChannelMessage = function(channel, data) { };
-    swampDragon.defaultOnClose = function() {
+    swampDragon.defaultOnClose = function(data) {
         swampDragon.conn = null;
         swampDragon.isReady = false;
+
+        if (data.code == 3001) {
+            // The connection was aborted.
+            // Will not reconnect
+            return;
+        }
+
         setTimeout(function() {
             if (swampDragon.connectionAttempt < 10) {
                 swampDragon.connectionAttempt++;

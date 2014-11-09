@@ -79,7 +79,10 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
             raise e
 
     def abort_connection(self):
-        self.close()
+        self.close(code=3001, message='Connection aborted')
+
+    def close(self, code=3000, message='Connection closed'):
+        self.session.close(code, message)
 
 
 class DjangoSubscriberConnection(SubscriberConnection):
