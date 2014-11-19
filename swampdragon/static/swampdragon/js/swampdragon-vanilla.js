@@ -2,12 +2,9 @@ var VanillaDragon = function(options) {
     options = options || {};
     var endpoint = window.swampdragon_settings.endpoint;
     var sdInstance = new SwampDragon(options);
+
     var _dragon = {
         _callbackId: 0,
-        _readyCallbacks: [],
-        _channelMessageCallbacks: [],
-        _loginRequiredCallbacks: [],
-        _heartbeatCallbacks: [],
 
         _getCallbackName: function () {
             var callbackName = 'cb_' + this._callbackId;
@@ -71,6 +68,7 @@ var VanillaDragon = function(options) {
             this.callRouter('unsubscribe', route, args, success, failure, channel);
         }
     };
+
     _dragon.connect();
     return _dragon;
 };
