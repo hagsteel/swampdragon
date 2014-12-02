@@ -7,11 +7,17 @@ def get_property(obj, field):
         attr_chain = field.split('.')
         attr = obj
         for elem in attr_chain:
-            attr = getattr(attr, elem, None)
+            try:
+                attr = getattr(attr, elem, None)
+            except:
+                attr = None
             if attr is None:
                 return None
         return attr
-    return getattr(obj, field, None)
+    try:
+        return getattr(obj, field, None)
+    except:
+        return None
 
 
 def string_to_list(val):
