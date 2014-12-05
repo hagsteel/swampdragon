@@ -20,11 +20,11 @@ setup(
     entry_points={'console_scripts': ['dragon-admin = swampdragon.core:run',]},
     install_requires=[
         "Django >= 1.4",
-        "Tornado",
-        "sockjs-tornado",
-        "tornado-redis",
-        "redis",
-        "python-dateutil"
+        "Tornado >= 3.2.2",
+        "sockjs-tornado >= 1.0.0",
+        "tornado-redis >= 2.4.18",
+        "redis >= 2.8",
+        "python-dateutil >= 2.2"
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
