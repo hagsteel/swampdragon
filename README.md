@@ -26,6 +26,8 @@ Redis blazing speed.
 
     pip install swampdragon
     
+**note:** Redis 2.8 or higher required
+    
    
 ## Quickstart
 
