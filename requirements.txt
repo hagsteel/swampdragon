@@ -1,5 +1,5 @@
 sockjs-tornado >= 1.0.0
-Django >= 1.4
+Django >= 1.6, < 1.8
 Tornado >= 3.2.2
 tornado-redis >= 2.4.18
 redis >= 2.8

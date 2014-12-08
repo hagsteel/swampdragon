@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 from swampdragon.swampdragon_server import run_server
 
