@@ -4,6 +4,7 @@ from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
 from swampdragon.model_tools import get_property, get_model
 from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.object_map import get_object_map
+from swampdragon.serializers.serializer import Serializer
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
 from swampdragon.serializers.serializer_tools import get_serializer_relationship_field, get_id_mappings
@@ -39,7 +40,7 @@ class ModelSerializerMeta(object):
         return fields
 
 
-class ModelSerializer(object):
+class ModelSerializer(Serializer):
     def __init__(self, data=None, instance=None, initial=None):
         if data and not isinstance(data, dict):
             raise Exception('data needs to be a dictionary')
@@ -145,12 +146,12 @@ class ModelSerializer(object):
             related_instance = serializer(val).deserialize()
             setattr(self.instance, key, related_instance)
 
-    def validate_field(self, field, value, data):
-        validation_name = 'validate_{}'.format(field)
-        if hasattr(self, validation_name):
-            validator = getattr(self, validation_name)
-            validator(value)
-        return None
+    # def validate_field(self, field, value, data):
+    #     validation_name = 'validate_{}'.format(field)
+    #     if hasattr(self, validation_name):
+    #         validator = getattr(self, validation_name)
+    #         validator(value)
+    #     return None
 
     def _get_related_serializer(self, key):
         serializer = getattr(self, key, None)
@@ -158,16 +159,16 @@ class ModelSerializer(object):
             return get_serializer(serializer, self.__class__)
         return serializer
 
-    def _get_custom_field_serializers(self):
-        """
-        Get all custom serializer functions.
-        If this function has a serializer attached to it, include that
-        """
-        functions = [(
-            getattr(self, f),
-            f.replace('serialize_', '')
-        ) for f in dir(self) if f.startswith('serialize_')]
-        return functions
+    # def _get_custom_field_serializers(self):
+    #     """
+    #     Get all custom serializer functions.
+    #     If this function has a serializer attached to it, include that
+    #     """
+    #     functions = [(
+    #         getattr(self, f),
+    #         f.replace('serialize_', '')
+    #     ) for f in dir(self) if f.startswith('serialize_')]
+    #     return functions
 
     def get_object_map_data(self):
         return {
