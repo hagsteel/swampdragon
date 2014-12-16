@@ -143,32 +143,17 @@ class ModelSerializer(Serializer):
                     related_instance.save()
                 getattr(self.instance, key).add(related_instance)
         else:
-            related_instance = serializer(val).deserialize()
-            setattr(self.instance, key, related_instance)
-
-    # def validate_field(self, field, value, data):
-    #     validation_name = 'validate_{}'.format(field)
-    #     if hasattr(self, validation_name):
-    #         validator = getattr(self, validation_name)
-    #         validator(value)
-    #     return None
+            if serializer:
+                related_instance = serializer(val).deserialize()
+                setattr(self.instance, key, related_instance)
+            else:
+                setattr(self.instance, key, val)
 
     def _get_related_serializer(self, key):
         serializer = getattr(self, key, None)
         if isinstance(serializer, str):
             return get_serializer(serializer, self.__class__)
         return serializer
-
-    # def _get_custom_field_serializers(self):
-    #     """
-    #     Get all custom serializer functions.
-    #     If this function has a serializer attached to it, include that
-    #     """
-    #     functions = [(
-    #         getattr(self, f),
-    #         f.replace('serialize_', '')
-    #     ) for f in dir(self) if f.startswith('serialize_')]
-    #     return functions
 
     def get_object_map_data(self):
         return {
@@ -187,13 +172,6 @@ class ModelSerializer(Serializer):
         # Set all the ids for related models
         # so the datamapper can find the connection
         data.update(get_id_mappings(self))
-
-        # Set the id value for related models, for the data mapper
-        # if ignore_serializers:
-        #     for ser in ignore_serializers:
-        #         via = '{}'.format(get_serializer_relationship_field(ser, self))
-        #         if hasattr(self.instance, via):
-        #             data[via] = getattr(self.instance, via)
 
         # Serialize the fields
         for field in fields:
