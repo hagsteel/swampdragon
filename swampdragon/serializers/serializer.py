@@ -1,3 +1,6 @@
+from swampdragon.serializers.validation import ValidationError
+
+
 class SerializerMeta(object):
     def __init__(self, options):
         self.publish_fields = getattr(options, 'publish_fields', None)
@@ -14,12 +17,29 @@ class Serializer(object):
     def __init__(self, data=None, initial=None):
         if data and not isinstance(data, dict):
             raise Exception('data needs to be a dictionary')
+        self.opts = SerializerMeta(self.Meta)
         self.data = data
+        self.clean_data = {}
         self.initial = initial or {}
         self.errors = {}
 
     def save(self):
-        pass
+        self.deserialize()
+        return self.clean_data
+
+    def deserialize(self):
+        for key, val in self.initial.items():
+            self.clean_data[key] = val
+
+        # Deserialize base fields
+        for key, val in self.data.items():
+            if key not in self.opts.update_fields:
+                continue
+            try:
+                self.validate_field(key, val, self.data)
+                self._deserialize_field(key, val)
+            except ValidationError as err:
+                self.errors.update(err.get_error_dict())
 
     def validate_field(self, field, value, data):
         validation_name = 'validate_{}'.format(field)

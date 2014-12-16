@@ -228,7 +228,9 @@ class ModelSerializer(Serializer):
             field_type = getattr(self.opts.model, attr_name)
             # Reverse FK
             if isinstance(field_type, ReverseSingleRelatedObjectDescriptor):
-                val = get_property(self.instance, attr_name).pk
+                rel = get_property(self.instance, attr_name)
+                if rel:
+                    val = rel.pk
             # FK
             elif isinstance(field_type, ForeignRelatedObjectsDescriptor):
                 val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
