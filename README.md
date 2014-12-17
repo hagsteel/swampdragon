@@ -2,7 +2,9 @@
 
 
 [![Downloads](https://pypip.in/download/SwampDragon/badge.svg?style=flat&?period=month)](https://pypi.python.org/pypi/SwampDragon/)
-[![Downloads](https://pypip.in/py_versions/SwampDragon/badge.svg?style=flat&)](https://pypi.python.org/pypi/SwampDragon/)
+[![PyVersion](https://pypip.in/py_versions/SwampDragon/badge.svg?style=flat&)](https://pypi.python.org/pypi/SwampDragon/)
+
+[![Build status](https://codeship.com/projects/fcebb9f0-1270-0132-b84c-7ee8f6cd4d2b/status?branch=master)]
 
 Build real-time web applications with Django.
 
