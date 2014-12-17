@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     long_description=read('README.txt'),
     include_package_data=True,
-    entry_points={'console_scripts': ['dragon-admin = swampdragon.core:run',]},
+    entry_points={'console_scripts': ['dragon-admin = swampdragon.core:run', ]},
     install_requires=[
         "Django >= 1.6, < 1.8",
         "Tornado >= 3.2.2",

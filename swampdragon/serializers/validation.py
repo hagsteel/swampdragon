@@ -6,6 +6,7 @@ class ValidationError(Exception):
     def get_error_dict(self):
         return self.errors
 
+
 class ModelValidationError(ValidationError):
     pass
     # def __init__(self, errors={}, *args, **kwargs):

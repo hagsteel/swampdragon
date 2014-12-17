@@ -7,6 +7,7 @@ class FooRouter(BaseRouter):
     def get_subscription_channels(self, **kwargs):
         return ['foo-chan']
 
+
 class TestDataPublisher(DragonTestCase):
     def setUp(self):
         self.router = FooRouter(self.connection)
