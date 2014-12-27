@@ -13,8 +13,8 @@ def run_server():
         django.setup()
 
     args = sys.argv
-    HOST = '127.0.0.1'
-    PORT = 9999
+    HOST = getattr(settings, 'SWAMP_DRAGON_HOST', '127.0.0.1')
+    PORT = getattr(settings, 'SWAMP_DRAGON_PORT', 9999)
 
     if len(args) > 1:
         host_port = args[1]
