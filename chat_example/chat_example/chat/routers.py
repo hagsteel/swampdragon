@@ -15,7 +15,7 @@ class ChatRouter(BaseRouter):
             errors['name'] = 'Specify a name'
 
         if 'message' not in kwargs or len(kwargs['message']) is 0:
-            errors['message'] = 'Enter a chat messge'
+            errors['message'] = 'Enter a chat message'
 
         if errors:
             self.send_error(errors)
