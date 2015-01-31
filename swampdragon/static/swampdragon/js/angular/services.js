@@ -12,6 +12,9 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
         _heartbeatCallbacks: [],
 
         onReady: function(fn) {
+            if(this.isReady()){
+                fn();
+            }
             this._readyCallbacks.push(fn);
         },
 
@@ -64,7 +67,9 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
         },
 
         isReady: function() {
-            return swampDragon.isReady;
+            if(typeof this.swampDragon === 'undefined')
+                return false;
+            return this.swampDragon.isReady;
         },
 
         on: function (eventName, callback) {
