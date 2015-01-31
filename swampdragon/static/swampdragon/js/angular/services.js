@@ -1,7 +1,7 @@
 var SwampDragonServices = angular.module('SwampDragonServices', []);
 
 
-SwampDragonServices.factory('$dragon', ['$q', function ($q) {
+SwampDragonServices.factory('$dragon', ['$q', '$timeout', function ($q, $timeout) {
     var endpoint = window.swampdragon_settings.endpoint;
 
     var dragon =  {
@@ -13,9 +13,13 @@ SwampDragonServices.factory('$dragon', ['$q', function ($q) {
 
         onReady: function(fn) {
             if(this.isReady()){
-                fn();
+                $timeout(function(){
+                    fn();
+                }, 0);
             }
-            this._readyCallbacks.push(fn);
+            else{
+                this._readyCallbacks.push(fn);
+            }
         },
 
         onLoginRequired: function(fn) {
