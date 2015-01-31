@@ -4,6 +4,8 @@ from swampdragon.swampdragon_server import run_server
 
 
 class Command(BaseCommand):
-
     def handle(self, *args, **options):
-        run_server()
+        host_port = None
+        if args:
+            host_port = args[0]
+        run_server(host_port=host_port)

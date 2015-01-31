@@ -33,7 +33,6 @@ Update your settings and add SWAMP_DRAGON_CONNECTION.
     cls = getattr(module, cls_name)
     channel = settings.SWAMP_DRAGON_CONNECTION[1]
     routers.append(SockJSRouter(cls, channel))
-    print('Channel {}'.format(channel))
 
     app_settings = {
         'debug': settings.DEBUG,
