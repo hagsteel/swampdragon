@@ -1,23 +1,20 @@
 import django
 from django.conf import settings
 from django.utils.importlib import import_module
-import sys
 from tornado import web, ioloop
 from sockjs.tornado import SockJSRouter
 from swampdragon import discover_routes, load_field_deserializers
 from swampdragon.settings_provider import SettingsHandler
 
 
-def run_server():
+def run_server(host_port=None):
     if hasattr(django, 'setup'):
         django.setup()
 
-    args = sys.argv
     HOST = getattr(settings, 'SWAMP_DRAGON_HOST', '127.0.0.1')
     PORT = getattr(settings, 'SWAMP_DRAGON_PORT', 9999)
 
-    if len(args) > 1:
-        host_port = args[1]
+    if host_port is not None:
         HOST = host_port.split(':')[0]
         PORT = host_port.split(':')[1]
     routers = []
