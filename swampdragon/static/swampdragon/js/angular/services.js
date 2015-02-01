@@ -4,33 +4,33 @@ var SwampDragonServices = angular.module('SwampDragonServices', []);
 SwampDragonServices.factory('$dragon', ['$q', '$timeout', function ($q, $timeout) {
     var endpoint = window.swampdragon_settings.endpoint;
 
-    var dragon =  {
+    var dragon = {
         _callbackId: 0,
         _readyCallbacks: [],
         _channelMessageCallbacks: [],
         _loginRequiredCallbacks: [],
         _heartbeatCallbacks: [],
 
-        onReady: function(fn) {
-            if(this.isReady()){
-                $timeout(function(){
+        onReady: function (fn) {
+            if (this.isReady()) {
+                $timeout(function () {
                     fn();
                 }, 0);
             }
-            else{
+            else {
                 this._readyCallbacks.push(fn);
             }
         },
 
-        onLoginRequired: function(fn) {
+        onLoginRequired: function (fn) {
             this._loginRequiredCallbacks.push(fn);
         },
 
-        onChannelMessage: function(fn) {
+        onChannelMessage: function (fn) {
             this._channelMessageCallbacks.push(fn);
         },
 
-        onHeartbeat: function(fn) {
+        onHeartbeat: function (fn) {
             this._heartbeatCallbacks.push(fn);
         },
 
@@ -42,7 +42,7 @@ SwampDragonServices.factory('$dragon', ['$q', '$timeout', function ($q, $timeout
             return callbackName;
         },
 
-        _handleSuccess: function(context, data, deferred) {
+        _handleSuccess: function (context, data, deferred) {
             var response = {data: data};
             if ('client_context' in context) {
                 response['context'] = context['client_context'];
@@ -50,7 +50,7 @@ SwampDragonServices.factory('$dragon', ['$q', '$timeout', function ($q, $timeout
             deferred.resolve(response);
         },
 
-        _handleError: function(context, data, deferred) {
+        _handleError: function (context, data, deferred) {
             var response = {errors: data};
             deferred.reject(response);
         },
@@ -70,8 +70,8 @@ SwampDragonServices.factory('$dragon', ['$q', '$timeout', function ($q, $timeout
             }
         },
 
-        isReady: function() {
-            if(typeof this.swampDragon === 'undefined')
+        isReady: function () {
+            if (typeof this.swampDragon === 'undefined')
                 return false;
             return this.swampDragon.isReady;
         },
@@ -141,7 +141,7 @@ SwampDragonServices.factory('$dragon', ['$q', '$timeout', function ($q, $timeout
             return this.callRouter('unsubscribe', route, args, channel);
         },
 
-        sendJSON: function(data) {
+        sendJSON: function (data) {
             return this.swampDragon.sendJSON(data);
         }
     };
