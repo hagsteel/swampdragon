@@ -46,6 +46,16 @@ Redis port, default is 6379
 Redis database number, default is 0
 
 
+### ```SWAMP_DRAGON_HOST```
+
+This setting will override the default `localhost` host
+
+
+### ```SWAMP_DRAGON_PORT```
+
+This setting will override the default `9999` port
+
+
 ## JavaScript settings (settings exposed to clients via JavaScript)
 
 By adding
