@@ -60,8 +60,16 @@ This setting will override the default `9999` port
 
 By adding
     
-    <script type="text/javascript" src="http://localhost:9999/settings.js"></script>
+    :::html
+    {% load swampdragon_tags %}
     
+    <html>
+    <body>
+    ...
+    {% swampdragon_settings %}
+    </body>
+    </html>
+        
 to your template, you can access SwampDragon specific settings within your JavaScript.
 
 You can expose your own settings by setting ```SWAMP_DRAGON``` to a dictionary in your (Django) settings.py file.

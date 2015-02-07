@@ -1,1 +1,1 @@
--e git://github.com/jonashagstedt/swampdragon.git#egg=swampdragon
+swampdragon
