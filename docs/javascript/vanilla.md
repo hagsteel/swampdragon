@@ -8,8 +8,10 @@ Each call can accept a ```success``` and ```error``` function.
 
 Include the following in your template (note that the data mapper is optional)
 
+    {% load swampdragon_tags %}
+
     <!-- Swamp dragon -->
-    <script type="text/javascript" src="http://localhost:9999/settings.js"></script>
+    {% swampdragon_settings %}
     <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/vendor/sockjs-0.3.4.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/swampdragon.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/datamapper.js"></script>
