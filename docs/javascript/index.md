@@ -1,66 +1,176 @@
 # JavaScript
 
-SwampDragon comes with an AngularJS service and directives, but it works just as well with other JavaScript libraries, or in fact, no library at all.
-
-For AngularJS see [SwampDragon and AngularJS](/documentation/angularjs-and-swampdragon/).
-
-There are 4 callbacks that can be passed as parameters when instantiating SwampDragon.
- 
-*  ```onopen```
-*  ```onmessage```
-*  ```onchannelmessage```
-*  ```onclose```
-
-The minium required script includes to use SwampDragon 
-
-    <!-- Swamp dragon -->
-    <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/vendor/sockjs-0.3.4.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/swampdragon.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/datamapper.js"></script>
-
-If you are using ```ModelRouter``` or ```ModelPublisherRouter``` it's recommended to include the DataMapper as well.
-
-    <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/datamapper.js"></script>
+**note** if you are using a version before 0.4.0 use the legacy documentation
 
 
-A vanilla JavaScript wrapper was added as of version 0.3.8 to avoid the awkward callback setup
+## Setup
 
-    <script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/swampdragon-vanilla.js"></script>
+Add the following code to your template:
 
-
-## Creating a connection
-
-        function onOpen() { ... }
-        function onMessage() { ... }
-        function onChannelMessage() { ... }
-        function onClose() { ... }
-
-        var swampDragon = new SwampDragon({
-            onopen: onOpen,
-            onmessage: onMessage,
-            onchannelmessage: onChannelMessage,
-            onclose: onClose
-        });
-
-        swampDragon.connect('http://' + window.location.hostname + ':9999', 'data')
-
-Note that once ```new SwampDragon(...)``` is called, it will assign an instance to ```window.swampDragon``` so there is no need to do this manually.
-
-See documentation on [callbacks](/documentation/javascript-callbacks/)
+    :::html
+    {% load swampdragon_tags %}
+    
+    <html>
+    <body>
+    ...
+    {% swampdragon_settings %}
+    <script type="text/javascript" src="{% static 'swampdragon/js/dist/swampdragon.min.js` %}"></script>
+    </body>
+    </html>    
 
 
-## Calling routers
+and make sure you have `DRAGON_URL` setup in your settings.
 
-SwampDragon have a few functions
+For local development: `DRAGON_URL='http://localhost:9999/'`.
 
-*  ```disconnect```     (disconnect from the server)
-*  ```callRouter```     (call a router)
-*  ```get_single```     (call a router to get a single object)
-*  ```get_list```       (call a router to get a list of objects)
-*  ```create_object```  (call a router with data and ask it to create an object)
-*  ```update_object```  (call a router with data and ask it to update an object)
-*  ```delete_object```  (call a router with data and ask it to delete an object)
-*  ```subscribe```      (subscribe to a channel)
-*  ```unsubscribe```    (unsubscribe from a channel)
 
-See documentation on [calling routers](/documentation/javascript-calling-routers/)
+## Usage
+
+Before calling a router, ensure that a connection is established 
+    
+    :::javascript
+    swampdragon.ready(function () {
+        // connection established
+        // call subscribe or any other router calls
+    });
+
+
+## Args
+
+These are the most common args:
+
+*  `route`: the name of your router (declared as `route_name` on the router)
+*  `data`: a dictionary of data to pass to the router
+*  `success`: a callback that takes two arguments: `context`, `data` where data is any data sent by the router
+*  `failure`: a callback that takes two arguments: `context`, `data` where data contains the error message(s)
+
+
+### Subscribe / unsubscribe
+
+To start listening to a channel call `subscribe`:
+
+    :::javascript
+    
+    // Subscribing to all channels provided by the foo-router
+    swampdragon.subscribe('foo-route', 'local-channel', null, function (context, data) {
+        // successfully subscribed
+    }, function (context, data) {
+        // subscription failed
+    });
+
+    // Unsubscribe
+    swampdragon.unsubscribe('foo-route', 'local-channel', null, function (context, data) {
+        // successfully unsubscribed
+    }, function (context, data) {
+        // unsubscribe failed
+    });
+    
+   
+`unsubscribe` will happen automatically if the connection is closed. If the browser window is closed or the user navigates away from the page
+
+
+### Call router
+
+There are predefined functions for getting lists, objects, creating and updating etc.
+Some times these functions doesn't suit your application. In these instances use `callRouter`.
+
+An example router that adds one to any value it's passed 
+
+
+    :::python
+    class FooRouter(BaseRouter):
+        route_name = 'foo-router'
+        valid_verbs = ['add_one']
+        
+    def add_one(self, value):
+        self.send({'result': value + 1})
+        
+
+The following JavaScript will call `add_one` and log the value to the console
+
+
+    :::javascript
+    swampdragon.callRouter('add_one', 'foo-router', {value: 10}, function (context, data) {
+        console.log(data.result);
+    });
+    
+    
+### Pre-defined functions for handling models
+
+In the case of a `ModelRouter` (or `ModelPublisherRouter`) there are pre-defined functions to handle manipulating instances of the model.
+
+
+#### getSingle
+
+`getSingle` asks for one instance of a model.
+
+Args: `route`, `data`, `success`, `failure`
+
+
+    :::javascript
+    swampdragon.getSingle(route, data, function (context, data) { ... }, function (context, data) { ... } );
+
+
+#### getList
+
+`getList` asks for a list of instances of a model.
+
+Args: `route`, `data`, `success`, `failure`
+
+
+    :::javascript
+    swampdragon.getList(route, data, function (context, data) { ... }, function (context, data) { ... } );
+
+
+#### getPagedList
+
+`getPagedList` asks for a paged list of instances of a model.
+
+Args: `route`, `data`, `page`, `success`, `failure`
+
+If no `page` argument is supplied it will default to one.
+
+
+    :::javascript
+    var pageNumber = 12;
+    swampdragon.getPagedList(route, data, pageNumber, function (context, data) { ... }, function (context, data) { ... } );
+
+
+#### create
+
+`create` an instance of a model 
+
+Args: `route`, `data`, `page`, `success`, `failure`
+
+
+    :::javascript
+    var data = {some_value: 12, other_value: 'hello world'};
+    swampdragon.create(route, data, function (context, data) { ... }, function (context, data) { ... } );
+
+
+By default `create` will respond with an instance of the newly created model (or errors if model creation failed)
+
+
+
+#### update
+
+`update` an instance of a model
+
+Args: `route`, `data`, `page`, `success`, `failure`
+
+
+    :::javascript
+    var data = {some_value: 12, other_value: 'hello world', id: 123};
+    swampdragon.update(route, data, function (context, data) { ... }, function (context, data) { ... } );
+
+
+#### delete
+
+`delete` an instance of a model
+
+Args: `route`, `data`, `page`, `success`, `failure`
+
+
+    :::javascript
+    var data = {id: 123};
+    swampdragon.delete(route, data, function (context, data) { ... }, function (context, data) { ... } );
