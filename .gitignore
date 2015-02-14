@@ -10,3 +10,4 @@ dist/
 .coverage
 SwampDragon.egg*
 pubpypi.sh
+node_modules/

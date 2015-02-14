@@ -112,3 +112,4 @@ TEMPLATE_DIRS = [
 ]
 
 SWAMP_DRAGON_CONNECTION = ('selfpub_example.sockserver.DataConnection', '/data')
+DRAGON_URL = 'http://localhost:9999/'

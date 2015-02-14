@@ -1,6 +1,7 @@
 var VanillaDragon = function(options) {
     options = options || {};
     var endpoint = window.swampdragon_settings.endpoint;
+    var host = window.swampdragon_host;
     var sdInstance = new SwampDragon(options);
 
     var _dragon = {
@@ -15,7 +16,7 @@ var VanillaDragon = function(options) {
         },
 
         connect: function() {
-            sdInstance.connect(window.swampdragon_host, endpoint)
+            sdInstance.connect(host, endpoint)
         },
 
         callRouter: function (verb, route, args, success, failure, channel) {

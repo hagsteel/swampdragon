@@ -1,3 +1,4 @@
+{% load swampdragon_tags %}
 <!DOCTYPE html>
 <html lang="en" ng-app="ChatApp">
 <head>
@@ -31,7 +32,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Project name</a>
+            <a class="navbar-brand" href="#">Chat example</a>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -52,19 +53,15 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}libs/angular-1.2.6/angular.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/vendor/sockjs-0.3.4.min.js"></script>
-<script type="text/javascript" src="http://localhost:9999/settings.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/swampdragon.js?v={% now 'u' %}"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/datamapper.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/angular/services.js?v={% now 'u' %}"></script>
+
+{% swampdragon_settings %}
+<script type="text/javascript" src="{{ STATIC_URL }}swampdragon/js/dist/swampdragon.js"></script>
 
 
-<script type="text/javascript" src="{{ STATIC_URL }}js/app.js?v={% now 'u' %}"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/chat-controllers.js"></script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/app.js"></script>
 
 </body>
 </html>

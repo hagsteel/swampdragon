@@ -1,0 +1,17 @@
+{
+    "name": "swampdragon",
+    "version": "0.3.9",
+    "description": "SwampDragon client",
+    "dependencies": {
+        "browserify-shim": "*"
+    },
+    "browserify": {
+        "transform": ["browserify-shim"]
+    },
+    "browser": {
+        "sockjs": "./vendor/sockjs-0.3.4.js"
+    },
+    "browserify-shim": {
+        "sockjs": "sockjs"
+    }
+}

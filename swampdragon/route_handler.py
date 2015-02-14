@@ -18,6 +18,10 @@ class UnexpectedVerbException(Exception):
     pass
 
 
+class RouteException(Exception):
+    pass
+
+
 class BaseRouter(object):
     valid_verbs = ['get_list', 'get_single', 'create', 'update', 'delete', 'subscribe', 'unsubscribe']
     exclude_verbs = []
@@ -323,4 +327,6 @@ def register(route):
 
 
 def get_route_handler(name):
+    if name not in registered_handlers:
+        raise RouteException('No route named "{}"'.format(name))
     return registered_handlers[name]

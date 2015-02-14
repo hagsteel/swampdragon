@@ -96,3 +96,5 @@ TEMPLATE_DIRS = [
 ]
 
 SWAMP_DRAGON_CONNECTION = ('chat_example.sockserver.DataConnection', '/data')
+
+DRAGON_URL = 'http://localhost:9999/'
