@@ -49,7 +49,6 @@ function onclose (data) {
     }
 
     setTimeout(function() {
-        console.log('trying again');
         if (connectionAttempt < 10) {
             connectionAttempt++;
             connect();

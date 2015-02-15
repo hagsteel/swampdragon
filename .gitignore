@@ -6,7 +6,6 @@ dev.sqlite3
 static_root/
 media/
 build/
-dist/
 .coverage
 SwampDragon.egg*
 pubpypi.sh
