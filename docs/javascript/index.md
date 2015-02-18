@@ -69,6 +69,21 @@ To start listening to a channel call `subscribe`:
 `unsubscribe` will happen automatically if the connection is closed. If the browser window is closed or the user navigates away from the page
 
 
+### On channel message
+
+Args: `channels`, `message`
+
+`channels` is a list of your channels (not the server channels, your local channels)
+`message` is the data provided by the server
+
+    :::javascript
+    swampdragon.onChannelMessage(function (channels, message) {
+        // 
+    });
+
+`onChannelMessage` is triggered every time some data is published.
+
+
 ### Call router
 
 There are predefined functions for getting lists, objects, creating and updating etc.
