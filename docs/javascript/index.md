@@ -73,7 +73,7 @@ To start listening to a channel call `subscribe`:
 
 Args: `channels`, `message`
 
-`channels` is a list of your channels (not the server channels, your local channels)
+`channels` is a list of your channels (not the server channels, your local channels used in `subscribe`)
 `message` is the data provided by the server
 
     :::javascript
@@ -82,6 +82,8 @@ Args: `channels`, `message`
     });
 
 `onChannelMessage` is triggered every time some data is published.
+
+
 
 
 ### Call router
