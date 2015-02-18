@@ -1,6 +1,6 @@
-# ModelPublisherRouter
+# ModelPubRouter
 
-The ```ModelPublisherRouter``` is similar to ```ModelRouter``` with one exceptions:
+The ```ModelPubRouter``` is similar to ```ModelRouter``` with one exceptions:
 the ModelPublisherRouter will publish data when a CRUD function is invoked on the router.
 
 This router is a good option when self-publishing models are not used.
@@ -10,12 +10,12 @@ If a model shouldn't be published unless certain criteria is met, it's better to
 
 Override the ```created```, ```updated``` and/or ```deleted``` function to handle the data being published.
 
-The benefits of using the ```ModelPublisherRouter``` instead of making every model a self-publishing model is 
+The benefits of using the ```ModelPubRouter``` instead of making every model a self-publishing model is 
 to have control over the publishing process.
 
 In the following scenario we only publish models that have a specific rating:
 
-    class FooRouter(ModelPublisherRouter):
+    class FooRouter(ModelPubRouter):
         model = Foo
         serializer_class = FooSerializer
         
