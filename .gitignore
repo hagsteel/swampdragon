@@ -10,3 +10,4 @@ build/
 SwampDragon.egg*
 pubpypi.sh
 node_modules/
+dist/SwampDragon-*
