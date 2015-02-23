@@ -1,6 +1,6 @@
 {
     "name": "swampdragon",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "SwampDragon client",
     "main": "./src/swampdragon.js",
     "dependencies": {
@@ -14,5 +14,8 @@
     },
     "browserify-shim": {
         "sockjs": "sockjs"
+    },
+    "scripts": {
+        "build": "browserify ./src/swampdragon.js -o ./dist/swampdragon.js -s swampdragon && yuglify ./dist/swampdragon.js"
     }
 }

@@ -5,7 +5,7 @@ var eventHandler = require('./event-handler'),
     channels = require('./channels'),
     connection = {},
     isReady = false,
-    connectionAttempts = 0;
+    connectionAttempt = 0;
 
 
 /********************************
@@ -28,6 +28,10 @@ function connect () {
     connection.socket.onopen = onopen;
     connection.socket.onclose = onclose;
     connection.socket.onmessage = onmessage;
+
+    window.onbeforeunload = function () {
+        connection.socket.close();
+    };
 }
 
 
