@@ -42,7 +42,7 @@ There are three connection related functions:
 *  `open`: execute every time the connection is opened
 *  `close`: execute every time the connection is closed / lost
 
-Wrapping your function calls in `swampdragon.ready(function () { ... });``` will queue up the call if the connection is not available.
+Wrapping your function calls in `swampdragon.ready(function () { ... });` will queue up the call if the connection is not available.
 Note that binding this call to something like a button click will queue up the call every time the button is clicked. 
 If the `onclick` event of the button triggers a writing router call (like create, update or delete) 
 and the end user clicks this button multiple times all these events will be executed once a connection is established.
