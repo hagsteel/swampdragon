@@ -1,6 +1,6 @@
 # JavaScript
 
-**note** if you are using a version before 0.4.0 use the legacy documentation
+**note** if you are using a version before 0.4.0 see the legacy JavaScript documentation
 
 
 ## Setup
@@ -31,7 +31,56 @@ Before calling a router, ensure that a connection is established
     :::javascript
     swampdragon.ready(function () {
         // connection established
-        // call subscribe or any other router calls
+    });
+
+
+## Connection related functions
+
+There are three connection related functions:
+
+*  `ready`: execute only once, and when the connection is ready
+*  `open`: execute every time the connection is opened
+*  `close`: execute every time the connection is closed / lost
+
+Wrapping your function calls in `swampdragon.ready(function () { ... });``` will queue up the call if the connection is not available.
+Note that binding this call to something like a button click will queue up the call every time the button is clicked. 
+If the `onclick` event of the button triggers a writing router call (like create, update or delete) 
+and the end user clicks this button multiple times all these events will be executed once a connection is established.
+ 
+It's better practice to disable the input and enable it once the connection is open (and disable it again if the connection is closed).
+
+
+### `ready`
+
+Wrapping your function calls in `ready` ensures that a connection is established before making any calls. 
+If no connection is available the call will be queued and executed once connected.
+
+
+    :::javascript
+    swampdragon.ready(function () {
+        swampdragon.callRouter(...) 
+    });
+
+
+### `open`
+
+`open` will execute every time a connection is established. This is a good place to put your `subscribe` calls as it will resubscribe to the channels if the connection is lost.
+
+
+    :::javascript
+    swampdragon.open(function () {
+        swampdragon.subscribe(...)
+    });
+
+
+### `close`
+
+`close` is called every time the connection is closed. This is useful as functionality depending on SwampDragon can be disabled until a connection is restablished. 
+
+
+    :::javascript
+    swampdragon.close(function () {
+        // Disable inputs depending on SwampDragon
     });
 
 

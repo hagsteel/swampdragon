@@ -5,7 +5,7 @@ var eventHandler = require('./event-handler'),
     channels = require('./channels'),
     connection = {},
     isReady = false,
-    connectionAttempt = 0;
+    connectionAttempts = 0;
 
 
 /********************************
@@ -28,23 +28,23 @@ function connect () {
     connection.socket.onopen = onopen;
     connection.socket.onclose = onclose;
     connection.socket.onmessage = onmessage;
-
-    window.onbeforeunload = function () {
-        connection.socket.close();
-    };
 }
 
 
-function onopen (callback) {
+function onopen () {
     connectionAttempt = 0;
     isReady = true;
     eventHandler.emit('open');
+    eventHandler.emitOnce('ready');
 }
 
 
 function onclose (data) {
     connection.socket = null;
     isReady = false;
+    if (connectionAttempt === 0) {
+        eventHandler.emit('close');
+    }
 
     if (data.code == 3001) {
         // The connection was aborted.
@@ -58,7 +58,6 @@ function onclose (data) {
             connect();
         }
     }, (connectionAttempt * 500) + 100);
-
 }
 
 function onmessage (e) {
@@ -81,28 +80,17 @@ function onmessage (e) {
     if ('channel_data' in e.data) {
         var channel_setup = e.data.channel_data,
             remote_chan;
-        for (i in channel_setup.remote_channels) {
-            remote_chan = channel_setup.remote_channels[i];
-            if (!(remote_chan in channels)) {
-                channels[remote_chan] = []
-            }
-            if (!(channel_setup.local_channel in channels[remote_chan])) {
-                channels[remote_chan].push(channel_setup.local_channel);
-            }
-        }
 
-        if (!(channel_setup.local_channel in channels)) {
-            channels[channel_setup.remote_channel] = channel_setup.local_channel;
-        }
+        channels.setupChannels(channel_setup);
     }
 
     /*******************
      * Channel message
      *******************/
     if ('channel' in e.data) {
-        var channel = channels[e.data.channel];
+        var localChannels = channels.getLocalChannels(e.data.channel);
         delete(e.data['channel']);
-        eventHandler.emit('channelMessage', [channel, e.data]);
+        eventHandler.emit('channelMessage', [localChannels, e.data]);
         return;
     }
 

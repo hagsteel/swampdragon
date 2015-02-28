@@ -12,11 +12,28 @@ var eventHandler = require('./event-handler');
 var swampdragon = swampdragon || {};
 
 
-swampdragon.ready = function (fn) {
+/*********************
+ * Connection setup
+ *********************/
+swampdragon.open = function (fn) {
     if (connection.ready()) {
         fn();
     } else {
         connection.on('open', fn);
+    }
+};
+
+
+swampdragon.close = function (fn) {
+    connection.on('close', fn);
+};
+
+
+swampdragon.ready = function (fn) {
+    if (connection.ready()) {
+        fn();
+    } else {
+        connection.on('ready', fn);
     }
 };
 
