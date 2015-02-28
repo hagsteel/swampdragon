@@ -1,7 +1,43 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.swampdragon = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var channels = {};
+var _channels = {};
 
-module.export = channels;
+
+function addRemoteChannel(remote, local) {
+    var i, shouldAdd = true;
+
+    if (remote in _channels) {
+        for (i = 0; i < _channels[remote].length; i += 1) {
+            if (_channels[remote][i] === local) {
+                return
+            }
+        }
+        _channels[remote].push(local)
+    } else {
+        _channels[remote] = [local];
+    }
+}
+
+
+function getLocalChannels(remote) {
+    return _channels[remote];
+}
+
+
+function setupChannels(channelSetup) {
+    var remoteChannels = channelSetup.remote_channels,
+        remoteChannelCount = channelSetup.remote_channels.length,
+        i;
+
+    for (i = 0; i < remoteChannelCount; i += 1) {
+        addRemoteChannel(remoteChannels[i], channelSetup.local_channel);
+    }
+}
+
+
+module.exports = {
+    setupChannels: setupChannels,
+    getLocalChannels: getLocalChannels
+};
 
 },{}],2:[function(require,module,exports){
 require('sockjs'); // browserify shim
@@ -11,7 +47,7 @@ var eventHandler = require('./event-handler'),
     channels = require('./channels'),
     connection = {},
     isReady = false,
-    connectionAttempt = 0;
+    connectionAttempts = 0;
 
 
 /********************************
@@ -34,23 +70,23 @@ function connect () {
     connection.socket.onopen = onopen;
     connection.socket.onclose = onclose;
     connection.socket.onmessage = onmessage;
-
-    window.onbeforeunload = function () {
-        connection.socket.close();
-    };
 }
 
 
-function onopen (callback) {
+function onopen () {
     connectionAttempt = 0;
     isReady = true;
     eventHandler.emit('open');
+    eventHandler.emitOnce('ready');
 }
 
 
 function onclose (data) {
     connection.socket = null;
     isReady = false;
+    if (connectionAttempt === 0) {
+        eventHandler.emit('close');
+    }
 
     if (data.code == 3001) {
         // The connection was aborted.
@@ -64,7 +100,6 @@ function onclose (data) {
             connect();
         }
     }, (connectionAttempt * 500) + 100);
-
 }
 
 function onmessage (e) {
@@ -87,28 +122,17 @@ function onmessage (e) {
     if ('channel_data' in e.data) {
         var channel_setup = e.data.channel_data,
             remote_chan;
-        for (i in channel_setup.remote_channels) {
-            remote_chan = channel_setup.remote_channels[i];
-            if (!(remote_chan in channels)) {
-                channels[remote_chan] = []
-            }
-            if (!(channel_setup.local_channel in channels[remote_chan])) {
-                channels[remote_chan].push(channel_setup.local_channel);
-            }
-        }
 
-        if (!(channel_setup.local_channel in channels)) {
-            channels[channel_setup.remote_channel] = channel_setup.local_channel;
-        }
+        channels.setupChannels(channel_setup);
     }
 
     /*******************
      * Channel message
      *******************/
     if ('channel' in e.data) {
-        var channel = channels[e.data.channel];
+        var localChannels = channels.getLocalChannels(e.data.channel);
         delete(e.data['channel']);
-        eventHandler.emit('channelMessage', [channel, e.data]);
+        eventHandler.emit('channelMessage', [localChannels, e.data]);
         return;
     }
 
@@ -154,21 +178,31 @@ function on(event, callback) {
     callbackQueue[event].push(callback);
 }
 
+
 function emit(event, args) {
     var queue = callbackQueue[event],
         i = 0, fn;
     if (queue === undefined) {
-        return;
+        return 0;
     }
     for (i = 0; i < queue.length; i += 1) {
         fn = queue[i];
         fn.apply(this, args);
     }
+    return queue.length;
 }
+
+
+function emitOnce(event, args) {
+    var eventCount = emit(event, args);
+    delete callbackQueue[event];
+}
+
 
 module.exports = {
     on: on,
     emit: emit,
+    emitOnce: emitOnce,
     getCallbackName: getCallbackName
 };
 
@@ -246,11 +280,28 @@ var eventHandler = require('./event-handler');
 var swampdragon = swampdragon || {};
 
 
-swampdragon.ready = function (fn) {
+/*********************
+ * Connection setup
+ *********************/
+swampdragon.open = function (fn) {
     if (connection.ready()) {
         fn();
     } else {
         connection.on('open', fn);
+    }
+};
+
+
+swampdragon.close = function (fn) {
+    connection.on('close', fn);
+};
+
+
+swampdragon.ready = function (fn) {
+    if (connection.ready()) {
+        fn();
+    } else {
+        connection.on('ready', fn);
     }
 };
 
