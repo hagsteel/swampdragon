@@ -2,20 +2,22 @@
 
 The base model router is used to create, read, update and delete Django models.
 
-    class FooModelRouter(ModelRouter):
-        route_name = 'foo-model'
-        serializer_class = FooModelSerializer
-        model = FooModel
-    
-        def get_object(self, **kwargs):
-            return self.model.objects.get(pk=kwargs['pk'])
-    
-        def get_query_set(self, **kwargs):
-            return self.model.objects.all()
-    
-    
-    route_handler.register(FooModelRouter)
+```python
 
+class FooModelRouter(ModelRouter):
+    route_name = 'foo-model'
+    serializer_class = FooModelSerializer
+    model = FooModel
+
+    def get_object(self, **kwargs):
+        return self.model.objects.get(pk=kwargs['pk'])
+
+    def get_query_set(self, **kwargs):
+        return self.model.objects.all()
+
+
+route_handler.register(FooModelRouter)
+```
 
 It is also the recommended router for self-publishing models as it won't publish when ```updated``` is invoked.
 
