@@ -1,29 +1,33 @@
-# Pagination
+# Pagination #
 
 
-## Route handler
+## Route handler ##
 
 Adding pagination is simple.
 
-Set ```paginate_by=<num>``` in your route handler.
+Set `paginate_by=<num>` in your route handler.
 
-    class FooRoute(ModelRouter):
-        ...
-        paginate_by=10
+```python
+class FooRoute(ModelRouter):
+    (...)
+    paginate_by=10
+```
 
+## Javascript ##
 
-## Javascript
+Set `_page=<num>` when calling get_list
 
-Set ```_page=<num>``` when calling get_list
+```javascript
+(...)
+var args = {'_page': 1};
+swampDragon.get_list(route, args, callbackName)
+```
 
-    ...
-    var args = {'_page': 1};
-    swampDragon.get_list(route, args, callbackName)
+## Angular ##
 
-
-## Angular
-
-        var page = 1;
-        dataService.getPagedList(route, {}, page).then(function (response) {
-            // handle data
-        });
+```javascript
+var page = 1;
+dataService.getPagedList(route, {}, page).then(function (response) {
+    // handle data
+});
+```

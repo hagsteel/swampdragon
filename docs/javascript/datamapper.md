@@ -1,11 +1,10 @@
-# DataMapper
+# DataMapper #
 
-The ```DataMapper``` is used to map model data.
+The `DataMapper` is used to map model data.
 
-When calling ```subscribe``` on a model router, it will answer with an object map.
+When calling `subscribe` on a model router, it will answer with an object map.
 
 ```javascript
-
 swampdragon.subscribe('foo-route', 'local-channel', null, function (context, data) {
     this.dataMapper = new DataMapper(data);
 });
