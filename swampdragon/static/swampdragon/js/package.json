@@ -16,6 +16,7 @@
         "sockjs": "sockjs"
     },
     "scripts": {
-        "build": "browserify ./src/swampdragon.js -o ./dist/swampdragon.js -s swampdragon && yuglify ./dist/swampdragon.js"
+        "build": "browserify ./src/swampdragon.js -o ./dist/swampdragon.js -s swampdragon && yuglify ./dist/swampdragon.js",
+        "watch": "watchify ./src/swampdragon.js -o ./dist/swampdragon.js -s swampdragon -d -v"
     }
 }
