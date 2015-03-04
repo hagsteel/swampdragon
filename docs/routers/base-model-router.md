@@ -1,35 +1,40 @@
-# ModelRouter
+# ModelRouter #
 
 The base model router is used to create, read, update and delete Django models.
 
-    class FooModelRouter(ModelRouter):
-        route_name = 'foo-model'
-        serializer_class = FooModelSerializer
-        model = FooModel
-    
-        def get_object(self, **kwargs):
-            return self.model.objects.get(pk=kwargs['pk'])
-    
-        def get_query_set(self, **kwargs):
-            return self.model.objects.all()
-    
-    
-    route_handler.register(FooModelRouter)
+```python
+from swampdragon import route_handler
+from swampdragon.route_handler import ModelRouter
 
 
-It is also the recommended router for self-publishing models as it won't publish when ```updated``` is invoked.
+class FooModelRouter(ModelRouter):
+    route_name = 'foo-model'
+    serializer_class = FooModelSerializer
+    model = FooModel
 
-Both the ```ModelRouter``` and the ```ModelPublisherRouter``` requires a model and serializer class.
+    def get_object(self, **kwargs):
+        return self.model.objects.get(pk=kwargs['pk'])
+
+    def get_query_set(self, **kwargs):
+        return self.model.objects.all()
 
 
-## get_object and get_query_set
+route_handler.register(FooModelRouter)
+```
 
-The ```get_object``` and ```get_query_set``` function is analogous to Django's class based views.
+It is also the recommended router for self-publishing models as it won't publish when `updated` is invoked.
 
-By default a router provides verbs for ```get_single``` and ```get_list```. Rather than overriding these function,
+Both the `ModelRouter` and the `ModelPublisherRouter` requires a model and serializer class.
+
+
+## get_object and get_query_set ##
+
+The `get_object` and `get_query_set` function is analogous to Django's class based views.
+
+By default a router provides verbs for `get_single` and `get_list`. Rather than overriding these function,
 simply define get_object or get_query_set.
 
-If a router is either a ```ModelRouter``` or a ```ModelPublisherRouter``` and all the default verbs are
+If a router is either a `ModelRouter` or a `ModelPublisherRouter` and all the default verbs are
 available, SwampDragon will raise an exception when you try to start the server if get_single and get_query_set are
 both missing.
 
