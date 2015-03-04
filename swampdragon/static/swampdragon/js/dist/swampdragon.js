@@ -1,9 +1,11 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.swampdragon = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var _channels = {};
+var _channels = {},
+    CHANNEL_DATA_SUBSCRIBE = 'subscribe',
+    CHANNEL_DATA_UNSUBSCRIBE = 'unsubscribe';
 
 
 function addRemoteChannel(remote, local) {
-    var i, shouldAdd = true;
+    var i;
 
     if (remote in _channels) {
         for (i = 0; i < _channels[remote].length; i += 1) {
@@ -18,6 +20,11 @@ function addRemoteChannel(remote, local) {
 }
 
 
+function removeRemoteChannel(remote, local) {
+    delete _channels[remote];
+}
+
+
 function getLocalChannels(remote) {
     return _channels[remote];
 }
@@ -29,7 +36,12 @@ function setupChannels(channelSetup) {
         i;
 
     for (i = 0; i < remoteChannelCount; i += 1) {
-        addRemoteChannel(remoteChannels[i], channelSetup.local_channel);
+        if (channelSetup.action === CHANNEL_DATA_SUBSCRIBE) {
+            addRemoteChannel(remoteChannels[i], channelSetup.local_channel);
+        }
+        if (channelSetup.action === CHANNEL_DATA_UNSUBSCRIBE) {
+            removeRemoteChannel(remoteChannels[i], channelSetup.local_channel);
+        }
     }
 }
 
