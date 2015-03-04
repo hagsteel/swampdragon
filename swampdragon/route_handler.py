@@ -9,6 +9,9 @@ SUCCESS = 'success'
 ERROR = 'error'
 LOGIN_REQUIRED = 'login_required'
 
+CHANNEL_DATA_SUBSCRIBE = 'subscribe'
+CHANNEL_DATA_UNSUBSCRIBE = 'unsubscribe'
+
 registered_handlers = {}
 
 publisher = get_publisher()
@@ -33,8 +36,8 @@ class BaseRouter(object):
         self.connection = connection
         self.context = dict()
 
-    def make_channel_data(self, client_channel, server_channels):
-        return {'local_channel': client_channel, 'remote_channels': server_channels}
+    def make_channel_data(self, client_channel, server_channels, action):
+        return {'local_channel': client_channel, 'remote_channels': server_channels, 'action': action}
 
     @classmethod
     def get_name(cls):
@@ -118,7 +121,7 @@ class BaseRouter(object):
         server_channels = self.get_subscription_channels(**kwargs)
         self.send(
             data='subscribed',
-            channel_setup=self.make_channel_data(client_channel, server_channels),
+            channel_setup=self.make_channel_data(client_channel, server_channels, CHANNEL_DATA_SUBSCRIBE),
             **kwargs)
         self.connection.pub_sub.subscribe(server_channels, self.connection)
 
@@ -127,7 +130,7 @@ class BaseRouter(object):
         server_channels = self.get_subscription_channels(**kwargs)
         self.send(
             data='unsubscribed',
-            channel_setup=self.make_channel_data(client_channel, server_channels),
+            channel_setup=self.make_channel_data(client_channel, server_channels, CHANNEL_DATA_UNSUBSCRIBE),
             **kwargs
         )
         self.connection.pub_sub.unsubscribe(server_channels, self.connection)
@@ -251,7 +254,7 @@ class BaseModelRouter(BaseRouter):
         client_channel = kwargs.pop('channel')
         server_channels = make_channels(self.serializer_class, self.include_related, self.get_subscription_contexts(**kwargs))
         data = self.serializer_class.get_object_map(self.include_related)
-        channel_setup = self.make_channel_data(client_channel, server_channels)
+        channel_setup = self.make_channel_data(client_channel, server_channels, CHANNEL_DATA_SUBSCRIBE)
         self.send(
             data=data,
             channel_setup=channel_setup,
@@ -264,7 +267,7 @@ class BaseModelRouter(BaseRouter):
         server_channels = make_channels(self.serializer_class, self.include_related, self.get_subscription_contexts(**kwargs))
         self.send(
             data='unsubscribed',
-            channel_setup=self.make_channel_data(client_channel, server_channels),
+            channel_setup=self.make_channel_data(client_channel, server_channels, CHANNEL_DATA_UNSUBSCRIBE),
             **kwargs)
         self.connection.pub_sub.unsubscribe(server_channels, self.connection)
 
