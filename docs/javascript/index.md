@@ -14,7 +14,7 @@ Add the following code to your template:
     <body>
     ...
     {% swampdragon_settings %}
-    <script type="text/javascript" src="{% static 'swampdragon/js/dist/swampdragon.min.js` %}"></script>
+    <script type="text/javascript" src="{% static 'swampdragon/js/dist/swampdragon.min.js' %}"></script>
     </body>
     </html>    
 
