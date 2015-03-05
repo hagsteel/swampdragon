@@ -1,5 +1,13 @@
 from tornado.web import RequestHandler
 from swampdragon.default_settings import SwampDragonSettings
+from django.conf import settings as django_settings
+
+
+def get_host():
+    host = django_settings.DRAGON_URL
+    if host.endswith('/'):
+        return host[:-1]
+    return host
 
 
 class SettingsHandler(RequestHandler):
@@ -8,10 +16,9 @@ class SettingsHandler(RequestHandler):
 
     def get(self, *args, **kwargs):
         data = '''window.swampdragon_settings = {settings};
-window.swampdragon_host = "{protocol}://{host}";
+window.swampdragon_host = "{host}";
 '''.format(**{
             'settings': SwampDragonSettings().to_dict(),
-            'host': self.request.headers['Host'],
-            'protocol': self.request.protocol,
+            'host': get_host()
         })
         self.write(data)
