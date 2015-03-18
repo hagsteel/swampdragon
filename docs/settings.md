@@ -44,7 +44,8 @@ Redis port, default is 6379
 ### ```SWAMP_DRAGON_REDIS_DB```
 
 Redis database number, default is 0. 
-Note that this does not have any effect on Redis PUBSUB.
+
+**Note** that this does not have any effect on Redis PUBSUB.
 
 
 ### ```SWAMP_DRAGON_HOST```
