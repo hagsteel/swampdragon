@@ -7,7 +7,7 @@ from swampdragon.serializers.object_map import get_object_map
 from swampdragon.serializers.serializer import Serializer
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
-from swampdragon.serializers.serializer_tools import get_serializer_relationship_field, get_id_mappings
+from swampdragon.serializers.serializer_tools import get_id_mappings
 from swampdragon.serializers.validation import ModelValidationError
 
 

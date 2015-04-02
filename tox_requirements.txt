@@ -1,0 +1,10 @@
+sockjs-tornado >= 1.0.0
+Tornado >= 3.2.2
+tornado-redis >= 2.4.18
+redis >= 2.8
+python-dateutil >= 2.2
+pytest-django==2.8.0
+pytest==2.6.4
+pytest-cov==1.6
+git+git://github.com/mverteuil/pytest-ipdb.git
+flake8==2.2.2
