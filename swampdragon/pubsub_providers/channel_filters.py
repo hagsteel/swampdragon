@@ -1,7 +1,7 @@
 try:
-    from urllib.parse import quote_plus, unquote_plus
+    from urllib.parse import unquote_plus
 except ImportError:
-    from urllib import quote_plus, unquote_plus
+    from urllib import unquote_plus
 
 
 def term_match_check(term, val, option):

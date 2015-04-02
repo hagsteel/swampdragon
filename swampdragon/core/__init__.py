@@ -1,6 +1,6 @@
 from django.core.management import call_command
 import sys
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname
 from os import path
 import os
 

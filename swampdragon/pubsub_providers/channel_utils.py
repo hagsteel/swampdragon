@@ -3,9 +3,9 @@ from .channel_filters import filter_options, in_compare, term_match_check
 
 
 try:
-    from urllib.parse import quote_plus, unquote_plus
+    from urllib.parse import quote_plus
 except ImportError:
-    from urllib import quote_plus, unquote_plus
+    from urllib import quote_plus
 
 
 def make_safe(val):
