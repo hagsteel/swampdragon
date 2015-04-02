@@ -1,5 +1,5 @@
 from swampdragon.default_settings import SwampDragonSettings
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 
 
 class TestJavaScriptSettings(DragonTestCase):

@@ -1,4 +1,4 @@
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import SDModel, ParentModel, ChildModel
 from django.db import models
 from swampdragon.serializers.model_serializer import ModelSerializer

@@ -1,6 +1,6 @@
 from swampdragon.connections.sockjs_connection import SubscriberConnection
 from swampdragon.route_handler import BaseRouter, UnexpectedVerbException
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from swampdragon import route_handler
 import uuid
 

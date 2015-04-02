@@ -1,4 +1,4 @@
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from swampdragon.route_handler import BaseRouter, LOGIN_REQUIRED, SUCCESS, ERROR
 from swampdragon.permissions import login_required, LoginRequired, RoutePermission
 

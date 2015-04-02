@@ -1,7 +1,7 @@
 from swampdragon import discover_routes
 from swampdragon import route_handler
 from swampdragon.pubsub_providers.subscriber_factory import get_subscription_provider
-from .mock_connection import TestConnection
+from swampdragon.connections.mock_connection import TestConnection
 from django.test import TestCase
 from django.conf import settings
 from django.utils.importlib import import_module
@@ -15,6 +15,7 @@ pub_sub = get_subscription_provider()
 class DragonTestCase(TestCase):
     def __init__(self, methodName='runTest'):
         super(DragonTestCase, self).__init__(methodName)
+
         pub_sub._channels = []
         pub_sub._subscribers = {}
         self.connection = TestConnection()

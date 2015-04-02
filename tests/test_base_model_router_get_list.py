@@ -1,6 +1,6 @@
 from swampdragon.serializers.model_serializer import ModelSerializer
 from swampdragon.route_handler import BaseModelRouter
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import TextModel
 
 

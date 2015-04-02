@@ -1,5 +1,5 @@
 from swampdragon.route_handler import BaseRouter
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from swampdragon.pubsub_providers.data_publisher import publish_data
 
 

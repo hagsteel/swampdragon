@@ -2,7 +2,7 @@ from swampdragon.serializers.model_serializer import ModelSerializer
 from swampdragon.serializers.validation import ModelValidationError
 from swampdragon.route_handler import ModelRouter, ERROR
 from swampdragon import route_handler
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import TwoFieldModel
 
 

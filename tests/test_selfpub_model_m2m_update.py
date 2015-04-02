@@ -1,6 +1,6 @@
 from swampdragon.models import SelfPublishModel
 from swampdragon.serializers.model_serializer import ModelSerializer
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import SDModel
 from django.db import models
 from swampdragon import route_handler

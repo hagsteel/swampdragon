@@ -42,7 +42,8 @@ def pytest_configure():
             'django.contrib.auth.hashers.CryptPasswordHasher',
         ),
 
-        SWAMP_DRAGON_CONNECTION=('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data')
+        SWAMP_DRAGON_CONNECTION=('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data'),
+        SWAMPDRAGON_TESTMODE=True
     )
 
     try:

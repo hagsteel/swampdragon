@@ -1,6 +1,6 @@
 from swampdragon.route_handler import BaseRouter, BaseModelRouter
 from swampdragon import route_handler
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 
 
 class Router(BaseRouter):

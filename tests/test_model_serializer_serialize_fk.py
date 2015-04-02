@@ -1,5 +1,5 @@
 from swampdragon.serializers.model_serializer import ModelSerializer
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import ParentModel, ChildModel
 
 

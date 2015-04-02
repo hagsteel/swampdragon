@@ -1,6 +1,6 @@
 from swampdragon.route_handler import ModelRouter
 from swampdragon.pubsub_providers.base_provider import PUBACTIONS
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import FooSelfPub, BarSelfPub
 from .serializers import FooSelfPubSerializer, BarSelfPubSerializer
 from datetime import datetime

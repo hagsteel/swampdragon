@@ -1,5 +1,5 @@
 from swampdragon.route_handler import BaseRouter, ERROR, SUCCESS, LOGIN_REQUIRED
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 
 
 class FooRouter(BaseRouter):

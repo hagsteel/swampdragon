@@ -1,6 +1,6 @@
 from swampdragon.pubsub_providers.base_provider import PUBACTIONS
 from swampdragon.route_handler import BaseRouter
-from .dragon_test_case import DragonTestCase
+from swampdragon.testing.dragon_testcase import DragonTestCase
 
 
 class FooRouter(BaseRouter):
