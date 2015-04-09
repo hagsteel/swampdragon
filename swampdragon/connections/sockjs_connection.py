@@ -4,6 +4,7 @@ from tornado.ioloop import PeriodicCallback
 from ..pubsub_providers.subscriber_factory import get_subscription_provider
 from .. import route_handler
 from ..sessions.sessions import get_session_store
+from ..same_origin import set_origin_connection, test_origin
 import json
 
 
@@ -49,7 +50,14 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
         self.session_store = session_store(self)
         self.pub_sub = get_subscription_provider()
 
+    def _close_invalid_origin(self):
+        self.close(4000, message='Invalid origin')
+
     def on_open(self, request):
+        if not set_origin_connection(request, self):
+            self._close_invalid_origin()
+            return
+
         super(SubscriberConnection, self).on_open(request)
         if is_heartbeat_enabled():
             self.periodic_callback = PeriodicCallback(self.send_heartbeat, get_heartbeat_frequency())
@@ -67,6 +75,9 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
         self.pub_sub.close(self)
 
     def on_message(self, data):
+        if not test_origin(self):
+            self._close_invalid_origin()
+
         try:
             data = self.to_json(data)
             if data == {'heartbeat': '1'}:
