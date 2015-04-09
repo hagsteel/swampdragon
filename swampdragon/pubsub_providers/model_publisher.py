@@ -10,9 +10,6 @@ def publish_model(model_instance, serializer, action, changed_fields=None):
     if action is PUBACTIONS.updated and not changed_fields:
         return
 
-    # if hasattr(serializer, '_cache'):
-    #     serializer.remove_from_cache()
-
     base_channel = serializer.get_base_channel()
     all_model_channels = publisher.get_channels(base_channel)
     channels = filter_channels_by_model(all_model_channels, model_instance)
@@ -31,3 +28,4 @@ def publish_model(model_instance, serializer, action, changed_fields=None):
         publish_data['action'] = PUBACTIONS.deleted
         for channel in remove_from_channels:
             publisher.publish(channel, publish_data)
+            publish_data['channel'] = channel
