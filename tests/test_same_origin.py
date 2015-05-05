@@ -1,11 +1,8 @@
 from http.cookies import SimpleCookie
 from django.conf import settings
 from sockjs.tornado.session import ConnectionInfo
-from tornado.httpclient import HTTPRequest
 from swampdragon.connections.sockjs_connection import SubscriberConnection
-from swampdragon.route_handler import BaseRouter, UnexpectedVerbException
-from swampdragon.testing.dragon_testcase import DragonTestCase, DragonTestCaseAsync
-from swampdragon import route_handler
+from swampdragon.testing.dragon_testcase import DragonTestCaseAsync
 import uuid
 
 

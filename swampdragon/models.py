@@ -1,3 +1,4 @@
+from django.db.models import ForeignKey
 from .pubsub_providers.base_provider import PUBACTIONS
 from .model_tools import get_property
 from .pubsub_providers.model_publisher import publish_model
@@ -39,13 +40,15 @@ class SelfPublishModel(object):
         This is used to save the state of the model before it's updated,
         to be able to get changes used when publishing an update (so not all fields are published)
         """
-        # update_fields = list(self._serializer.opts.update_fields)
-        # publish_fields = list(self._serializer.opts.publish_fields)
-        # relevant_fields = set(update_fields + publish_fields)
         relevant_fields = self._serializer.base_fields
 
         if 'id' in relevant_fields:
             relevant_fields.remove('id')
+
+        for field_name in relevant_fields:
+            field = self._meta.get_field_by_name(field_name)[0]
+            if isinstance(field, ForeignKey):
+                relevant_fields.remove(field_name)
 
         return relevant_fields
 
