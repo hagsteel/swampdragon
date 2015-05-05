@@ -32,6 +32,7 @@ def pytest_configure():
 
             'tests',
             'swampdragon',
+            'rest_framework',
         ),
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.SHA1PasswordHasher',

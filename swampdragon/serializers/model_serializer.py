@@ -50,7 +50,8 @@ class ModelSerializer(Serializer):
         self.base_fields = self._get_base_fields()
         self.m2m_fields = self._get_m2m_fields()
         self.related_fields = self._get_related_fields()
-        self.errors = {}
+        self.errors = None
+        self._validated = False
 
     class Meta(object):
         pass
@@ -87,21 +88,26 @@ class ModelSerializer(Serializer):
                 self.validate_field(key, val, self.data)
                 self._deserialize_field(key, val)
             except ModelValidationError as err:
+                if self.errors is None:
+                    self.errors = {}
                 self.errors.update(err.get_error_dict())
-
-        if self.errors:
-            raise ModelValidationError(errors=self.errors)
 
         return self.instance
 
-    def save(self):
+    def is_valid(self):
         self.deserialize()
-        if self.errors:
-            raise ModelValidationError(self.errors)
         try:
             self.instance.clean_fields()
         except ValidationError as e:
-            raise ModelValidationError(e.message_dict)
+            self.errors = e.message_dict
+        self._validated = True
+        return self.errors is None
+
+    def save(self):
+        if not self._validated:
+            self.is_valid()
+        if self.errors:
+            raise ModelValidationError(self.errors)
         self.instance.save()
 
         # Serialize related fields

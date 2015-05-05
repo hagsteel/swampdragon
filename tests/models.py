@@ -37,3 +37,7 @@ class BarSelfPub(SelfPublishModel, SDModel):
     serializer_class = BarSelfPubSerializer
     date = models.DateTimeField()
     foo = models.ForeignKey(FooSelfPub, related_name='bars')
+
+
+class DRFModel(SDModel):
+    name = models.CharField(max_length=100)
