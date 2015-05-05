@@ -45,9 +45,18 @@ def get_object_map(serializer, ignore_serializer_pairs=None):
         is_reverse_m2m = isinstance(field_type, ReverseManyRelatedObjectsDescriptor)
 
         if is_fk:
-            model = field_type.field.related.parent_model
+            # Django 1.8:
+            # the related.parent_model is related.model in Django 1.8
+            if hasattr(field_type.field.related, 'parent_model'):
+                model = field_type.field.related.parent_model
+            else:
+                model = field_type.field.related.model
             is_collection = False
-            attname = field_type.field.related.var_name
+
+            if hasattr(field_type.field.related, 'var_name'):
+                attname = field_type.field.related.var_name
+            else:
+                attname = field_type.field.rel.name
 
         if is_o2o:
             model = field_type.related.model
@@ -65,18 +74,19 @@ def get_object_map(serializer, ignore_serializer_pairs=None):
             attname = field_type.related.field.name
 
         if is_reverse_m2m:
-            model = field_type.field.related.parent_model
+            # Django 1.8:
+            # the related.parent_model is related.model in Django 1.8
+            if hasattr(field_type.field.related, 'parent_model'):
+                model = field_type.field.related.parent_model
+            else:
+                model = field_type.field.related.model
             is_collection = True
-            attname = field_type.field.related.var_name
 
-        # if hasattr(field, 'related'):
-        #     model = field.related.model
-        #     attname = field.related.field.name
-        #     is_collection = True
-        # else:
-        #     model = field.field.related.parent_model
-        #     attname = field.field.related.var_name
-        #     is_collection = False
+            if hasattr(field_type.field.related, 'var_name'):
+                attname = field_type.field.related.var_name
+            else:
+                attname = field_type.field.rel.name
+
         graph.append(
             _construct_graph(
                 serializer_instance.opts.model._meta.model_name,

@@ -1,3 +1,6 @@
+VERSION = (0, 4, 2)
+
+
 def discover_routes():
     from swampdragon import route_handler
     """

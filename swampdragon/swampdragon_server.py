@@ -3,8 +3,22 @@ from django.conf import settings
 from django.utils.importlib import import_module
 from tornado import web, ioloop
 from sockjs.tornado import SockJSRouter
-from swampdragon import discover_routes, load_field_deserializers
+from swampdragon import discover_routes, load_field_deserializers, VERSION
 from swampdragon.settings_provider import SettingsHandler
+
+
+def _output_server(host, port):
+    """
+    Print info about the current instance
+    of SwampDragon
+    """
+    print('-------- SwampDragon ------')
+    print('Running SwampDragon on {}:{}'.format(host, port))
+    print('DRAGON_URL: {}'.format(settings.DRAGON_URL))
+    print('Version {}'.format('.'.join([str(v) for v in VERSION])))
+    print('Debug: {}'.format(settings.DEBUG))
+    print('Quit the server with ctrl+c')
+    print('---------------------------')
 
 
 def run_server(host_port=None):
@@ -47,7 +61,9 @@ Update your settings and add SWAMP_DRAGON_CONNECTION.
 
     app = web.Application(urls, **app_settings)
     app.listen(PORT, address=HOST, no_keep_alive=False)
-    print('Running SwampDragon on {}:{}'.format(HOST, PORT))
+
+    _output_server(host=HOST, port=PORT)
+
     try:
         iol = ioloop.IOLoop.instance()
         iol.start()

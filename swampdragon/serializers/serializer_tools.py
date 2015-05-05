@@ -2,7 +2,8 @@ from collections import namedtuple
 from django.db.models.fields.related import ForeignKey, ReverseSingleRelatedObjectDescriptor, \
     ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor, ForeignRelatedObjectsDescriptor, \
     SingleRelatedObjectDescriptor
-from django.db.models.related import RelatedObject
+# from django.db.models.related import RelatedObject
+from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.fields.related import ManyToManyField
 
 
@@ -12,7 +13,7 @@ class FieldType(namedtuple('FieldType', 'field, model, fk, m2m')):
     '''
     @property
     def is_m2m(self):
-        return self.fk is False and self.m2m is True and isinstance(self.field, RelatedObject)
+        return self.fk is False and self.m2m is True and isinstance(self.field, ForeignObjectRel)
 
     @property
     def is_reverse_m2m(self):
@@ -24,7 +25,7 @@ class FieldType(namedtuple('FieldType', 'field, model, fk, m2m')):
 
     @property
     def is_reverse_fk(self):
-        return self.fk is False and self.m2m is False and isinstance(self.field, RelatedObject)
+        return self.fk is False and self.m2m is False and isinstance(self.field, ForeignObjectRel)
 
 
 def get_serializer_relationship_field(serializer, related_serializer):
