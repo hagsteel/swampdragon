@@ -3,7 +3,6 @@ from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
     ReverseManyRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor
 from swampdragon.model_tools import get_property, get_model
 from swampdragon.serializers.field_serializers import serialize_field
-from swampdragon.serializers.object_map import get_object_map
 from swampdragon.serializers.serializer import Serializer
 from swampdragon.serializers.serializer_importer import get_serializer
 from swampdragon.serializers.field_deserializers import get_deserializer
@@ -219,10 +218,6 @@ class ModelSerializer(Serializer):
 
         # Serialize the field
         return serialize_field(val)
-
-    @classmethod
-    def get_object_map(cls, include_serializers=None, ignore_serializers=None):
-        return get_object_map(cls, ignore_serializers)
 
     @classmethod
     def get_base_channel(cls):

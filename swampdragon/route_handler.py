@@ -4,6 +4,7 @@ from .pubsub_providers.base_provider import PUBACTIONS
 from .message_format import format_message
 from .pubsub_providers.model_channel_builder import make_channels, filter_channels_by_model, filter_channels_by_dict
 from .serializers.validation import ModelValidationError
+from .serializers.object_map import get_object_map
 
 SUCCESS = 'success'
 ERROR = 'error'
@@ -253,7 +254,7 @@ class BaseModelRouter(BaseRouter):
     def subscribe(self, **kwargs):
         client_channel = kwargs.pop('channel')
         server_channels = make_channels(self.serializer_class, self.include_related, self.get_subscription_contexts(**kwargs))
-        data = self.serializer_class.get_object_map(self.include_related)
+        data = get_object_map(self.serializer_class, self.include_related[:])
         channel_setup = self.make_channel_data(client_channel, server_channels, CHANNEL_DATA_SUBSCRIBE)
         self.send(
             data=data,

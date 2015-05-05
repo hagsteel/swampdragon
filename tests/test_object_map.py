@@ -1,3 +1,4 @@
+from swampdragon.serializers.object_map import get_object_map
 from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import SDModel, ParentModel, ChildModel
 from django.db import models
@@ -71,23 +72,23 @@ class ChildSerializerOM(ModelSerializer):
 
 class TestObjectMap(DragonTestCase):
     def test_get_object_map_for_one2one(self):
-        om = FooSerializerOM.get_object_map()
+        om = get_object_map(FooSerializerOM)
         for m in om:
             self.assertFalse(m['is_collection'])
 
     def test_get_object_map_for_reverse_one2one(self):
-        om = BarSerializerOM.get_object_map()
+        om = get_object_map(BarSerializerOM)
         for m in om:
             self.assertFalse(m['is_collection'])
 
     def test_get_object_map_for_fk(self):
-        om = ChildSerializerOM.get_object_map()
+        om = get_object_map(ChildSerializerOM)
         self.assertEqual(len(om), 2)
 
     def test_get_object_map_for_reverse_fk(self):
-        om = ParentSerializerOM.get_object_map()
+        om = get_object_map(ParentSerializerOM)
         self.assertEqual(len(om), 2)
 
     def test_get_object_map_form_m2m(self):
-        om = FooM2MSerializer.get_object_map()
+        om = get_object_map(FooM2MSerializer)
         self.assertEqual(len(om), 2)

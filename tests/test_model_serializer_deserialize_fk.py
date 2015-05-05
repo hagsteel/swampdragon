@@ -1,4 +1,5 @@
 from swampdragon.serializers.model_serializer import ModelSerializer
+from swampdragon.serializers.object_map import get_object_map
 from swampdragon.testing.dragon_testcase import DragonTestCase
 from .models import SDModel
 from django.db import models
@@ -60,7 +61,7 @@ class TestModelSerializer(DragonTestCase):
         The object map should return information on how to map parents to children
         and vice versa
         """
-        object_map = ParentSerializer.get_object_map()
+        object_map = get_object_map(ParentSerializer)
         self.assertLessEqual(len(object_map), 2)
         for om in object_map:
             self.assertIn('via', om)
