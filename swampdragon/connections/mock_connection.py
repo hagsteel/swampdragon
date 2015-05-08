@@ -80,9 +80,10 @@ class TestConnection(object):
             return None
         return last_pub['data']
 
-    def subscribe(self, route, client_channel, subscription_data):
+    def subscribe(self, route, client_channel, subscription_data=None):
         data = {'route': route, 'verb': 'subscribe', 'args': {'channel': client_channel}}
-        data['args'].update(subscription_data)
+        if subscription_data:
+            data['args'].update(subscription_data)
         self.client_send(data)
 
     def unsubscribe(self, route, client_channel, subscription_data):
