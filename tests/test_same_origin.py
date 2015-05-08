@@ -1,4 +1,8 @@
-from http.cookies import SimpleCookie
+try:
+    from http.cookies import SimpleCookie
+except ImportError:
+    from Cookie import SimpleCookie
+
 from django.conf import settings
 from sockjs.tornado.session import ConnectionInfo
 from swampdragon.connections.sockjs_connection import SubscriberConnection
