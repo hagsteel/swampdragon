@@ -1,4 +1,3 @@
-from django.conf import settings
 from ..model_tools import string_to_list, get_property
 from .channel_filters import filter_options, in_compare, term_match_check
 
