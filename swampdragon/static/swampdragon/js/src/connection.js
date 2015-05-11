@@ -100,7 +100,7 @@ function onmessage (e) {
     if ('data' in e && 'heartbeat' in e['data']) {
         if (e.data.heartbeat == 1) {
             connection.socket.send(JSON.stringify(e.data));
-            eventHandler.emit('heartbeat', [channel, e.data]);
+            eventHandler.emit('heartbeat', [e.data]);
             return;
         }
     }
