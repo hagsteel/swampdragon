@@ -74,15 +74,28 @@ class TestObjectMap(DragonTestCase):
         om = FooSerializerOM.get_object_map()
         for m in om:
             self.assertFalse(m['is_collection'])
+            if m['parent_type'] == 'fooone2oneom':
+                self.assertEqual(m['child_type'], 'barone2oneom')
+            else:
+                self.assertEqual(m['child_type'], 'fooone2oneom')
 
     def test_get_object_map_for_reverse_one2one(self):
         om = BarSerializerOM.get_object_map()
         for m in om:
             self.assertFalse(m['is_collection'])
+            if m['parent_type'] == 'fooone2oneom':
+                self.assertEqual(m['child_type'], 'barone2oneom')
+            else:
+                self.assertEqual(m['child_type'], 'fooone2oneom')
 
     def test_get_object_map_for_fk(self):
         om = ChildSerializerOM.get_object_map()
         self.assertEqual(len(om), 2)
+        for m in om:
+            if m['parent_type'] == 'parentmodel':
+                self.assertEqual(m['child_type'], 'childmodel')
+            else:
+                self.assertEqual(m['child_type'], 'parentmodel')
 
     def test_get_object_map_for_reverse_fk(self):
         om = ParentSerializerOM.get_object_map()
@@ -91,3 +104,8 @@ class TestObjectMap(DragonTestCase):
     def test_get_object_map_form_m2m(self):
         om = FooM2MSerializer.get_object_map()
         self.assertEqual(len(om), 2)
+        for m in om:
+            if m['parent_type'] == 'foom2mom':
+                self.assertEqual(m['child_type'], 'barm2mom')
+            else:
+                self.assertEqual(m['child_type'], 'foom2mom')
