@@ -87,6 +87,11 @@ class TestObjectMap(DragonTestCase):
     def test_get_object_map_for_reverse_fk(self):
         om = ParentSerializerOM.get_object_map()
         self.assertEqual(len(om), 2)
+        for m in om:
+            if m['parent_type'] == 'parentmodel':
+                self.assertEqual(m['child_type'], 'childmodel')
+            else:
+                self.assertEqual(m['child_type'], 'parentmodel')
 
     def test_get_object_map_form_m2m(self):
         om = FooM2MSerializer.get_object_map()
