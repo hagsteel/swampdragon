@@ -87,10 +87,10 @@ These settings are available  from ```window.swampdragon_settings```.
     </script>
     
     
-If you want to access the url for your SwampDragon instance from JavaScript, you can do so with ```window.swamp_dragon_host```.
+If you want to access the url for your SwampDragon instance from JavaScript, you can do so with ```window.swampdragon_host```.
 
     <script>
         // ouput http://localhost:9999 assuming you are running your server on that url
-        console.log(window.swamp_dragon_host); 
+        console.log(window.swampdragon_host); 
     </script>
     

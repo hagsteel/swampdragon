@@ -47,6 +47,13 @@ See [Documentation](http://swampdragon.net/documentation/) here
 See change logs at [swampdragon.net](http://swampdragon.net/changelog/) here
 
 
+# Contributing and running the tests
+
+Feel free to make a pull request, just make sure you write tests to cover the changes / additions you make.
+
+To run the tests install Tox and run `tox` (in the same directory as tox.ini)
+
+
 # License
 
 Copyright (c) 2014, jonas hagstedt 

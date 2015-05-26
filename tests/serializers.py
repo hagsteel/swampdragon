@@ -15,3 +15,9 @@ class BarSelfPubSerializer(ModelSerializer):
     class Meta:
         model = 'tests.BarSelfPub'
         publish_fields = ('date', 'foo', 'id')
+
+
+class BoolSelfPubSerializer(ModelSerializer):
+    class Meta:
+        model = 'tests.BoolSelfPub'
+        publish_fields = ('bool', )

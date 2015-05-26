@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name="SwampDragon",
-    version="0.4.2",
+    version="0.4.2.2",
     author="Jonas Hagstedt",
     author_email="hagstedt@gmail.com",
     description=("SwampDragon is a powerful platform making it easy to build real time web applications, combining the power of Django and Tornado"),
@@ -19,7 +19,7 @@ setup(
     include_package_data=True,
     entry_points={'console_scripts': ['dragon-admin = swampdragon.core:run', ]},
     install_requires=[
-        "Django >= 1.6, < 1.8",
+        "Django >= 1.6, < 1.9",
         "Tornado >= 3.2.2",
         "sockjs-tornado >= 1.0.0",
         "tornado-redis >= 2.4.18",
