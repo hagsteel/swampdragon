@@ -1,5 +1,8 @@
-from django.db.models.loading import get_model as get_django_model
-
+try:
+    from django.apps import apps
+    get_django_model = apps.get_model
+except ImportError:
+    from django.db.models.loading import get_model as get_django_model
 
 def get_property(obj, field):
     field = field.replace('__', '.')
