@@ -22,6 +22,10 @@ class ModelRouterGetQuerySet(BaseModelRouter):
 
 
 class TestRouteHandler(DragonTestCase):
+    def setUp(self):
+        super(TestRouteHandler, self).setUp()
+        route_handler.registered_handlers = {}
+
     def test_register_router(self):
         route_handler.register(Router)
         self.assertIsNotNone(route_handler.get_route_handler(Router.get_name()))

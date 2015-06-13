@@ -24,7 +24,6 @@ class DragonTestCase(TestCase):
         self.urls = discover_routes()
 
     def tearDown(self):
-        route_handler.registered_handlers = {}
         pub_sub._channels = []
         pub_sub._subscribers = {}
 
