@@ -197,6 +197,9 @@ class BaseModelRouter(BaseRouter):
     def get_subscription_contexts(self, **kwargs):
         return dict(kwargs)
 
+    def get_subscription_context(self, **kwargs):
+        return dict(kwargs)
+
     def send_list(self, object_list, **kwargs):
         self.send([self.serializer_class(instance=o).serialize() for o in object_list], **kwargs)
 
