@@ -75,19 +75,33 @@ def channel_match_check(channel, data):
 def properties_match_channel_by_object(obj, channel_properties):
     result = True
     for prop, val in channel_properties:
-        if not has_val(obj, prop, val) and not has_related_value(obj, prop, val):
+        obj_val = get_property(obj, remove_channel_filter(prop))
+
+        if not obj_val and not has_related_value(obj, prop, val):
             return False
+
+        channel_filter = get_channel_filter(prop)
+        if not channel_filter(val, obj_val):
+            return False
+
     return result
 
 
 def properties_match_channel_by_dict(dict, channel_properties):
     result = True
     for prop, val in channel_properties:
-        if prop not in dict:
+        clean_prop = remove_channel_filter(prop)  # Remove the channel filter
+        if clean_prop not in dict:
             return False
         val_type = type(val)
-        if not val_type(dict[prop]) == val:
+
+        if not val_type(dict[clean_prop]) == val:
             return False
+
+        channel_filter = get_channel_filter(prop)
+        if not channel_filter(val, val_type(dict[clean_prop])):
+            return False
+
     return result
 
 
@@ -103,8 +117,7 @@ def has_val(obj, prop, val):
     obj_val = get_property(obj, remove_channel_filter(prop))
     if not obj_val:
         return False
-    channel_filter = get_channel_filter(prop)
-    return channel_filter(val, obj_val)
+    return True
 
 
 def has_related_value(obj, field, channel_val):

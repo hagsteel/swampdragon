@@ -42,11 +42,14 @@ def filter_channels_by_dict(channels, dict):
     result = []
     for channel in channels:
         channel_properties = get_property_and_value_from_channel(channel)
+
         if not channel_properties:
             result.append(channel)
             continue
+
         if properties_match_channel_by_dict(dict, channel_properties):
             result.append(channel)
+
     return result
 
 
@@ -54,9 +57,11 @@ def filter_channels_by_model(channels, obj):
     result = []
     for channel in channels:
         channel_properties = get_property_and_value_from_channel(channel)
+
         if not channel_properties:
             result.append(channel)
             continue
+
         if properties_match_channel_by_object(obj, channel_properties):
             result.append(channel)
     return result
