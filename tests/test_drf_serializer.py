@@ -22,10 +22,11 @@ class TestDRFSerializer(DragonTestCase):
         super(TestDRFSerializer, self).setUp()
         route_handler.register(Router)
 
-    def test_serializer_drf_with_route_handler(self):
+    def test_drf_serializes_with_route_handler(self):
         DRFModel.objects.create(name='drf test')
         self.connection.call_verb(Router.route_name, 'get_single')
         self.assertDictEqual(self.connection.last_message['data'], {'name': 'drf test', 'id': 1})
 
     def test_deserialize_drf_with_route_handler(self):
         self.connection.call_verb(Router.route_name, 'create', name='creating')
+        self.assertTrue(DRFModel.objects.exists())
