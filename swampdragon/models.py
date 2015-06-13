@@ -80,7 +80,7 @@ class SelfPublishModel(object):
         publish_model(self, self._serializer, action, changed_fields)
 
     def save(self, *args, **kwargs):
-        if not self.pk:
+        if self._state.adding:
             self.action = PUBACTIONS.created
             self.changed_fields = None
         else:
