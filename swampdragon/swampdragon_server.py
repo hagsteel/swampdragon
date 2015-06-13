@@ -1,6 +1,9 @@
 import django
 from django.conf import settings
-from django.utils.importlib import import_module
+try:
+    from importlib import import_module
+except ImportError:
+    from django.utils.importlib import import_module
 from tornado import web, ioloop
 from sockjs.tornado import SockJSRouter
 from swampdragon import discover_routes, load_field_deserializers, VERSION
