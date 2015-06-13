@@ -10,6 +10,9 @@ class Company(SelfPublishModel, models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'Companies'
+
 
 class CompanyOwner(SelfPublishModel, models.Model):
     name = models.CharField(max_length=100)
@@ -28,11 +31,14 @@ class Staff(SelfPublishModel, models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'Staff'
+
 
 class Document(SelfPublishModel, models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    staff = models.ManyToManyField(Staff, related_name='documents', null=True, blank=True)
+    staff = models.ManyToManyField(Staff, related_name='documents')
     serializer_class = DocumentSerializer
 
     def __str__(self):
