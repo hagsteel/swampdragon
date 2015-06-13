@@ -125,7 +125,16 @@ This is useful in scenarios where you would make, for instance, a chat with mult
 
 
 When subscribing to a ModelRouter it will, by default, subscribe to all changes to that model.
-Use the ```get_subscription_channels``` to filter the models.
+Use the ```get_subscription_context``` to filter the models.
+
+Example: The following example would only publish changes to a model where the value is less than 100. 
+
+    class FooModelRouter(ModelRouter):
+        ...
+        def get_subscription_context(self, **kwargs):
+            return {value__lt: 100}
+            
+
 
 To subscribe to a model including changes to related models use ```include_related```.
 
