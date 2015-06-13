@@ -33,7 +33,7 @@ function setupChannels(channelSetup) {
     var remoteChannels = channelSetup.remote_channels || [],
         remoteChannelCount = channelSetup.remote_channels.length,
         i;
-    
+
     for (i = 0; i < remoteChannelCount; i += 1) {
         if (channelSetup.action === CHANNEL_DATA_SUBSCRIBE) {
             addRemoteChannel(remoteChannels[i], channelSetup.local_channel);
