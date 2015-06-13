@@ -76,7 +76,8 @@ def get_object_map(serializer, ignore_serializer_pairs=None):
             else:
                 model = field_type.related.model
             is_collection = True
-            attname = field_type.related.field.name
+            # attname = field_type.related.field.name
+            attname = field_type.related.field.get_attname()
 
         if is_m2m:
             # Django 1.8:
@@ -104,11 +105,11 @@ def get_object_map(serializer, ignore_serializer_pairs=None):
 
         graph.append(
             _construct_graph(
-                serializer_instance.opts.model._meta.model_name,
-                model._meta.model_name,
-                attname,
-                is_collection,
-                field_name
+                parent_type=serializer_instance.opts.model._meta.model_name,
+                child_type=model._meta.model_name,
+                via=attname,
+                is_collection=is_collection,
+                property_name=field_name
             )
         )
         ignore_serializer_pairs.append((serializer, related_serializer))
