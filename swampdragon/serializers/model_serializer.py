@@ -46,7 +46,7 @@ class ModelSerializer(Serializer):
             raise Exception('data needs to be a dictionary')
         self.opts = ModelSerializerMeta(self.Meta)
         self._instance = instance
-        self.data = data
+        self._data = data
         self.initial = initial or {}
         self.base_fields = self._get_base_fields()
         self.m2m_fields = self._get_m2m_fields()
@@ -81,11 +81,11 @@ class ModelSerializer(Serializer):
             setattr(self.instance, key, val)
 
         # Deserialize base fields
-        for key, val in self.data.items():
+        for key, val in self._data.items():
             if key not in self.opts.update_fields or key not in self.base_fields:
                 continue
             try:
-                self.validate_field(key, val, self.data)
+                self.validate_field(key, val, self._data)
                 self._deserialize_field(key, val)
             except ModelValidationError as err:
                 self.errors.update(err.get_error_dict())
@@ -106,13 +106,13 @@ class ModelSerializer(Serializer):
         self.instance.save()
 
         # Serialize related fields
-        for key, val in self.data.items():
+        for key, val in self._data.items():
             if key not in self.related_fields:
                 continue
             self._deserialize_related(key, val)
 
         # Serialize m2m fields
-        for key, val in self.data.items():
+        for key, val in self._data.items():
             if key not in self.m2m_fields:
                 continue
             self._deserialize_related(key, val, save_instance=True)
