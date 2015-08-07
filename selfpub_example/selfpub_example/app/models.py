@@ -9,6 +9,9 @@ class Company(SelfPublishModel, models.Model):
 
     def __str__(self):
         return self.name
+        
+    class Meta:
+        verbose_name_plural = "companies"
 
 
 class CompanyOwner(SelfPublishModel, models.Model):
@@ -27,6 +30,9 @@ class Staff(SelfPublishModel, models.Model):
 
     def __str__(self):
         return self.name
+        
+    class Meta:
+        verbose_name_plural = "staff"
 
 
 class Document(SelfPublishModel, models.Model):
