@@ -28,7 +28,7 @@ def run_server(host_port=None):
     if hasattr(django, 'setup'):
         django.setup()
 
-    HOST = getattr(settings, 'SWAMP_DRAGON_HOST', '127.0.0.1')
+    HOST = getattr(settings, 'SWAMP_DRAGON_HOST', 'localhost')
     PORT = getattr(settings, 'SWAMP_DRAGON_PORT', 9999)
 
     if host_port is not None:
