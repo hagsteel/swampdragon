@@ -1,6 +1,6 @@
 from .redis_session_store import RedisSessionStore
 from django.conf import settings
-from django.utils.importlib import import_module
+from importlib import import_module
 
 
 session_store = None

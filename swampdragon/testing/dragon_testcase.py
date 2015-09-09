@@ -6,7 +6,7 @@ from swampdragon.pubsub_providers.subscriber_factory import get_subscription_pro
 from swampdragon.connections.mock_connection import TestConnection
 from django.test import TestCase
 from django.conf import settings
-from django.utils.importlib import import_module
+from importlib import import_module
 from sockjs.tornado import SockJSRouter
 from tornado import web
 from swampdragon.settings_provider import SettingsHandler
