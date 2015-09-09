@@ -1,5 +1,9 @@
+import django
 from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor, SingleRelatedObjectDescriptor, \
     ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor
+
+
+DJANGO_VERSION_BEFORE_1_8 = django.VERSION[:2] < (1, 8)
 
 
 def _construct_graph(parent_type, child_type, via, is_collection, property_name):
@@ -38,70 +42,51 @@ def get_object_map(serializer, ignore_serializer_pairs=None):
             continue
 
         field_type = getattr(serializer_instance.opts.model, field_name)
-        is_fk = isinstance(field_type, ReverseSingleRelatedObjectDescriptor)
-        is_o2o = isinstance(field_type, SingleRelatedObjectDescriptor)
-        is_reverse_fk = isinstance(field_type, ForeignRelatedObjectsDescriptor)
-        is_m2m = isinstance(field_type, ManyRelatedObjectsDescriptor)
-        is_reverse_m2m = isinstance(field_type, ReverseManyRelatedObjectsDescriptor)
 
-        if is_fk:
-            # Django 1.8:
-            # the related.parent_model is related.model in Django 1.8
-            if hasattr(field_type.field.related, 'parent_model'):
-                model = field_type.field.related.parent_model
-            else:
-                model = field_type.field.related.model
+        if isinstance(field_type, ReverseSingleRelatedObjectDescriptor):
+            # fk
             is_collection = False
-
-            if hasattr(field_type.field.related, 'var_name'):
+            if DJANGO_VERSION_BEFORE_1_8:
+                model = field_type.field.related.parent_model
                 attname = field_type.field.related.var_name
             else:
+                model = field_type.field.related.model
                 attname = field_type.field.rel.name
-
-        if is_o2o:
-            # Django 1.8:
-            # the related.model is related.related_model in Django 1.8
-            if hasattr(field_type.related, 'related_model'):
-                model = field_type.related.related_model
-            else:
-                model = field_type.related.model
+        elif isinstance(field_type, SingleRelatedObjectDescriptor):
+            # o2o
             is_collection = False
-            attname = field_type.related.field.name
-
-        if is_reverse_fk:
-            # Django 1.8:
-            # the related.model is related.related_model in Django 1.8
-            if hasattr(field_type.related, 'related_model'):
-                model = field_type.related.related_model
-            else:
+            if DJANGO_VERSION_BEFORE_1_8:
                 model = field_type.related.model
+            else:
+                model = field_type.related.related_model
+            attname = field_type.related.field.name
+        elif isinstance(field_type, ForeignRelatedObjectsDescriptor):
+            # reverse fk
             is_collection = True
-            # attname = field_type.related.field.name
+            if DJANGO_VERSION_BEFORE_1_8:
+                model = field_type.related.model
+            else:
+                model = field_type.related.related_model
             attname = field_type.related.field.get_attname()
-
-        if is_m2m:
-            # Django 1.8:
-            # the related.model is related.related_model in Django 1.8
-            if hasattr(field_type.related, 'related_model'):
-                model = field_type.related.related_model
-            else:
+        elif isinstance(field_type, ManyRelatedObjectsDescriptor):
+            # m2m
+            is_collection = True
+            if DJANGO_VERSION_BEFORE_1_8:
                 model = field_type.related.model
-            is_collection = True
-            attname = field_type.related.field.name
-
-        if is_reverse_m2m:
-            # Django 1.8:
-            # the related.parent_model is related.model in Django 1.8
-            if hasattr(field_type.field.related, 'parent_model'):
-                model = field_type.field.related.parent_model
             else:
-                model = field_type.field.related.model
+                model = field_type.related.related_model
+            attname = field_type.related.field.name
+        elif isinstance(field_type, ReverseManyRelatedObjectsDescriptor):
+            # reverse m2m
             is_collection = True
-
-            if hasattr(field_type.field.related, 'var_name'):
+            if DJANGO_VERSION_BEFORE_1_8:
+                model = field_type.field.related.parent_model
                 attname = field_type.field.related.var_name
             else:
+                model = field_type.field.related.model
                 attname = field_type.field.rel.name
+        else:
+            raise Exception('Unhandled field type: %r' % field_type)
 
         graph.append(
             _construct_graph(
