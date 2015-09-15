@@ -85,9 +85,9 @@ class SubscriberConnection(ConnectionMixin, SockJSConnection):
                 return
             handler = route_handler.get_route_handler(data['route'])
             handler(self).handle(data)
-        except Exception as e:
+        except Exception:
             self.abort_connection()
-            raise e
+            raise
 
     def abort_connection(self):
         self.close(code=3001, message='Connection aborted')
