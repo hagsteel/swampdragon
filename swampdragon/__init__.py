@@ -8,7 +8,11 @@ def discover_routes():
     Returns urls for each route handler
     """
     from django.conf import settings
-    from django.utils.importlib import import_module
+    try:
+        from importlib import import_module
+    except ImportError:
+        from django.utils.importlib import import_module
+
     imported_routers = []
     urls = []
     for app in settings.INSTALLED_APPS:
@@ -27,7 +31,11 @@ def discover_routes():
 
 def load_field_deserializers():
     from django.conf import settings
-    from django.utils.importlib import import_module
+    try:
+        from importlib import import_module
+    except ImportError:
+        from django.utils.importlib import import_module
+
     imported_deserializers = []
     for app in settings.INSTALLED_APPS:
         try:
