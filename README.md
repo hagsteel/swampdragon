@@ -3,8 +3,8 @@
 ## Help needed, and the future of SwampDragon
 
 SwampDragon has a lot of dependencies, and is heavily dependent on Django.
-Going forward I have decided that this needs to be fixed.
 One of the libs that SwampDragon is dependant on is [https://github.com/leporo/tornado-redis](https://github.com/leporo/tornado-redis), and this project looks like it might no longer be maintained (I believe Leporo has done a great job with this library and I understand that he may no longer have time to maintain it)
+Going forward I have decided that this needs a solution.
 
 So the current plan for SwampDragon is this:
 
