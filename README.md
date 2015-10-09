@@ -1,5 +1,32 @@
 # SwampDragon
 
+## Help needed, and the future of SwampDragon
+
+SwampDragon has a lot of dependencies, and is heavily dependent on Django.
+Going forward I have decided that this needs to be fixed.
+One of the libs that SwampDragon is dependant on is [https://github.com/leporo/tornado-redis](https://github.com/leporo/tornado-redis), and this project looks like it might no longer be maintained (I believe Leporo has done a great job with this library and I understand that he may no longer have time to maintain it)
+
+So the current plan for SwampDragon is this:
+
+*  Remove as many external dependencies as possible
+*  Make it work with other frameworks like Flask etc. (i.e remove Django as a required dependency)
+*  Better testing 
+*  More code coverage
+*  Swappable serializer (it should be possible to use 3rd party serializers like that of DRF)
+*  SelfPublishModel needs rewriting and should be a separate module
+*  ... and much more
+*  Proper contribution guidelines
+  
+### How to get there
+
+This is a big job and help is required to get there.
+Anything from writing code and tests to reviewing PRs etc. would be appreciated.
+
+If you are interested in helping out let me know.
+
+General conversations about this can be found here: [https://github.com/jonashagstedt/swampdragon/issues/161](https://github.com/jonashagstedt/swampdragon/issues/161)
+
+---
 
 [![Downloads](https://pypip.in/download/SwampDragon/badge.svg?style=flat&?period=month)](https://pypi.python.org/pypi/SwampDragon/)
 [![PyVersion](https://pypip.in/py_versions/SwampDragon/badge.svg?style=flat&)](https://pypi.python.org/pypi/SwampDragon/)
