@@ -138,7 +138,7 @@ class BaseRouter(object):
     def publish(self, channels, publish_data):
         for channel in channels:
             publish_data['channel'] = channel
-            publisher.publish(channel, publish_data)
+            self.connection.pub_sub.publish(channel, publish_data)
 
 
 class BaseModelRouter(BaseRouter):
