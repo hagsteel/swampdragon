@@ -8,22 +8,22 @@ class CompanyOwnerSerializer(ModelSerializer):
 
 class CompanySerializer(ModelSerializer):
     companyowner = CompanyOwnerSerializer
-    staff = 'app.StaffSerializer'
+    staff = 'StaffSerializer'
 
     class Meta:
         model = 'app.Company'
         publish_fields = ('name', 'staff', 'companyowner')
-        update_fields = ('name', )
-
-
-class StaffSerializer(ModelSerializer):
-    documents = 'app.DocumentSerializer'
-
-    class Meta:
-        model = 'app.Staff'
-        publish_fields = ('name', 'documents', 'company')
+        update_fields = ('name',)
 
 
 class DocumentSerializer(ModelSerializer):
     class Meta:
         model = 'app.Document'
+
+
+class StaffSerializer(ModelSerializer):
+    documents = 'DocumentSerializer'
+
+    class Meta:
+        model = 'app.Staff'
+        publish_fields = ('name', 'documents', 'company')

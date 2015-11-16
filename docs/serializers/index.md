@@ -65,7 +65,7 @@ If a property containing a serializer with the same name as the function (minus 
 To include related data in a serializer, the related model need a serializer of it own.
 
     class FooSerializer(ModelSerializer):
-        baz_set = 'app.BazSerializer'
+        baz_set = 'BazSerializer'
     
         class Meta:
             model = 'app.FooModel'
@@ -88,13 +88,6 @@ Full path to serializer
     
     class Serializer(ModelSerializer):
         related = OtherSerializer
-
-
-\['app'\].\['serializer'\]. 
-
-
-    class Serializer(ModelSerializer):
-        related = 'app.OtherSerializer'
 
 
 \['serializer'\] (if the serializer is in the same .py file)
