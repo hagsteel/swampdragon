@@ -19,7 +19,7 @@ setup(
     include_package_data=True,
     entry_points={'console_scripts': ['dragon-admin = swampdragon.core:run', ]},
     install_requires=[
-        "Django >= 1.6, < 1.9",
+        "Django>=1.6,<1.9",
         "Tornado >= 3.2.2",
         "sockjs-tornado >= 1.0.0",
         "tornado-redis >= 2.4.18",
