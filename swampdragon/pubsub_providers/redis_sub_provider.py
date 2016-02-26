@@ -2,7 +2,7 @@ import json
 import tornadoredis.pubsub
 import tornadoredis
 from .base_provider import BaseProvider
-from .redis_settings import get_redis_host, get_redis_port, get_redis_db
+from .redis_settings import get_redis_host, get_redis_port, get_redis_db, get_redis_password
 
 
 class RedisSubProvider(BaseProvider):
@@ -10,6 +10,7 @@ class RedisSubProvider(BaseProvider):
         self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client(
             host=get_redis_host(),
             port=get_redis_port(),
+            password=get_redis_password(),
             selected_db=get_redis_db()
         ))
 
