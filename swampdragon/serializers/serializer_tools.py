@@ -1,7 +1,21 @@
 from collections import namedtuple
-from django.db.models.fields.related import ForeignKey, ReverseSingleRelatedObjectDescriptor, \
-    ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor, ForeignRelatedObjectsDescriptor, \
-    SingleRelatedObjectDescriptor
+from django.db.models.fields.related import ForeignKey
+try:
+    # bis 1.8.x
+    from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
+    from django.db.models.fields.related import ManyRelatedObjectsDescriptor
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+    from django.db.models.fields.related import SingleRelatedObjectDescriptor
+    pre19syntax = True
+except:
+    # ab 1.9.0
+    from django.db.models.fields.related import ForwardManyToOneDescriptor
+    from django.db.models.fields.related import ManyToManyDescriptor
+    from django.db.models.fields.related import ReverseManyToOneDescriptor
+    from django.db.models.fields.related import ReverseOneToOneDescriptor
+    pre19syntax = False
+
 # from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.fields.related import ManyToManyField
@@ -73,11 +87,18 @@ def get_id_mappings(serializer):
             continue
 
         field_type = getattr(serializer.opts.model, field_name)
-        is_fk = isinstance(field_type, ReverseSingleRelatedObjectDescriptor)
-        is_o2o = isinstance(field_type, SingleRelatedObjectDescriptor)
-        is_reverse_fk = isinstance(field_type, ForeignRelatedObjectsDescriptor)
-        is_m2m = isinstance(field_type, ManyRelatedObjectsDescriptor)
-        is_reverse_m2m = isinstance(field_type, ReverseManyRelatedObjectsDescriptor)
+        if pre19syntax:
+            is_fk = isinstance(field_type, ReverseSingleRelatedObjectDescriptor)
+            is_o2o = isinstance(field_type, SingleRelatedObjectDescriptor)
+            is_reverse_fk = isinstance(field_type, ForeignRelatedObjectsDescriptor)
+            is_m2m = isinstance(field_type, ManyRelatedObjectsDescriptor)
+            is_reverse_m2m = isinstance(field_type, ReverseManyRelatedObjectsDescriptor)
+        else:
+            is_fk = isinstance(field_type, ForwardManyToOneDescriptor)
+            is_o2o = isinstance(field_type, ReverseOneToOneDescriptor)
+            is_reverse_fk = isinstance(field_type, ReverseManyToOneDescriptor)
+            is_m2m = isinstance(field_type, ManyToManyDescriptor) and not field_type.reverse
+            is_reverse_m2m = isinstance(field_type, ManyToManyDescriptor) and field_type.reverse
 
         try:
             val = getattr(serializer.instance, field_name)
