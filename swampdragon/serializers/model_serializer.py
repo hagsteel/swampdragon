@@ -1,6 +1,20 @@
 from django.core.exceptions import ValidationError
-from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor, ForeignRelatedObjectsDescriptor, \
-    ReverseManyRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor
+try:
+    # bis 1.8.x
+    from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
+    from django.db.models.fields.related import ManyRelatedObjectsDescriptor
+    from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+    from django.db.models.fields.related import SingleRelatedObjectDescriptor
+    pre19syntax = True
+except:
+    # ab 1.9.0
+    from django.db.models.fields.related import ForwardManyToOneDescriptor
+    from django.db.models.fields.related import ManyToManyDescriptor
+    from django.db.models.fields.related import ReverseManyToOneDescriptor
+    from django.db.models.fields.related import ReverseOneToOneDescriptor
+    pre19syntax = False
+ 
 from swampdragon.model_tools import get_property, get_model
 from swampdragon.serializers.field_serializers import serialize_field
 from swampdragon.serializers.object_map import get_object_map
@@ -204,19 +218,30 @@ class ModelSerializer(Serializer):
         elif hasattr(self.opts.model, attr_name):
             # Check if the field is a relation of any kind
             field_type = getattr(self.opts.model, attr_name)
-            # Reverse FK
-            if isinstance(field_type, ReverseSingleRelatedObjectDescriptor):
-                rel = get_property(self.instance, attr_name)
-                if rel:
-                    val = rel.pk
-            # FK
-            elif isinstance(field_type, ForeignRelatedObjectsDescriptor):
-                val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
-            elif isinstance(field_type, ReverseManyRelatedObjectsDescriptor):
-                val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
-            elif isinstance(field_type, ManyRelatedObjectsDescriptor):
-                val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
-
+            if pre19syntax:
+                # Reverse FK
+                if isinstance(field_type, ReverseSingleRelatedObjectDescriptor):
+                    rel = get_property(self.instance, attr_name)
+                    if rel:
+                        val = rel.pk
+                # FK
+                elif isinstance(field_type, ForeignRelatedObjectsDescriptor):
+                    val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
+                elif isinstance(field_type, ReverseManyRelatedObjectsDescriptor):
+                    val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
+                elif isinstance(field_type, ManyRelatedObjectsDescriptor):
+                    val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
+            else:
+                if isinstance(field_type, ForwardManyToOneDescriptor):
+                    rel = get_property(self.instance, attr_name)
+                    if rel:
+                        val = rel.pk
+                elif isinstance(field_type, ReverseManyToOneDescriptor):
+                    val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
+                elif isinstance(field_type, ManyToManyDescriptor) and field_type.reverse:
+                    al = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
+                elif isinstance(field_type, ManyToManyDescriptor) and not field_type.reverse:
+                    val = list(get_property(self.instance, attr_name).all().values_list('pk', flat=True))
         # Serialize the field
         return serialize_field(val)
 
