@@ -5,6 +5,30 @@ from datetime import datetime
 from django.db import models
 
 
+# to make sure none of the ModelSerializer variables are clobbering the data
+MODEL_KEYWORDS = ('data', )
+# TODO: support the rest of these field names
+# MODEL_KEYWORDS = ('data', 'opts', 'initial', 'base_fields', 'm2m_fields', 'related_fields', 'errors')
+
+
+class KeywordModel(SDModel):
+    data = models.TextField()
+    # TODO: support the rest of these field names
+    # opts = models.TextField()
+    # initial = models.TextField()
+    # base_fields = models.TextField()
+    # m2m_fields = models.TextField()
+    # related_fields = models.TextField()
+    # errors = models.TextField()
+
+
+class KeywordModelSerializer(ModelSerializer):
+    class Meta:
+        model = KeywordModel
+        publish_fields = MODEL_KEYWORDS
+        update_fields = MODEL_KEYWORDS
+
+
 class DateModel(SDModel):
     date = models.DateTimeField()
 
@@ -47,3 +71,10 @@ class TestModelSerializer(DragonTestCase):
         serializer = DateModelSerializer(data)
         object = serializer.save()
         self.assertEqual(object.date, date)
+
+    def test_deserialize_keyword_field(self):
+        data = dict(zip(MODEL_KEYWORDS, MODEL_KEYWORDS))
+        serializer = KeywordModelSerializer(data)
+        object = serializer.save()
+        for attr in MODEL_KEYWORDS:
+            self.assertEqual(getattr(object, attr), attr)
