@@ -1,5 +1,11 @@
 # SwampDragon
 
+# Looking for someone to take over
+
+I no longer have time to support this project, so I am looking for someone to take over.
+Please raise an issue in the issue tracker if you are interested in taking over the maintenance of SwampDragon.
+
+
 ## Help needed, and the future of SwampDragon
 
 SwampDragon has a lot of dependencies, and is heavily dependent on Django.
