@@ -2,17 +2,25 @@ import json
 import tornadoredis.pubsub
 import tornadoredis
 from .base_provider import BaseProvider
-from .redis_settings import get_redis_host, get_redis_port, get_redis_db, get_redis_password
-
+from .redis_settings import get_redis_host, get_redis_port, get_redis_db, get_redis_password, get_redis_socket
 
 class RedisSubProvider(BaseProvider):
     def __init__(self):
-        self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client(
-            host=get_redis_host(),
-            port=get_redis_port(),
-            password=get_redis_password(),
-            selected_db=get_redis_db()
-        ))
+        socket = get_redis_socket()
+        if socket is not None:
+            self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client(
+                unix_socket_path=socket,
+                port=get_redis_port(),
+                password=get_redis_password(),
+                selected_db=get_redis_db()
+            ))
+        else:
+            self._subscriber = tornadoredis.pubsub.SockJSSubscriber(tornadoredis.Client(
+                host=get_redis_host(),
+                port=get_redis_port(),
+                password=get_redis_password(),
+                selected_db=get_redis_db()
+            ))
 
     def close(self, broadcaster):
         for channel in self._subscriber.subscribers:
