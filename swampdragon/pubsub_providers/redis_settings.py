@@ -4,7 +4,7 @@ redis_host = None
 redis_port = None
 redis_db = None
 redis_password = None
-
+redis_socket = None
 
 def get_redis_host():
     global redis_host
@@ -32,3 +32,9 @@ def get_redis_password():
     if not redis_password:
         redis_password = getattr(settings, 'SWAMP_DRAGON_REDIS_PASSWORD', None)
     return redis_password
+
+def get_redis_socket():
+    global redis_socket
+    if not redis_socket:
+        redis_socket = getattr(settings, 'SWAMP_DRAGON_REDIS_SOCKET', None)
+    return redis_socket
